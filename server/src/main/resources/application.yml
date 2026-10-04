@@ -1,0 +1,56 @@
+# ArchFlux server configuration.
+# DDL lives exclusively in db/ (manual psql). Hibernate NEVER creates schema.
+server:
+  port: ${PORT:3001}
+
+spring:
+  main:
+    # Degraded boot: stay up (health + typed 503/500 JSON) even when tables are
+    # absent. JPA/Hibernate boots lazily on first DB touch; every service entry
+    # point guards via SchemaReadinessService (to_regclass check) first.
+    lazy-initialization: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+  datasource:
+    # Primary: SPRING_DATASOURCE_URL/USERNAME/PASSWORD (relaxed binding).
+    # Fallback: DATABASE_URL (postgresql://...) converted by
+    # DatabaseUrlEnvironmentPostProcessor. Dev default: local postgres.
+    url: ${SPRING_DATASOURCE_URL:}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      # Never crash boot because the DB is down/absent; /ready reports 503.
+      initialization-fail-timeout: 0
+      connection-timeout: 3000
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    # Repository proxies (and therefore the EMF) must not initialize at
+    # startup: degraded boot has to survive a missing schema.
+    repositories:
+      bootstrap-mode: lazy
+    properties:
+      hibernate:
+        timezone:
+          default_storage: NORMALIZE_UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+app:
+  # Primary token env: APP_API_TOKEN. Fallback: API_TOKEN (compose). Blank here
+  # means "unset" — code applies the non-prod default (and logs that a default
+  # is in use, never the value) or fails fast when profile=prod.
+  api-token: ${APP_API_TOKEN:${API_TOKEN:}}
+
+logging:
+  level:
+    com.archflux: INFO
+    org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator: WARN

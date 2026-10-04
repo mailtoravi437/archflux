@@ -1,0 +1,25 @@
+# Test configuration - disables Flyway since Testcontainers manages schema
+spring:
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  datasource:
+    url: jdbc:tc:postgresql:17:///test
+    username: test
+    password: test
+    hikari:
+      initialization-fail-timeout: 0
+      connection-timeout: 3000
+      maximum-pool-size: 10
+
+app:
+  api-token: test-token
+
+logging:
+  level:
+    com.archflux: DEBUG
+    org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator: WARN
+    org.springframework.test: DEBUG

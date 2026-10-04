@@ -1,0 +1,11 @@
+# Local-dev conveniences (Agent C). Auto-merged by `docker compose` on top of
+# compose.yml. Prod bring-up MUST skip it: docker compose -f compose.yml up -d --build
+services:
+  db:
+    # Expose postgres to the host so `npm run dev` can use a direct connection
+    # (local dev runs the UI + API on the host, only postgres in Docker).
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+  server:
+    environment:
+      NODE_ENV: development

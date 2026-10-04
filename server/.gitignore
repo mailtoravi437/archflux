@@ -1,0 +1,12 @@
+# Java build artifacts
+target/
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
