@@ -27,10 +27,26 @@ public class User {
   @Column(name = "role", nullable = false)
   private String role = "member";
 
+  // OAuth2 fields
+  @Column(name = "provider")
+  private String provider;
+
+  @Column(name = "provider_id")
+  private String providerId;
+
+  @Column(name = "avatar_url")
+  private String avatarUrl;
+
+  @Column(name = "access_token", columnDefinition = "TEXT")
+  private String accessToken;
+
+  @Column(name = "last_login_at")
+  private java.time.Instant lastLoginAt;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
-  protected User() {
+  public User() {
   }
 
   public User(UUID id, String email, String name, String role) {
@@ -80,6 +96,46 @@ public class User {
 
   public void setRole(String role) {
     this.role = role;
+  }
+
+  public String getProvider() {
+    return provider;
+  }
+
+  public void setProvider(String provider) {
+    this.provider = provider;
+  }
+
+  public String getProviderId() {
+    return providerId;
+  }
+
+  public void setProviderId(String providerId) {
+    this.providerId = providerId;
+  }
+
+  public String getAvatarUrl() {
+    return avatarUrl;
+  }
+
+  public void setAvatarUrl(String avatarUrl) {
+    this.avatarUrl = avatarUrl;
+  }
+
+  public String getAccessToken() {
+    return accessToken;
+  }
+
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  public java.time.Instant getLastLoginAt() {
+    return lastLoginAt;
+  }
+
+  public void setLastLoginAt(java.time.Instant lastLoginAt) {
+    this.lastLoginAt = lastLoginAt;
   }
 
   public Instant getCreatedAt() {

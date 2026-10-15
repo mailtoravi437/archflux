@@ -44,7 +44,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F7F7F5', padding: 24 }}>
         <div style={{ maxWidth: 520, background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: 28 }}>
-          <h1 style={{ fontSize: 20, color: '#1F2937', margin: '0 0 8px' }}>Something broke on the canvas</h1>
+          <h1 data-testid="error-boundary-title" style={{ fontSize: 20, color: '#1F2937', margin: '0 0 8px' }}>Something broke on the canvas</h1>
           <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 12px' }}>
             ArchFlux hit an unexpected error. Your diagrams are stored locally — try reloading first. If it persists,
             reset local data (exports you downloaded are unaffected).
@@ -53,7 +53,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             {details}
           </pre>
           <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-            <button type="button" className="btn btn-primary" onClick={this.reloadCanvas}>
+            <button type="button" data-testid="error-boundary-reload" className="btn btn-primary" onClick={this.reloadCanvas}>
               Reload Canvas
             </button>
             <button type="button" className="btn" onClick={this.loadSafeDefault} title="Stashes the broken graph to archflux:corrupt-backup and loads the sample mesh">

@@ -48,6 +48,14 @@ public class Diagram {
   @Column(name = "graph", nullable = false, columnDefinition = "jsonb")
   private String graph = "{}";
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parent_diagram_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  private Diagram parentDiagram;
+
+  @Column(name = "branch_name", nullable = false)
+  private String branchName = "main";
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
@@ -75,6 +83,9 @@ public class Diagram {
     }
     if (graph == null) {
       graph = "{}";
+    }
+    if (branchName == null || branchName.isBlank()) {
+      branchName = "main";
     }
   }
 
@@ -129,6 +140,31 @@ public class Diagram {
 
   public void setGraph(String graph) {
     this.graph = graph;
+  }
+
+  public Diagram getParentDiagram() {
+    return parentDiagram;
+  }
+
+  public void setParentDiagram(Diagram parentDiagram) {
+    this.parentDiagram = parentDiagram;
+  }
+
+  public UUID parentDiagramId() {
+    try {
+      if (parentDiagram == null) return null;
+      return parentDiagram.getId();
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  public String getBranchName() {
+    return branchName;
+  }
+
+  public void setBranchName(String branchName) {
+    this.branchName = (branchName == null || branchName.isBlank()) ? "main" : branchName;
   }
 
   public Instant getCreatedAt() {

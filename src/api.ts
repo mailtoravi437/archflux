@@ -80,13 +80,29 @@ export const api = {
     request<any>(`/v1/export?diagramId=${id}`),
 
   // Checkpoints
-  listCheckpoints: (diagramId: string) =>
-    request<{ data: any[] }>(`/v1/diagrams/${diagramId}/checkpoints`),
+  listCheckpoints: (diagramId: string, branch?: string) =>
+    request<{ data: any[] }>(`/v1/diagrams/${diagramId}/checkpoints${branch ? `?branch=${encodeURIComponent(branch)}` : ''}`),
 
-  createCheckpoint: (diagramId: string, title: string, meta?: string) =>
+  createCheckpoint: (diagramId: string, title: string, meta?: string, branch?: string) =>
     request<{ data: any }>(`/v1/diagrams/${diagramId}/checkpoints`, {
       method: 'POST',
-      body: JSON.stringify({ title, meta }),
+      body: JSON.stringify({ title, meta, branch }),
+    }),
+
+  restoreCheckpoint: (diagramId: string, checkpointId: string) =>
+    request<{ data: any }>(`/v1/diagrams/${diagramId}/checkpoints/${checkpointId}/restore`, {
+      method: 'POST',
+    }),
+
+  deleteCheckpoint: (diagramId: string, checkpointId: string) =>
+    request<void>(`/v1/diagrams/${diagramId}/checkpoints/${checkpointId}`, {
+      method: 'DELETE',
+    }),
+
+  createBranch: (diagramId: string, title: string, branchName?: string) =>
+    request<{ data: any }>(`/v1/diagrams/${diagramId}/branches`, {
+      method: 'POST',
+      body: JSON.stringify({ title, branchName }),
     }),
 
   // Threads/Replies
@@ -127,15 +143,48 @@ export const api = {
 };
 
 // Offline queue for mutations
+const QUEUE_STORAGE_KEY = 'archflux:mutation-queue:v1';
+
 interface QueuedMutation {
   path: string;
   options: RequestInit;
   resolve: (v: any) => void;
   reject: (e: Error) => void;
   retries: number;
+  timestamp: number;
 }
 
-const mutationQueue: QueuedMutation[] = [];
+function loadQueue(): QueuedMutation[] {
+  try {
+    const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((item: any) => ({
+      ...item,
+      options: {
+        ...item.options,
+        headers: item.options.headers,
+        body: item.options.body,
+      },
+      resolve: () => {},
+      reject: () => {},
+    }));
+  } catch {
+    return [];
+  }
+}
+
+function saveQueue(queue: QueuedMutation[]) {
+  try {
+    const serializable = queue.map(({ resolve, reject, ...rest }) => rest);
+    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(serializable));
+  } catch {
+    /* quota ignore */
+  }
+}
+
+let mutationQueue: QueuedMutation[] = loadQueue();
 let isProcessingQueue = false;
 
 async function processQueue() {
@@ -165,15 +214,23 @@ async function processQueue() {
         item.reject(e as Error);
       }
     }
+    saveQueue(mutationQueue);
   }
   isProcessingQueue = false;
 }
 
 window.addEventListener('online', processQueue);
 
+// Process any persisted mutations on load
+if (mutationQueue.length > 0) {
+  processQueue();
+}
+
 export function queueMutation(path: string, options: RequestInit): Promise<any> {
   return new Promise((resolve, reject) => {
-    mutationQueue.push({ path, options, resolve, reject, retries: 3 });
+    const item: QueuedMutation = { path, options, resolve, reject, retries: 3, timestamp: Date.now() };
+    mutationQueue.push(item);
+    saveQueue(mutationQueue);
     processQueue();
   });
 }

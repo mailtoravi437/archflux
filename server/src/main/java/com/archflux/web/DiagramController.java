@@ -19,6 +19,7 @@ import com.archflux.security.RequestUser;
 import com.archflux.service.CheckpointService;
 import com.archflux.service.DiagramService;
 import com.archflux.service.ThreadService;
+import com.archflux.web.dto.BranchCreateRequest;
 import com.archflux.web.dto.CheckpointCreateRequest;
 import com.archflux.web.dto.DiagramCreateRequest;
 import com.archflux.web.dto.DiagramUpdateRequest;
@@ -26,9 +27,17 @@ import com.archflux.web.dto.ReplyCreateRequest;
 import com.archflux.web.dto.ThreadCreateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/diagrams")
+@Tag(name = "Diagrams", description = "Architecture diagram management - CRUD, checkpoints, threads, and replies")
 public class DiagramController {
 
   private final DiagramService diagrams;
@@ -42,11 +51,18 @@ public class DiagramController {
     this.threads = threads;
   }
 
+  @Operation(summary = "List diagrams", description = "Paginated list of diagrams owned by the current user")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successful response"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+    @ApiResponse(responseCode = "403", description = "Forbidden")
+  })
   @GetMapping
-  public Map<String, Object> list(HttpServletRequest request,
-      @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "20") int limit,
-      @RequestParam(required = false) String q) {
+  public Map<String, Object> list(
+      @Parameter(description = "Page number (1-based)") @RequestParam(defaultValue = "1") int page,
+      @Parameter(description = "Items per page (max 100)") @RequestParam(defaultValue = "20") int limit,
+      @Parameter(description = "Search query") @RequestParam(required = false) String q,
+      HttpServletRequest request) {
     int safeLimit = limit <= 0 ? DiagramService.DEFAULT_LIMIT : Math.min(limit, DiagramService.MAX_LIMIT);
     int safePage = Math.max(page, 1);
     DiagramService.PageResult<Map<String, Object>> result =
@@ -59,6 +75,12 @@ public class DiagramController {
     return out;
   }
 
+  @Operation(summary = "Create diagram", description = "Create a new architecture diagram")
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Diagram created"),
+    @ApiResponse(responseCode = "400", description = "Invalid request"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
   @PostMapping
   public ResponseEntity<Map<String, Object>> create(HttpServletRequest request,
       @Valid @RequestBody DiagramCreateRequest body) {
@@ -68,8 +90,16 @@ public class DiagramController {
     return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("data", created));
   }
 
+  @Operation(summary = "Get diagram", description = "Get a single diagram by ID")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Diagram found"),
+    @ApiResponse(responseCode = "404", description = "Diagram not found"),
+    @ApiResponse(responseCode = "403", description = "Forbidden - diagram belongs to another user")
+  })
   @GetMapping("/{id}")
-  public Map<String, Object> get(HttpServletRequest request, @PathVariable UUID id) {
+  public Map<String, Object> get(
+      @Parameter(description = "Diagram ID") @PathVariable UUID id,
+      HttpServletRequest request) {
     return Map.of("data", diagrams.get(RequestUser.get(request), id));
   }
 
@@ -89,16 +119,45 @@ public class DiagramController {
     return ResponseEntity.noContent().build();
   }
 
+  @Operation(summary = "List checkpoints", description = "Newest-first snapshots, optionally filtered by branch")
   @GetMapping("/{id}/checkpoints")
-  public Map<String, Object> listCheckpoints(HttpServletRequest request, @PathVariable UUID id) {
-    return Map.of("data", checkpoints.list(RequestUser.get(request), id));
+  public Map<String, Object> listCheckpoints(
+      HttpServletRequest request,
+      @PathVariable UUID id,
+      @Parameter(description = "Only checkpoints on this branch") @RequestParam(required = false) String branch) {
+    return Map.of("data", checkpoints.list(RequestUser.get(request), id, branch));
   }
 
   @PostMapping("/{id}/checkpoints")
   public ResponseEntity<Map<String, Object>> createCheckpoint(HttpServletRequest request,
       @PathVariable UUID id, @Valid @RequestBody CheckpointCreateRequest body) {
     Map<String, Object> created =
-        checkpoints.create(RequestUser.get(request), id, body.getTitle(), body.getMeta());
+        checkpoints.create(RequestUser.get(request), id, body.getTitle(), body.getMeta(), body.getBranch());
+    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("data", created));
+  }
+
+  @Operation(summary = "Delete checkpoint", description = "Delete a checkpoint owned via the diagram")
+  @DeleteMapping("/{id}/checkpoints/{cid}")
+  public ResponseEntity<Void> deleteCheckpoint(HttpServletRequest request,
+      @PathVariable UUID id, @PathVariable("cid") UUID checkpointId) {
+    checkpoints.delete(RequestUser.get(request), id, checkpointId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Operation(summary = "Restore checkpoint", description = "Restore a diagram's graph from a checkpoint snapshot (versioning)")
+  @PostMapping("/{id}/checkpoints/{cid}/restore")
+  public Map<String, Object> restoreCheckpoint(HttpServletRequest request,
+      @PathVariable UUID id, @PathVariable("cid") UUID checkpointId) {
+    Map<String, Object> restored = checkpoints.restore(RequestUser.get(request), id, checkpointId);
+    return Map.of("data", restored);
+  }
+
+  @Operation(summary = "Create branch", description = "Duplicate a diagram as a new branch with parent link")
+  @PostMapping("/{id}/branches")
+  public ResponseEntity<Map<String, Object>> createBranch(HttpServletRequest request,
+      @PathVariable UUID id, @Valid @RequestBody BranchCreateRequest body) {
+    Map<String, Object> created =
+        diagrams.createBranch(RequestUser.get(request), id, body.getTitle(), body.getBranchName());
     return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("data", created));
   }
 

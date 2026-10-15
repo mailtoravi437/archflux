@@ -38,37 +38,71 @@ export interface SyncLog {
 export type CanvasTool = 'select' | 'pan' | 'draw' | 'text' | 'service' | 'gateway' | 'db' | 'stream' | 'connector' | 'comment';
 export type LayoutKind = 'dag' | 'tree' | 'matrix';
 
-export interface DiagramContextValue {
-  theme: ThemeName;
-  setTheme: (t: ThemeName) => void;
+// ==================== SPLIT CONTEXTS FOR PERFORMANCE ====================
+
+// Core graph data - changes frequently during editing
+export interface DiagramCoreContextValue {
   nodes: ArchNode[];
   edges: ArchEdge[];
-  setNodes: React.Dispatch<React.SetStateAction<ArchNode[]>>;
-  setEdges: React.Dispatch<React.SetStateAction<ArchEdge[]>>;
   strokes: FreeStroke[];
+  texts: FreeText[];
+  selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
+  selectedEdgeId: string | null;
+  setSelectedEdgeId: (id: string | null) => void;
+  selectedStrokeId: string | null;
+  setSelectedStrokeId: (id: string | null) => void;
+  selectedTextId: string | null;
+  setSelectedTextId: (id: string | null) => void;
+  multiSel: string[];
+  setMultiSel: (ids: string[]) => void;
+}
+
+// Stable action functions - rarely change
+export interface DiagramActionsContextValue {
+  // Node operations
+  addNode: (type: CanvasTool, x: number, y: number) => void;
+  deleteSelected: () => void;
+  deleteNodes: (ids: string[]) => void;
+  duplicateSelected: () => void;
+  updateNode: (id: string, patch: Partial<ArchNode>) => void;
+  moveNode: (id: string, x: number, y: number) => void;
+  checkpoint: (markDrift?: boolean) => void;
+  // Edge operations
+  deleteEdge: (id: string) => void;
+  updateEdge: (id: string, patch: Partial<ArchEdge>) => void;
+  connectNodes: (from: string, to: string | null, targetCoords?: { x: number; y: number }) => void;
+  // Graph operations
+  loadGraph: (nodes: ArchNode[], edges: ArchEdge[], label?: string) => void;
+  mergeGraph: (nodes: ArchNode[], edges: ArchEdge[], label?: string) => void;
+  // Stroke operations
   addStroke: (pts: { x: number; y: number }[], color: string, width: number) => void;
   updateStroke: (id: string, patch: Partial<FreeStroke>) => void;
   moveStroke: (id: string, dx: number, dy: number) => void;
   deleteStroke: (id: string) => void;
-  texts: FreeText[];
+  // Text operations
   addText: (x: number, y: number, text: string, fontSize: number, color: string) => string | null;
   updateText: (id: string, patch: Partial<FreeText>) => void;
   moveText: (id: string, dx: number, dy: number) => void;
   deleteText: (id: string) => void;
-  selectedId: string | null;
-  setSelectedId: (id: string | null) => void;
-  freshness: FreshnessState;
-  freshnessLabel: string;
-  driftCount: number;
-  toasts: Toast[];
-  pushToast: (text: string) => void;
-  resync: () => void;
-  healOrphan: (id?: string | null, silent?: boolean) => void;
-  pruneWire: (id?: string | null, silent?: boolean) => void;
-  healAll: () => void;
-  exportArch: () => void;
-  exportPNG: () => void;
-  importArch: (data: { nodes: ArchNode[]; edges: ArchEdge[] }) => void;
+  // History
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  undoDepth: number;
+  redoDepth: number;
+  // Layout
+  applyLayout: (kind: LayoutKind) => void;
+  resetDefaultNodes: () => void;
+  panToNode: (id: string) => void;
+  placeShape: (shape: LibraryShape, x: number, y: number) => void;
+}
+
+// UI state - changes during interaction
+export interface DiagramUIContextValue {
+  theme: ThemeName;
+  setTheme: (t: ThemeName) => void;
   zoom: number;
   pan: { x: number; y: number };
   setPan: (p: { x: number; y: number }) => void;
@@ -81,13 +115,22 @@ export interface DiagramContextValue {
   zoomBy: (delta: number) => void;
   zoomTo: (z: number) => void;
   resetView: () => void;
-  applyLayout: (kind: LayoutKind) => void;
-  resetDefaultNodes: () => void;
-  panToNode: (id: string) => void;
+  freshness: FreshnessState;
+  freshnessLabel: string;
+  driftCount: number;
+  toasts: Toast[];
+  pushToast: (text: string) => void;
+  pauseToasts: () => void;
+  resumeToasts: (ids: number[]) => void;
+  isOnline: boolean;
+  lintCount: number;
+}
+
+// Document management
+export interface DiagramDocsContextValue {
   docTitle: string;
   setDocTitle: (t: string) => void;
   dirty: boolean;
-  // Multi-document model: each doc owns its graph; switching clears undo.
   docs: DiagramDoc[];
   activeDocId: string;
   openDoc: (id: string) => void;
@@ -96,25 +139,10 @@ export interface DiagramContextValue {
   setDocTags: (id: string, tags: string[]) => void;
   duplicateDoc: (id: string) => void;
   deleteDoc: (id: string) => void;
-  placeShape: (shape: LibraryShape, x: number, y: number) => void;
-  undo: () => void;
-  redo: () => void;
-  canUndo: boolean;
-  canRedo: boolean;
-  undoDepth: number;
-  redoDepth: number;
-  addNode: (type: CanvasTool, x: number, y: number) => void;
-  deleteSelected: () => void;
-  deleteNodes: (ids: string[]) => void;
-  duplicateSelected: () => void;
-  updateNode: (id: string, patch: Partial<ArchNode>) => void;
-  moveNode: (id: string, x: number, y: number) => void;
-  deleteEdge: (id: string) => void;
-  updateEdge: (id: string, patch: Partial<ArchEdge>) => void;
-  checkpoint: (markDrift?: boolean) => void;
-  connectNodes: (from: string, to: string | null, targetCoords?: { x: number; y: number }) => void;
-  loadGraph: (nodes: ArchNode[], edges: ArchEdge[], label?: string) => void;
-  mergeGraph: (nodes: ArchNode[], edges: ArchEdge[], label?: string) => void;
+}
+
+// Collaboration features
+export interface DiagramCollabContextValue {
   threads: ReviewThread[];
   addThread: (pinnedTo: string, text: string, label?: string) => void;
   replyThread: (id: string, text: string) => void;
@@ -126,13 +154,25 @@ export interface DiagramContextValue {
   tagCheckpoint: (title: string) => void;
   restoreCheckpoint: (id: string) => void;
   deleteCheckpoint: (id: string) => void;
+  createBranch: (branchName?: string) => void;
+  branchError: string | null;
+  retryBranch: () => void;
   syncLog: SyncLog[];
   pushLog: (text: string) => void;
-  /** Real browser connectivity — sync refuses to pretend while offline. */
-  isOnline: boolean;
+  resync: () => void;
+  healOrphan: (id?: string | null, silent?: boolean) => void;
+  pruneWire: (id?: string | null, silent?: boolean) => void;
+  healAll: () => void;
+  exportArch: () => void;
+  exportPNG: () => void;
+  importArch: (data: { nodes: ArchNode[]; edges: ArchEdge[] }) => void;
 }
 
-export const DiagramContext = createContext<DiagramContextValue | null>(null);
+export const DiagramCoreContext = createContext<DiagramCoreContextValue | null>(null);
+export const DiagramActionsContext = createContext<DiagramActionsContextValue | null>(null);
+export const DiagramUIContext = createContext<DiagramUIContextValue | null>(null);
+export const DiagramDocsContext = createContext<DiagramDocsContextValue | null>(null);
+export const DiagramCollabContext = createContext<DiagramCollabContextValue | null>(null);
 
 let toastSeq = 1;
 let logSeq = 1;
@@ -156,6 +196,36 @@ function cloneStrokes(src: FreeStroke[]): FreeStroke[] {
 
 function cloneTexts(src: FreeText[]): FreeText[] {
   return src.map((t) => ({ ...t }));
+}
+
+// Server-backed versioning: local docs use `doc-*` ids; docs synced with the
+// server carry the server UUID as their id (see exportDiagram flow).
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function serverDiagramId(docId: string | null | undefined): string | null {
+  if (!docId || docId.startsWith('doc-')) return null;
+  return UUID_RE.test(docId) ? docId : null;
+}
+
+// Adapt a server checkpoint ({id,diagramId,title,meta,branch,snapshot,createdAt})
+// to the local SnapshotCheckpoint shape so both render in one list.
+export function serverCheckpointToLocal(cp: any): SnapshotCheckpoint {
+  const snap = cp?.snapshot ?? {};
+  const graph = snap?.graph ?? snap;
+  const nodes = Array.isArray(graph?.nodes) ? graph.nodes : [];
+  const edges = Array.isArray(graph?.edges) ? graph.edges : [];
+  const strokes = Array.isArray(graph?.strokes) ? graph.strokes : [];
+  const texts = Array.isArray(graph?.texts) ? graph.texts : [];
+  return {
+    id: String(cp.id),
+    title: String(cp.title ?? 'checkpoint'),
+    meta: String(cp.meta ?? cp.branch ?? cp.createdAt ?? ''),
+    active: false,
+    badge: `${nodes.length} nodes, ${edges.length} routes`,
+    nodes: cloneNodes(nodes),
+    edges: cloneEdges(edges),
+    strokes: cloneStrokes(strokes),
+    texts: cloneTexts(texts),
+  };
 }
 
 function isValidText(t: unknown): t is FreeText {
@@ -419,6 +489,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     return [];
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const [selectedStrokeId, setSelectedStrokeId] = useState<string | null>(null);
+  const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
+  const [multiSel, setMultiSel] = useState<string[]>([]);
   const [freshness, setFreshness] = useState<FreshnessState>(() => persisted.current?.freshness ?? 'drift');
   const [freshnessLabel, setFreshnessLabel] = useState(
     () => persisted.current?.freshnessLabel ?? 'Out of sync — review changes',
@@ -470,8 +544,6 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   const docs = docState.docs;
   const activeDocId = docState.activeDocId;
   const [dirty, setDirty] = useState(false);
-  const [past, setPast] = useState<{ nodes: ArchNode[]; edges: ArchEdge[]; strokes: FreeStroke[]; texts: FreeText[] }[]>([]);
-  const [future, setFuture] = useState<{ nodes: ArchNode[]; edges: ArchEdge[]; strokes: FreeStroke[]; texts: FreeText[] }[]>([]);
   const seedThreadList = (): ReviewThread[] => [
     {
       id: 't1',
@@ -538,6 +610,11 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
 
   // Persist (debounced). The active doc always mirrors the live graph.
   // Review state persists per document (v5); legacy flat arrays migrate on load.
+  const persistVersion = useRef(0);
+  const schedulePersist = useCallback(() => {
+    persistVersion.current += 1;
+  }, []);
+
   useEffect(() => {
     const t = window.setTimeout(() => {
       try {
@@ -550,14 +627,17 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         );
         localStorage.setItem(
           STORE_KEY,
-          JSON.stringify({ docs: synced, activeDocId: active, theme, docTitle, displayName, threadsByDoc: threadMap, cpsByDoc: cpsMap, syncLog, freshness, freshnessLabel, driftCount, pan, zoom, v: 5 }),
+          JSON.stringify({ docs: synced, activeDocId: active, theme: themeRef.current, docTitle: docTitleRef.current, displayName, threadsByDoc: threadMap, cpsByDoc: cpsMap, syncLog, freshness: freshnessRef.current, freshnessLabel, driftCount, pan: panRef.current, zoom: zoomRef.current, v: 5 }),
         );
       } catch {
         /* quota ignore */
       }
     }, 300);
     return () => window.clearTimeout(t);
-  }, [nodes, edges, strokes, texts, theme, docTitle, displayName, threadMap, cpsMap, syncLog, freshness, freshnessLabel, driftCount, docState, pan, zoom]);
+  // Collection sizes are deps so ink/text/node edits schedule a write even
+  // when no other persist-tracked state changes (debounced, no extra renders).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persistVersion, displayName, threadMap, cpsMap, syncLog, freshnessLabel, driftCount, nodes.length, edges.length, strokes.length, texts.length]);
 
   // Synchronous flush on unload: the debounced persist above can lag keystrokes
   // by 300ms, so a reload within that window would drop the latest characters.
@@ -583,17 +663,43 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const lastToast = useRef<{ text: string; at: number }>({ text: '', at: 0 });
+  // Toast auto-dismiss (NAV-R3: 5s, max 3 visible). Hover/focus pauses:
+  // the tray clears pending timers on enter and re-schedules on leave.
+  const toastTimersRef = useRef(new Map<number, number>());
+  const scheduleToastDismiss = useCallback((id: number, delay = 5000) => {
+    const prev = toastTimersRef.current.get(id);
+    if (prev !== undefined) window.clearTimeout(prev);
+    toastTimersRef.current.set(
+      id,
+      window.setTimeout(() => {
+        toastTimersRef.current.delete(id);
+        setToasts((t) => t.filter((x) => x.id !== id));
+      }, delay),
+    );
+  }, []);
+
+  const pauseToasts = useCallback(() => {
+    toastTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+    toastTimersRef.current.clear();
+  }, []);
+
+  const resumeToasts = useCallback(
+    (ids: number[]) => {
+      ids.forEach((id) => scheduleToastDismiss(id, 1500));
+    },
+    [scheduleToastDismiss],
+  );
+
   const pushToast = useCallback((text: string) => {
     // Collapse rapid identical toasts (e.g. repeated layout clicks).
     const now = Date.now();
     if (lastToast.current.text === text && now - lastToast.current.at < 1200) return;
     lastToast.current = { text, at: now };
     const id = toastSeq++;
+    // Max 3 visible (NAV-R3): oldest drops as new ones arrive.
     setToasts((prev) => [...prev.slice(-2), { id, text }]);
-    window.setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 2500);
-  }, []);
+    scheduleToastDismiss(id);
+  }, [scheduleToastDismiss]);
 
   const pushLog = useCallback((text: string) => {
     setSyncLog((prev) => [{ id: logSeq++, text, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 30));
@@ -615,8 +721,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     const entry = { nodes: cloneNodes(n), edges: cloneEdges(e), strokes: cloneStrokes(strokesRef.current), texts: cloneTexts(textsRef.current) };
     pastRef.current = [...pastRef.current.slice(-29), entry];
     futureRef.current = [];
-    setPast(pastRef.current);
-    setFuture([]);
+    // setPast removed - using ref only
+    // setFuture removed - using ref only
     setDirty(true);
     // Any semantic graph mutation invalidates a previous "fresh" sync.
     if (markDrift && freshnessRef.current === 'fresh') {
@@ -629,9 +735,6 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   // Plain setters: history is recorded explicitly via snapshot()/checkpoint()
   // so per-frame updates (drag) and per-keystroke updates (inspector) don't
   // flood the undo stack. Kept for API compatibility.
-  const setNodes: React.Dispatch<React.SetStateAction<ArchNode[]>> = useCallback((action) => {
-    setNodesState(action);
-  }, []);
 
   const edgesRef = useRef(edges);
   edgesRef.current = edges;
@@ -667,9 +770,6 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   const archBaseName = () =>
     docTitleRef.current.replace(/\.arch$/i, '').replace(/[^\w\-+.]+/g, '-').replace(/^-+|-+$/g, '') || 'system_architecture';
 
-  const setEdges: React.Dispatch<React.SetStateAction<ArchEdge[]>> = useCallback((action) => {
-    setEdgesState(action);
-  }, []);
 
   // Record one undo step for the current graph. Drags and inspector typing
   // call this once on grab/focus, then use moveNode/updateNode (silent).
@@ -701,8 +801,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setEdgesState((prev) => prev.filter((e) => e.id !== id));
       pushToast('Deleted route');
       pushLog(`Canvas: deleted route ${id}`);
+      schedulePersist();
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const updateEdge = useCallback((id: string, patch: Partial<ArchEdge>) => {
@@ -723,8 +824,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       ...futureRef.current,
     ].slice(0, 30);
     pastRef.current = p.slice(0, -1);
-    setPast(pastRef.current);
-    setFuture(futureRef.current);
+    // setPast removed - using ref only
+    // setFuture removed - using ref only
     setNodesState(cloneNodes(last.nodes));
     setEdgesState(cloneEdges(last.edges));
     setStrokesState(cloneStrokes(last.strokes ?? []));
@@ -744,8 +845,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       { nodes: cloneNodes(nodesRef.current), edges: cloneEdges(edgesRef.current), strokes: cloneStrokes(strokesRef.current), texts: cloneTexts(textsRef.current) },
     ].slice(-30);
     futureRef.current = f.slice(1);
-    setPast(pastRef.current);
-    setFuture(futureRef.current);
+    // setPast removed - using ref only
+    // setFuture removed - using ref only
     setNodesState(cloneNodes(head.nodes));
     setEdgesState(cloneEdges(head.edges));
     setStrokesState(cloneStrokes(head.strokes ?? []));
@@ -758,13 +859,15 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setThemeState(t);
       document.documentElement.setAttribute('data-theme', t);
       pushToast(`Switched theme to ${t.toUpperCase()}`);
+      schedulePersist();
     },
-    [pushToast],
+    [pushToast, schedulePersist],
   );
 
   const setPan = useCallback((p: { x: number; y: number }) => {
     setPanState({ x: p.x, y: p.y });
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const setTool = useCallback(
     (t: CanvasTool) => {
@@ -782,13 +885,14 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       ...prev,
       docs: prev.docs.map((d) => (d.id === id ? { ...d, title: name, updatedAt: Date.now() } : d)),
     }));
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const resetHistory = useCallback(() => {
     pastRef.current = [];
     futureRef.current = [];
-    setPast([]);
-    setFuture([]);
+    // setPast removed - using ref only
+    // setFuture removed - using ref only
   }, []);
 
   const openDoc = useCallback(
@@ -817,9 +921,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setSelectedId(null);
       setDirty(false);
       resetHistory();
+      schedulePersist();
       pushToast(`Opened ${target.title}`);
     },
-    [pushToast, resetHistory],
+    [pushToast, resetHistory, schedulePersist],
   );
 
   const newDoc = useCallback(() => {
@@ -852,9 +957,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     setFreshness('local');
     setFreshnessLabel('New diagram — add services to begin');
     setDriftCount(0);
+    schedulePersist();
     pushToast(`Created ${doc.title}`);
     pushLog(`Diagram created: ${doc.title}`);
-  }, [pushToast, pushLog, resetHistory]);
+  }, [pushToast, pushLog, resetHistory, schedulePersist]);
 
   const renameDoc = useCallback((id: string, title: string) => {
     const name = title.trim().slice(0, 80) || 'untitled.arch';
@@ -863,7 +969,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       docs: prev.docs.map((d) => (d.id === id ? { ...d, title: name, updatedAt: Date.now() } : d)),
     }));
     if (id === activeDocRef.current) setDocTitleState(name);
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const setDocTags = useCallback((id: string, tags: string[]) => {
     const clean = [...new Set(tags.map((t) => t.trim().slice(0, 24)).filter(Boolean))].slice(0, 8);
@@ -871,7 +978,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       ...prev,
       docs: prev.docs.map((d) => (d.id === id ? { ...d, tags: clean, updatedAt: Date.now() } : d)),
     }));
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const duplicateDoc = useCallback(
     (id: string) => {
@@ -927,9 +1035,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setSelectedId(null);
       setDirty(false);
       resetHistory();
+      schedulePersist();
       pushToast(`Duplicated as ${copy.title}`);
     },
-    [pushToast, resetHistory],
+    [pushToast, resetHistory, schedulePersist],
   );
 
   const deleteDoc = useCallback(
@@ -965,6 +1074,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         setSelectedId(null);
         setDirty(false);
         resetHistory();
+        schedulePersist();
         pushToast('Deleted — started a blank diagram');
         return;
       }
@@ -980,9 +1090,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         setDirty(false);
         resetHistory();
       }
+      schedulePersist();
       pushToast(`Deleted ${target.title}`);
     },
-    [pushToast, resetHistory],
+    [pushToast, resetHistory, schedulePersist],
   );
 
   const placeShape = useCallback(
@@ -1016,16 +1127,19 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
 
   const zoomBy = useCallback((delta: number) => {
     setZoom((prev) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev + delta)));
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const zoomTo = useCallback((z: number) => {
     setZoom(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z)));
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const resetView = useCallback(() => {
     setZoom(1.0);
     setPanState({ ...DEFAULT_PAN });
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const applyLayout = useCallback(
     (kind: LayoutKind) => {
@@ -1212,7 +1326,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     // Silent: callers checkpoint() once on focus so typing doesn't flood undo.
     setNodesState((prev) => prev.map((n) => (n.id === id ? { ...n, ...patch } : n)));
     setDirty(true);
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const connectNodes = useCallback(
     (from: string, to: string | null, targetCoords?: { x: number; y: number }) => {
@@ -1231,8 +1346,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setEdgesState((prev) => [...prev, edge]);
       pushToast(to ? `Connected ${from} → ${to}` : 'Created dangling wire (select target to resolve)');
       pushLog(`Canvas: wire ${from} → ${to ?? '∅'}`);
+      schedulePersist();
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const loadGraph = useCallback(
@@ -1247,8 +1363,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setDirty(false);
       pushToast(label ?? 'Graph loaded');
       pushLog(label ?? 'Graph loaded');
+      schedulePersist();
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   // Freehand ink: one undo step per finished stroke (snapshot on commit).
@@ -1266,8 +1383,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setStrokesState((prev) => [...prev, stroke]);
       setDirty(true);
       pushLog(`Freehand: ink stroke (${clean.length} pts)`);
+      schedulePersist();
     },
-    [pushLog, snapshot],
+    [pushLog, snapshot, schedulePersist],
   );
 
   const updateStroke = useCallback((id: string, patch: Partial<FreeStroke>) => {
@@ -1294,8 +1412,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setStrokesState((prev) => prev.filter((s) => s.id !== id));
       pushToast('Deleted ink stroke');
       pushLog(`Freehand: deleted stroke ${id}`);
+      schedulePersist();
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const addText = useCallback(
@@ -1315,22 +1434,25 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setTextsState((prev) => [...prev, t]);
       setDirty(true);
       pushLog(`Text: "${clean.slice(0, 30)}${clean.length > 30 ? '…' : ''}"`);
+      schedulePersist();
       return id;
     },
-    [pushLog, snapshot],
+    [pushLog, snapshot, schedulePersist],
   );
 
   const updateText = useCallback((id: string, patch: Partial<FreeText>) => {
     setTextsState((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch, id: t.id } : t)));
     setDirty(true);
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const moveText = useCallback((id: string, dx: number, dy: number) => {
     setTextsState((prev) =>
       prev.map((t) => (t.id === id ? { ...t, x: Math.round(t.x + dx), y: Math.round(t.y + dy) } : t)),
     );
     setDirty(true);
-  }, []);
+    schedulePersist();
+  }, [schedulePersist]);
 
   const deleteText = useCallback(
     (id: string) => {
@@ -1342,8 +1464,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setTextsState((prev) => prev.filter((t) => t.id !== id));
       pushToast('Deleted text');
       pushLog(`Text: deleted ${id}`);
+      schedulePersist();
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   // Append a graph beside existing content (Blueprints "Insert"), remapping
@@ -1385,8 +1508,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setEdgesState([...cloneEdges(edgesRef.current), ...mappedEdges]);
       pushToast(label ?? `Inserted ${mapped.length} nodes`);
       pushLog(label ?? `Inserted ${mapped.length} nodes`);
+      schedulePersist();
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const resync = useCallback(() => {
@@ -1413,8 +1537,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       const sha = Math.random().toString(16).slice(2, 9);
       pushToast('Synced upstream Fraud Worker into diagram!');
       pushLog(`Sync complete: ${sha} +1 node Fraud Worker, drift=0`);
+      schedulePersist();
     }, 700);
-  }, [pushToast, pushLog, snapshot]);
+  }, [pushToast, pushLog, snapshot, schedulePersist]);
 
   const healOrphan = useCallback(
     (id: string | null = null, silent = false) => {
@@ -1443,9 +1568,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         pushToast(`Bound ${target.label} to mesh!`);
         pushLog(`Linter heal: ${target.id}`);
       }
+      schedulePersist();
       return true;
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const pruneWire = useCallback(
@@ -1462,9 +1588,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         pushToast(`Pruned wire ${wire.from} → ∅`);
         pushLog(`Linter prune: ${wire.id}`);
       }
+      schedulePersist();
       return true;
     },
-    [pushToast, pushLog, snapshot],
+    [pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const healAll = useCallback(() => {
@@ -1494,7 +1621,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     setEdgesState((prev) => prev.filter((e) => !wireIds.includes(e.id)));
     pushLog(`Linter auto-heal: ${orphanIds.length} bound, ${wireIds.length} pruned`);
     pushToast('All architecture linter rules passed!');
-  }, [pushToast, pushLog, snapshot]);
+    schedulePersist();
+  }, [pushToast, pushLog, snapshot, schedulePersist]);
 
   const exportArch = useCallback(async () => {
     const settings = (() => {
@@ -1754,6 +1882,14 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       );
       pushToast(`Checkpoint saved: ${name}`);
       pushLog(`Checkpoint: ${name}`);
+      // Mirror to server when this doc is server-backed (fire-and-forget).
+      const serverId = serverDiagramId(docId);
+      if (serverId) {
+        api.createCheckpoint(serverId, name, `local:${docId}`).then(
+          () => pushLog(`Checkpoint synced to server: ${name}`),
+          (e) => pushToast(`Server checkpoint failed (kept locally): ${e instanceof Error ? e.message : e}`),
+        );
+      }
     },
     [pushToast, pushLog, displayName],
   );
@@ -1761,6 +1897,25 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   const restoreCheckpoint = useCallback(
     (id: string) => {
       const docId = activeDocRef.current;
+      const serverId = serverDiagramId(docId);
+      // Server-backed checkpoint: restore via API, then apply to canvas.
+      if (serverId && UUID_RE.test(id)) {
+        api.restoreCheckpoint(serverId, id).then(
+          ({ data }) => {
+            const graph = data?.graph ?? {};
+            loadGraph(graph.nodes ?? [], graph.edges ?? [], `Restored server checkpoint`);
+            setStrokesState(cloneStrokes(graph.strokes ?? []));
+            setTextsState(cloneTexts(graph.texts ?? []));
+            setCpsMap((prev) => ({
+              ...prev,
+              [docId]: (prev[docId] ?? []).map((c) => ({ ...c, active: c.id === id })),
+            }));
+            pushToast('Restored checkpoint from server');
+          },
+          (e) => pushToast(`Server restore failed: ${e instanceof Error ? e.message : e}`),
+        );
+        return;
+      }
       const cp = (cpsMapRef.current[docId] ?? []).find((c) => c.id === id);
       if (!cp) return;
       loadGraph(cp.nodes, cp.edges, `Restored ${cp.title}`);
@@ -1771,12 +1926,18 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         [docId]: (prev[docId] ?? []).map((c) => ({ ...c, active: c.id === id })),
       }));
     },
-    [loadGraph],
+    [loadGraph, pushToast],
   );
 
   const deleteCheckpoint = useCallback(
     (id: string) => {
       const docId = activeDocRef.current;
+      const serverId = serverDiagramId(docId);
+      if (serverId && UUID_RE.test(id)) {
+        api.deleteCheckpoint(serverId, id).catch(() => {
+          /* local delete still applies; server retry on next sync */
+        });
+      }
       setCpsMap((prev) => ({
         ...prev,
         [docId]: (prev[docId] ?? []).filter((c) => c.id !== id),
@@ -1786,71 +1947,78 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     [pushToast],
   );
 
-  const value = useMemo<DiagramContextValue>(
+  // Last failed server-branch request, retained so the UI can offer Retry
+  // without losing the local duplicate (REV-R4).
+  const failedBranchRef = useRef<{ serverId: string; title: string; branchName: string } | null>(null);
+  const [branchError, setBranchError] = useState<string | null>(null);
+
+  const requestServerBranch = useCallback(
+    (req: { serverId: string; title: string; branchName: string }) => {
+      setBranchError(null);
+      api.createBranch(req.serverId, req.title, req.branchName).then(
+        ({ data }) => {
+          failedBranchRef.current = null;
+          pushLog(`Server branch created: ${data?.id ?? req.branchName}`);
+        },
+        (e) => {
+          failedBranchRef.current = req;
+          const msg = e instanceof Error ? e.message : String(e);
+          setBranchError(msg);
+          pushToast(`Server branch failed (local branch kept): ${msg}`);
+        },
+      );
+    },
+    [pushLog, pushToast],
+  );
+
+  const retryBranch = useCallback(() => {
+    const req = failedBranchRef.current;
+    if (!req) return;
+    pushLog(`Retrying server branch: ${req.branchName}`);
+    requestServerBranch(req);
+  }, [requestServerBranch, pushLog]);
+
+  // Branch the active doc: local duplicate tagged with the branch name, plus a
+  // server-side branch when the doc is server-backed.
+  const createBranch = useCallback(
+    (branchName?: string) => {
+      const docId = activeDocRef.current;
+      const clean = (branchName ?? '').trim().slice(0, 40) || `branch-${new Date().toISOString().slice(0, 10)}`;
+      duplicateDoc(docId);
+      const copyId = docsRef.current.activeDocId;
+      setDocTags(copyId, [...(docsRef.current.docs.find((d) => d.id === copyId)?.tags ?? []), `branch:${clean}`].slice(0, 8));
+      renameDoc(copyId, `${docTitleRef.current.replace(/\.arch$/i, '')} [${clean}].arch`);
+      pushLog(`Branch created: ${clean}`);
+      const serverId = serverDiagramId(docId);
+      if (serverId) {
+        requestServerBranch({ serverId, title: `${docTitleRef.current} [${clean}]`, branchName: clean });
+      }
+    },
+    [duplicateDoc, setDocTags, renameDoc, pushLog, requestServerBranch],
+  );
+
+  const coreValue = useMemo<DiagramCoreContextValue>(
     () => ({
-      theme,
-      setTheme,
       nodes,
       edges,
-      setNodes,
-      setEdges,
       strokes,
-      addStroke,
-      updateStroke,
-      moveStroke,
-      deleteStroke,
       texts,
-      addText,
-      updateText,
-      moveText,
-      deleteText,
       selectedId,
       setSelectedId,
-      freshness,
-      freshnessLabel,
-      driftCount,
-      toasts,
-      pushToast,
-      resync,
-      healOrphan,
-      pruneWire,
-      healAll,
-      exportArch,
-      exportPNG,
-      importArch,
-      zoom,
-      pan,
-      setPan,
-      tool,
-      setTool,
-      orthogonal,
-      setOrthogonal,
-      snapGrid,
-      setSnapGrid,
-      zoomBy,
-      zoomTo,
-      resetView,
-      applyLayout,
-      resetDefaultNodes,
-      panToNode,
-      docTitle,
-      setDocTitle,
-      dirty,
-      docs,
-      activeDocId,
-      openDoc,
-      newDoc,
-      renameDoc,
-      setDocTags,
-      duplicateDoc,
-      deleteDoc,
-      placeShape,
-      undo,
-      redo,
-      canUndo: past.length > 0,
-      canRedo: future.length > 0,
-      undoDepth: past.length,
-      redoDepth: future.length,
+      selectedEdgeId,
+      setSelectedEdgeId,
+      selectedStrokeId,
+      setSelectedStrokeId,
+      selectedTextId,
+      setSelectedTextId,
+      multiSel,
+      setMultiSel,
+    }),
+    [nodes, edges, strokes, texts, selectedId, setSelectedId, selectedEdgeId, setSelectedEdgeId, selectedStrokeId, setSelectedStrokeId, selectedTextId, setSelectedTextId, multiSel, setMultiSel],
+  );
+
+  const actionsValue = useMemo<DiagramActionsContextValue>(
+    () => ({
       addNode,
       deleteSelected,
       deleteNodes,
@@ -1863,6 +2031,89 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       connectNodes,
       loadGraph,
       mergeGraph,
+      addStroke,
+      updateStroke,
+      moveStroke,
+      deleteStroke,
+      addText,
+      updateText,
+      moveText,
+      deleteText,
+      undo,
+      redo,
+      canUndo: pastRef.current.length > 0,
+      canRedo: futureRef.current.length > 0,
+      undoDepth: pastRef.current.length,
+      redoDepth: futureRef.current.length,
+      applyLayout,
+      resetDefaultNodes,
+      panToNode,
+      placeShape,
+    }),
+    [addNode, deleteSelected, deleteNodes, duplicateSelected, updateNode, moveNode, checkpoint, deleteEdge, updateEdge, connectNodes, loadGraph, mergeGraph, addStroke, updateStroke, moveStroke, deleteStroke, addText, updateText, moveText, deleteText, undo, redo, applyLayout, resetDefaultNodes, panToNode, placeShape],
+  );
+
+  const lintCount = useMemo(() => {
+    const deg = new Map<string, number>();
+    nodes.forEach((n) => deg.set(n.id, 0));
+    edges.forEach((e) => {
+      deg.set(e.from, (deg.get(e.from) ?? 0) + 1);
+      if (e.to) deg.set(e.to, (deg.get(e.to) ?? 0) + 1);
+    });
+    const orphans = nodes.filter((n) => (deg.get(n.id) ?? 0) === 0 || n.isOrphan).length;
+    const dangling = edges.filter((e) => e.isDangling || !e.to).length;
+    const ambiguous = edges.filter((e) => e.to && !e.isDangling && !e.protocol).length;
+    return orphans + dangling + ambiguous;
+  }, [nodes, edges]);
+
+  const uiValue = useMemo<DiagramUIContextValue>(
+    () => ({
+      theme,
+      setTheme,
+      zoom,
+      pan,
+      setPan,
+      tool,
+      setTool,
+      orthogonal,
+      setOrthogonal,
+      snapGrid,
+      setSnapGrid,
+      zoomBy,
+      zoomTo,
+      resetView,
+      freshness,
+      freshnessLabel,
+      driftCount,
+      toasts,
+      pushToast,
+      pauseToasts,
+      resumeToasts,
+      isOnline,
+      lintCount,
+    }),
+    [theme, setTheme, zoom, pan, setPan, tool, setTool, orthogonal, setOrthogonal, snapGrid, setSnapGrid, zoomBy, zoomTo, resetView, freshness, freshnessLabel, driftCount, toasts, pushToast, pauseToasts, resumeToasts, isOnline, lintCount],
+  );
+
+  const docsValue = useMemo<DiagramDocsContextValue>(
+    () => ({
+      docTitle,
+      setDocTitle,
+      dirty,
+      docs,
+      activeDocId,
+      openDoc,
+      newDoc,
+      renameDoc,
+      setDocTags,
+      duplicateDoc,
+      deleteDoc,
+    }),
+    [docTitle, setDocTitle, dirty, docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc],
+  );
+
+  const collabValue = useMemo<DiagramCollabContextValue>(
+    () => ({
       threads,
       addThread,
       replyThread,
@@ -1874,21 +2125,33 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       tagCheckpoint,
       restoreCheckpoint,
       deleteCheckpoint,
+      createBranch,
+      branchError,
+      retryBranch,
       syncLog,
       pushLog,
-      isOnline,
+      resync,
+      healOrphan,
+      pruneWire,
+      healAll,
+      exportArch,
+      exportPNG,
+      importArch,
     }),
-    [
-      theme, setTheme, nodes, edges, setNodes, setEdges, strokes, addStroke, updateStroke, moveStroke, deleteStroke, selectedId, freshness, freshnessLabel,
-      driftCount, toasts, pushToast, resync, healOrphan, pruneWire, healAll, exportArch, exportPNG, importArch,
-      zoom, pan, setPan, tool, setTool, orthogonal, setOrthogonal, snapGrid, zoomBy, zoomTo, resetView, applyLayout,
-      resetDefaultNodes, panToNode, docTitle, setDocTitle, dirty, docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, placeShape, undo, redo, past.length, future.length,
-      addNode, deleteSelected, deleteNodes, duplicateSelected, updateNode, moveNode, checkpoint, deleteEdge, updateEdge, connectNodes, loadGraph, mergeGraph, threads,
-      addThread, replyThread, toggleResolveThread, deleteThread, displayName, checkpoints, tagCheckpoint, restoreCheckpoint,
-      deleteCheckpoint, syncLog, pushLog, isOnline,
-      texts, addText, updateText, moveText, deleteText,
-    ],
+    [threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, syncLog, pushLog, resync, healOrphan, pruneWire, healAll, exportArch, exportPNG, importArch],
   );
 
-  return <DiagramContext.Provider value={value}>{children}</DiagramContext.Provider>;
+  return (
+    <DiagramCoreContext.Provider value={coreValue}>
+      <DiagramActionsContext.Provider value={actionsValue}>
+        <DiagramUIContext.Provider value={uiValue}>
+          <DiagramDocsContext.Provider value={docsValue}>
+            <DiagramCollabContext.Provider value={collabValue}>
+              {children}
+            </DiagramCollabContext.Provider>
+          </DiagramDocsContext.Provider>
+        </DiagramUIContext.Provider>
+      </DiagramActionsContext.Provider>
+    </DiagramCoreContext.Provider>
+  );
 }

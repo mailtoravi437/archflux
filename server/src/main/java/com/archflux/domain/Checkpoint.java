@@ -32,6 +32,9 @@ public class Checkpoint {
   @Column(name = "meta")
   private String meta;
 
+  @Column(name = "branch", nullable = false)
+  private String branch = "main";
+
   @org.hibernate.annotations.Type(OtherStringUserType.class)
   @Column(name = "snapshot", nullable = false, columnDefinition = "jsonb")
   private String snapshot = "{}";
@@ -52,6 +55,9 @@ public class Checkpoint {
     }
     if (snapshot == null) {
       snapshot = "{}";
+    }
+    if (branch == null || branch.isBlank()) {
+      branch = "main";
     }
   }
 
@@ -85,6 +91,14 @@ public class Checkpoint {
 
   public void setMeta(String meta) {
     this.meta = meta;
+  }
+
+  public String getBranch() {
+    return branch;
+  }
+
+  public void setBranch(String branch) {
+    this.branch = (branch == null || branch.isBlank()) ? "main" : branch;
   }
 
   public String getSnapshot() {

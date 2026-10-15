@@ -37,6 +37,10 @@ public class DiagramService {
   private final EntityManager entityManager;
   private final ObjectMapper mapper = JsonCanonicals.baseMapper();
 
+  public ObjectMapper getMapper() {
+    return mapper;
+  }
+
   public DiagramService(DiagramRepository diagrams, UserRepository users,
       SchemaReadinessService readiness, EntityManager entityManager) {
     this.diagrams = diagrams;
@@ -167,11 +171,38 @@ public class DiagramService {
     return any.get();
   }
 
+  @Transactional
+  public Map<String, Object> createBranch(UUID ownerId, UUID id, String title, String branchName) {
+    readiness.requireReady();
+    Diagram source = requireOwnedForWrite(ownerId, id);
+    if (title == null || title.isBlank()) {
+      throw ApiException.validation("title is required");
+    }
+    User owner = users.findById(ownerId).orElseThrow(() -> ApiException.notFound("User not found"));
+    Diagram branch = new Diagram();
+    branch.setOwner(owner);
+    branch.setTitle(title);
+    branch.setTags(source.getTags());
+    branch.setGraph(source.getGraph());
+    branch.setParentDiagram(source);
+    branch.setBranchName(branchName);
+    Diagram saved = diagrams.saveAndFlush(branch);
+    return toJson(saved);
+  }
+
   public Map<String, Object> toJson(Diagram diagram) {
     Map<String, Object> out = new LinkedHashMap<>();
     out.put("id", diagram.getId().toString());
     out.put("title", diagram.getTitle());
     out.put("tags", diagram.getTags());
+    out.put("branchName", diagram.getBranchName());
+    UUID parentId = null;
+    try {
+      parentId = diagram.parentDiagramId();
+    } catch (Exception ignored) {
+      parentId = null;
+    }
+    out.put("parentDiagramId", parentId == null ? null : parentId.toString());
     Map<String, Object> graph = readGraphAsMap(diagram.getGraph());
     out.put("graph", graph);
     out.put("nodes", graph.getOrDefault("nodes", List.of()));

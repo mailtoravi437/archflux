@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import com.archflux.config.AppProperties;
 import com.archflux.service.SyncService;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Sync semantics: canonical SHA stability + DB-backed idempotency. */
 @SpringBootTest
+@Import(TestInfraMocks.class)
 @Transactional
 class SyncServiceTest extends PostgresIT {
 

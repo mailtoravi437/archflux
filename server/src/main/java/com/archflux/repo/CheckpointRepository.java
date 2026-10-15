@@ -8,4 +8,6 @@ import com.archflux.domain.Checkpoint;
 public interface CheckpointRepository extends JpaRepository<Checkpoint, UUID> {
 
   List<Checkpoint> findByDiagram_IdOrderByCreatedAtDesc(UUID diagramId);
+
+  List<Checkpoint> findByDiagram_IdAndBranchOrderByCreatedAtDesc(UUID diagramId, String branch);
 }

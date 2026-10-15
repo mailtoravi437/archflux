@@ -3,6 +3,7 @@ import { Navigate, createHashRouter } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import LoginScreen from './screens/LoginScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
+import AuthCallbackScreen from './screens/AuthCallbackScreen';
 import { withFallback } from './withFallback';
 import { RequireSession } from './RequireSession';
 import { IndexRoute } from './IndexRoute';
@@ -24,6 +25,7 @@ const SettingsStorageScreen = lazy(() => import('./screens/SettingsStorageScreen
 const router = createHashRouter([
   { path: '/login', element: <LoginScreen /> },
   { path: '/onboarding', element: <OnboardingScreen /> },
+  { path: '/auth/callback', element: <AuthCallbackScreen /> },
   {
     path: '/',
     element: (

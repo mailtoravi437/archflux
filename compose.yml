@@ -6,7 +6,7 @@ name: archflux
 
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:15-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-archflux}
@@ -36,9 +36,10 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
       PORT: 3001
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/${POSTGRES_DB:-archflux}}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-archflux}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres-pw}
+      SPRING_DATASOURCE_USERNAME: ${DB_APP_USER:-archflux_app}
+      SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:-dev-app-only}
       APP_API_TOKEN: ${API_TOKEN:-dev-token}
+      "spring.flyway.enabled": "false"
     depends_on:
       db:
         condition: service_healthy

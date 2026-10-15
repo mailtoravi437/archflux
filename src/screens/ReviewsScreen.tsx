@@ -1,12 +1,60 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import HonestyBadge from '../components/HonestyBadge';
+import { SIMULATED } from '../honesty';
 import { useDiagram } from '../useDiagram';
+import { BlueprintThumb } from './BlueprintsScreen';
 import GitScreen from './GitScreen';
 
 type SubTab = 'discuss' | 'merge';
 
+export interface ReviewerSlot {
+  name: string;
+  approved: boolean;
+  /** True when approval comes from the Admin role rather than a user decision. */
+  auto?: boolean;
+}
+
+/** True when the team store is empty/invalid, i.e. the sample trio shows. */
+export function isSampleTeamReviewers(teamRaw: string | null): boolean {
+  try {
+    const team = teamRaw ? (JSON.parse(teamRaw) as { name?: string; status?: string }[]) : [];
+    const active = Array.isArray(team) ? team.filter((m) => m && m.status !== 'invited' && m.name) : [];
+    return active.length === 0;
+  } catch {
+    return true;
+  }
+}
+
+export function resolveReviewers(
+  teamRaw: string | null,
+  decision: 'approved' | 'changes' | null,
+  displayName: string,
+): ReviewerSlot[] {
+  if (!isSampleTeamReviewers(teamRaw)) {
+    try {
+      const team = JSON.parse(teamRaw as string) as { name?: string; role?: string }[];
+      return (team as { name?: string; role?: string; status?: string }[])
+        .filter((m) => m && m.status !== 'invited' && m.name)
+        .slice(0, 3)
+        .map((m) => ({
+          name: String(m.name),
+          approved: m.role === 'Admin' ? true : decision === 'approved',
+          auto: m.role === 'Admin' ? true : undefined,
+        }));
+    } catch {
+      /* fall through to static trio */
+    }
+  }
+  return [
+    { name: 'Elena R.', approved: true },
+    { name: 'Marcus T.', approved: decision === 'approved' },
+    { name: displayName.trim() || 'You', approved: decision === 'approved' },
+  ];
+}
+
 export default function ReviewsScreen() {
-  const { threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, nodes, panToNode, pushToast, pushLog, docs, activeDocId } = useDiagram();
+  const { threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, nodes, panToNode, pushToast, pushLog, docs, activeDocId } = useDiagram();
   const navigate = useNavigate();
   const location = useLocation();
   // Merge & Automation (ex-#/git) lives here as a sub-tab; deep links and
@@ -25,15 +73,22 @@ export default function ReviewsScreen() {
   const [newText, setNewText] = useState('');
   const [newPin, setNewPin] = useState(nodes[0]?.id ?? '');
   const [cpTitle, setCpTitle] = useState('');
+  const [branchName, setBranchName] = useState('');
   const [compareA, setCompareA] = useState(checkpoints[0]?.id ?? '');
   const [compareB, setCompareB] = useState(checkpoints[1]?.id ?? checkpoints[0]?.id ?? '');
   const [decision, setDecision] = useState<'approved' | 'changes' | null>(null);
 
-  const reviewers = [
-    { name: 'Elena R.', approved: true },
-    { name: 'Marcus T.', approved: decision === 'approved' },
-    { name: displayName.trim() || 'You', approved: decision === 'approved' },
-  ];
+  // Reviewer slots come from Team settings (archflux:team:v1) — Admins arrive
+  // pre-approved. Falls back to the static trio when the team list is empty.
+  const teamRaw = (() => {
+    try {
+      return localStorage.getItem('archflux:team:v1');
+    } catch {
+      return null;
+    }
+  })();
+  const reviewers = resolveReviewers(teamRaw, decision, displayName);
+  const usingSampleReviewers = isSampleTeamReviewers(teamRaw);
 
   // Guards against stale ids when nodes/checkpoints change underneath.
   const effectivePin = nodes.some((n) => n.id === newPin) ? newPin : (nodes[0]?.id ?? '');
@@ -41,6 +96,10 @@ export default function ReviewsScreen() {
   const cpB = checkpoints.find((c) => c.id === compareB) ?? checkpoints[0];
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [armThread, setArmThread] = useState<string | null>(null);
+  // Resolved threads render collapsed; explicit false reopens. Open threads ignore this.
+  const [collapsedThreads, setCollapsedThreads] = useState<Record<string, boolean>>({});
+  const isCollapsed = (t: { id: string; resolved: boolean }) =>
+    t.resolved && collapsedThreads[t.id] !== false;
   // Two-click delete: arm first, confirm within 3s. Checkpoint deletion
   // has no undo, so it must never fire on a stray click.
   const [armDelete, setArmDelete] = useState<string | null>(null);
@@ -129,18 +188,22 @@ export default function ReviewsScreen() {
         <div className="content-card" aria-label="Review session status">
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <strong style={{ fontSize: 14 }}>{prTitle}</strong>
-            <div style={{ display: 'flex', gap: 4 }} aria-label="Reviewers">
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }} aria-label="Reviewers">
               {reviewers.map((r) => (
-                <span key={r.name} title={`${r.name}${r.approved ? ' — approved ✓' : ''}`} style={{ width: 26, height: 26, borderRadius: '50%', background: r.approved ? '#DCFCE7' : 'var(--bg-panel-subtle)', border: `2px solid ${r.approved ? '#16A34A' : 'var(--border-panel)'}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                <span key={r.name} title={`${r.name}${r.approved ? (r.auto ? ' — auto-approved (Admin)' : ' — approved ✓') : ''}`} style={{ width: 26, height: 26, borderRadius: '50%', background: r.approved ? '#DCFCE7' : 'var(--bg-panel-subtle)', border: `2px solid ${r.approved ? '#16A34A' : 'var(--border-panel)'}`, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
                   {r.name.charAt(0)}{r.approved ? '✓' : ''}
                 </span>
               ))}
+              {usingSampleReviewers && (
+                <span className="badge-count" title="Sample reviewers — configure your team in Settings → Team">Sample</span>
+              )}
             </div>
             <span style={{ flex: 1 }} />
+            <HonestyBadge label={SIMULATED} tone="demo" title="Review decisions stay local — no server call occurs" />
             <button className="btn-xs" onClick={() => { setDecision('changes'); pushLog(`Review: requested changes on ${prTitle}`); pushToast(`Requested changes on ${prTitle}`); }}>Request Changes</button>
             <button className="btn-xs btn-xs-primary" onClick={() => { setDecision('approved'); pushLog(`Review: approved ${prTitle}`); pushToast(`Approved ${prTitle} ✓`); }}>Approve Architecture</button>
           </div>
-          {decision && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }} role="status">Decision recorded: {decision === 'approved' ? 'Approved ✓' : 'Changes requested'} (simulated)</div>}
+          {decision && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, display: 'flex', gap: 6, alignItems: 'center' }} role="status"><span>Decision recorded: {decision === 'approved' ? 'Approved ✓' : 'Changes requested'}</span><HonestyBadge label={SIMULATED} tone="demo" title="Local-only decision — no server call occurs" /></div>}
         </div>
         <nav style={{ display: 'flex', gap: 6 }} aria-label="Reviews sections">
           <button className={`btn-xs${subTab === 'discuss' ? ' btn-xs-primary' : ''}`} aria-pressed={subTab === 'discuss'} onClick={() => setSubTab('discuss')}>💬 Discussion & Diff</button>
@@ -165,6 +228,23 @@ export default function ReviewsScreen() {
               />
               <button type="button" className="btn btn-primary" onClick={() => { tagCheckpoint(cpTitle); setCpTitle(''); }}>+ Tag Checkpoint</button>
             </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              <input
+                className="doc-title-input"
+                style={{ flex: 1, background: 'var(--bg-panel-subtle)', border: '1px solid var(--border-panel)', borderRadius: 6, padding: '6px 10px' }}
+                placeholder="Branch name (e.g. feature/mesh-v2)…"
+                value={branchName}
+                onChange={(e) => setBranchName(e.target.value)}
+                aria-label="Branch name"
+              />
+              <button type="button" className="btn" onClick={() => { createBranch(branchName); setBranchName(''); }}>⑂ Create Branch</button>
+            </div>
+            {branchError && (
+              <div role="alert" style={{ fontSize: 11, color: 'var(--accent-rose)', marginBottom: 8, display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                <span>Server branch failed: {branchError} — local branch kept.</span>
+                <button type="button" className="btn-xs" onClick={retryBranch}>Retry</button>
+              </div>
+            )}
             <div className="timeline-stream">
               {checkpoints.length === 0 && <div className="callout-block">No checkpoints yet — tag one to capture the current graph.</div>}
               {checkpoints.map((cp) => (
@@ -183,7 +263,7 @@ export default function ReviewsScreen() {
                       onClick={() => requestDeleteCheckpoint(cp.id)}
                       style={armDelete === cp.id ? { borderColor: 'var(--accent-rose)', color: '#FFFFFF', background: 'var(--accent-rose)' } : { color: 'var(--accent-rose)' }}
                     >
-                      {armDelete === cp.id ? 'Sure?' : 'Delete'}
+                      {armDelete === cp.id ? 'Confirm delete' : 'Delete'}
                     </button>
                   </div>
                 </div>
@@ -192,16 +272,56 @@ export default function ReviewsScreen() {
             {checkpoints.length >= 2 && (
               <div style={{ marginTop: 12, borderTop: '1px solid var(--border-panel)', paddingTop: 10 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>Compare versions</div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <select className="theme-select" value={cpA?.id ?? ''} onChange={(e) => setCompareA(e.target.value)} aria-label="Compare A">
+                <div className="compare-row" style={{ display: 'flex', gap: 6 }}>
+                  <select
+                    className="theme-select"
+                    value={cpA?.id ?? ''}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setCompareA(next);
+                      // A = B shows nothing — nudge B to a different checkpoint.
+                      if (next === compareB) {
+                        const other = checkpoints.find((c) => c.id !== next);
+                        if (other) setCompareB(other.id);
+                      }
+                    }}
+                    aria-label="Compare A"
+                  >
                     {checkpoints.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
                   </select>
-                  <select className="theme-select" value={cpB?.id ?? ''} onChange={(e) => setCompareB(e.target.value)} aria-label="Compare B">
+                  <select
+                    className="theme-select"
+                    value={cpB?.id ?? ''}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setCompareB(next);
+                      if (next === compareA) {
+                        const other = [...checkpoints].reverse().find((c) => c.id !== next);
+                        if (other) setCompareA(other.id);
+                      }
+                    }}
+                    aria-label="Compare B"
+                  >
                     {checkpoints.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
                   </select>
                 </div>
                 {diffSummary && <div style={{ fontSize: 11, fontFamily: 'var(--mono-font)', marginTop: 6, color: 'var(--accent-cyan)' }}>{diffSummary}</div>}
                 {diffLines.map((l, i) => <div key={i} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: l.startsWith('+') ? '#16A34A' : l.startsWith('-') ? '#DC2626' : 'var(--text-muted)' }}>{l}</div>)}
+                {cpA && cpB && cpA.id !== cpB.id && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 8 }} role="group" aria-label="Visual checkpoint comparison">
+                    {[
+                      { cp: cpA, tag: 'A' },
+                      { cp: cpB, tag: 'B' },
+                    ].map(({ cp, tag }) => (
+                      <div key={tag} style={{ border: '1px solid var(--border-panel)', borderRadius: 6, overflow: 'hidden' }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, fontFamily: 'var(--mono-font)', padding: '4px 8px', background: 'var(--bg-panel-subtle)' }}>
+                          {tag} · {cp.title}
+                        </div>
+                        <BlueprintThumb nodes={cp.nodes} edges={cp.edges} title={`${tag}: ${cp.title}`} />
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 10, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)' }} aria-label="Diff legend">
                   <span><span style={{ color: '#16A34A' }}>🟩</span> Added in this revision</span>
                   <span><span style={{ color: '#D97706' }}>🟨</span> Modified label / route</span>
@@ -263,10 +383,20 @@ export default function ReviewsScreen() {
                 const detached = t.pinnedTo !== '__canvas' && !nodes.some((n) => n.id === t.pinnedTo);
                 return (
                 <div key={t.id} className="lint-card" style={{ borderLeft: t.resolved ? '3px solid var(--accent-emerald)' : '3px solid var(--accent-cyan)', cursor: 'default' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (t.resolved) setCollapsedThreads((p) => ({ ...p, [t.id]: !isCollapsed(t) }));
+                    }}
+                    aria-expanded={!isCollapsed(t)}
+                    aria-label={`${t.resolved ? 'Resolved' : 'Open'} thread by ${t.author}${t.resolved ? ' — activate to expand' : ''}`}
+                    style={{ all: 'unset', display: 'flex', justifyContent: 'space-between', fontSize: '11px', width: '100%', cursor: t.resolved ? 'pointer' : 'default', boxSizing: 'border-box' }}
+                  >
                     <strong style={{ color: 'var(--accent-cyan)' }}>{t.author} ({t.role}) {t.resolved ? '✓ resolved' : ''}</strong>
-                    <span style={{ color: 'var(--text-dim)', fontFamily: 'var(--mono-font)' }}>{t.time}</span>
-                  </div>
+                    <span style={{ color: 'var(--text-dim)', fontFamily: 'var(--mono-font)' }}>{t.time}{t.resolved ? (isCollapsed(t) ? ' ▸' : ' ▾') : ''}</span>
+                  </button>
+                  {!isCollapsed(t) && (
+                  <>
                   <div style={{ fontSize: '11px', fontFamily: 'var(--mono-font)', color: 'var(--accent-emerald)', display: 'flex', gap: 6, alignItems: 'center' }}>
                     <span>Pinned to: [{t.pinnedLabel}]</span>
                     {detached && <span className="badge-count warn">detached</span>}
@@ -310,9 +440,11 @@ export default function ReviewsScreen() {
                         }
                       }}
                     >
-                      {armThread === t.id ? 'Sure?' : 'Delete'}
+                      {armThread === t.id ? 'Confirm delete' : 'Delete'}
                     </button>
                   </div>
+                  </>
+                  )}
                 </div>
                 );
               })}

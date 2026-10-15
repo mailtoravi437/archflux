@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import type { ThemeName } from '../types';
+import HonestyBadge from './HonestyBadge';
+import { sourceModeForDoc, sourceModeLabel, sourceModeTooltip } from '../honesty';
 import { libraryShapes } from '../mocks';
-import { useDiagram } from '../useDiagram';
+import { useDiagram, useDiagramUI } from '../useDiagram';
 import { useFocusTrap } from '../useFocusTrap';
 import { ErrorBoundary } from '../ErrorBoundary';
 
@@ -35,9 +37,17 @@ function relTime(ts: number): string {
 }
 
 function ToastTray() {
-  const { toasts } = useDiagram();
+  const { toasts, pauseToasts, resumeToasts } = useDiagram();
   return (
-    <div className="toast-tray" role="status" aria-live="polite">
+    <div
+      className="toast-tray"
+      role="status"
+      aria-live="polite"
+      onMouseEnter={pauseToasts}
+      onMouseLeave={() => resumeToasts(toasts.map((t) => t.id))}
+      onFocus={pauseToasts}
+      onBlur={() => resumeToasts(toasts.map((t) => t.id))}
+    >
       {toasts.map((t) => (
         <div key={t.id} className="toast-msg cyan">
           {t.text}
@@ -50,7 +60,29 @@ function ToastTray() {
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, nodes, edges } = useDiagram();
+  const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, displayName } = useDiagram();
+  const isCanvas = location.pathname === '/canvas';
+  const [userOpen, setUserOpen] = useState(false);
+  const authToken = (() => {
+    try {
+      return localStorage.getItem('archflux:auth_token');
+    } catch {
+      return null;
+    }
+  })();
+  const userInitial = ((displayName ?? '').trim()[0] ?? 'G').toUpperCase();
+  const signOut = () => {
+    try {
+      localStorage.removeItem('archflux:auth_token');
+      localStorage.setItem('archflux:session', JSON.stringify({ mode: 'guest' }));
+    } catch {
+      /* ignore */
+    }
+    setUserOpen(false);
+    pushToast('Signed out — guest mode');
+    navigate('/login');
+  };
+  const { lintCount } = useDiagramUI();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIdx, setActiveIdx] = useState(0);
@@ -67,20 +99,6 @@ export default function AppShell() {
   const paletteTrap = useFocusTrap<HTMLDivElement>(paletteOpen);
   const shortcutsTrap = useFocusTrap<HTMLDivElement>(shortcutsOpen);
   const docsTrap = useFocusTrap<HTMLDivElement>(docsOpen);
-
-    // v2.4 §11: live linter count for the top-bar chip (pulse replays on change).
-  const lintCount = useMemo(() => {
-    const deg = new Map<string, number>();
-    nodes.forEach((n) => deg.set(n.id, 0));
-    edges.forEach((e) => {
-      deg.set(e.from, (deg.get(e.from) ?? 0) + 1);
-      if (e.to) deg.set(e.to, (deg.get(e.to) ?? 0) + 1);
-    });
-    const orphans = nodes.filter((n) => (deg.get(n.id) ?? 0) === 0 || n.isOrphan).length;
-    const dangling = edges.filter((e) => e.isDangling || !e.to).length;
-    const ambiguous = edges.filter((e) => e.to && !e.isDangling && !e.protocol).length;
-    return orphans + dangling + ambiguous;
-  }, [nodes, edges]);
 
   const commands: { id: string; label: string; run: () => void; disabled?: boolean }[] = useMemo(() => [
     { id: 'dashboard', label: 'Go to Document Library', run: () => navigate('/dashboard') },
@@ -114,7 +132,17 @@ export default function AppShell() {
     { id: 'theme-light', label: 'Theme: Engineering Light', run: () => setTheme('light') },
   ], [navigate, exportArch, exportPNG, newDoc, resync, healAll, applyLayout, placeShape, openDoc, docs, undo, redo, canUndo, canRedo, resetView, setTheme]);
 
-  const filtered = query.trim() ? commands.filter((c) => c.label.toLowerCase().includes(query.trim().toLowerCase())) : commands;
+  // Subsequence fuzzy match: every query char appears in order ("expt" → "Export PNG").
+  const fuzzyMatch = (label: string, q: string) => {
+    const h = label.toLowerCase();
+    let i = 0;
+    const needle = q.toLowerCase();
+    for (let j = 0; j < h.length && i < needle.length; j++) {
+      if (h[j] === needle[i]) i++;
+    }
+    return i === needle.length;
+  };
+  const filtered = query.trim() ? commands.filter((c) => fuzzyMatch(c.label, query.trim())) : commands;
   const clampedIdx = Math.min(activeIdx, Math.max(0, filtered.length - 1));
 
   // Reset active index when query changes (UX: clear selection on new filter).
@@ -151,9 +179,9 @@ export default function AppShell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        const tag = (e.target as HTMLElement)?.tagName;
-        const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
         if (typing) return;
         e.preventDefault();
         setPaletteOpen((v) => !v);
@@ -165,6 +193,10 @@ export default function AppShell() {
         setShortcutsOpen(false);
         setDocsOpen(false);
         stopPresenting();
+      }
+      if (e.key === '?' && !typing) {
+        e.preventDefault();
+        setShortcutsOpen(true);
       }
     };
     window.addEventListener('keydown', onKey);
@@ -245,6 +277,17 @@ export default function AppShell() {
             />
             <span style={{ color: 'var(--text-dim)' }} title={dirty ? 'Modified in this session (auto-saved locally)' : 'No unsaved session changes'}>[git:main]{dirty ? ' ●' : ''}</span>
           </div>
+          {(() => {
+            const mode = sourceModeForDoc(activeDocId);
+            return (
+              <HonestyBadge
+                label={sourceModeLabel(mode)}
+                tone={mode === 'local' ? 'neutral' : 'info'}
+                title={sourceModeTooltip(mode)}
+                data-testid="source-mode-badge"
+              />
+            );
+          })()}
           <div className={`freshness-pill ${freshness}`} onClick={() => navigate('/living')} role="button" tabIndex={0} aria-label={`${freshnessLabel} — open Living Sync`} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/living'); } }}>
             <span className="status-pulse-dot"></span>
             <span>{freshnessLabel}</span>
@@ -274,14 +317,18 @@ export default function AppShell() {
             )}
           </NavLink>
           <NavLink to="/blueprints" className={({ isActive }) => `screen-tab-btn${isActive ? ' active' : ''}`}><img src="/icons/general/blueprint.svg" alt="" style={{width:16,height:16,marginRight:6}}/> Blueprints</NavLink>
-          <NavLink to="/settings/general" className={() => `screen-tab-btn${location.pathname.startsWith('/settings') ? ' active' : ''}`} aria-current={location.pathname.startsWith('/settings') ? 'page' : undefined}><img src="/icons/tools/settings.svg" alt="" style={{width:16,height:16,marginRight:6}}/> Settings</NavLink>
+          <NavLink to="/settings/general" className={() => `screen-tab-btn${location.pathname.startsWith('/settings') ? ' active' : ''}`} aria-current={location.pathname.startsWith('/settings') ? 'page' : undefined}><img src="/icons/tools/settings.svg" alt="" style={{width:16,height:16,marginRight:6}}/> Settings{!authToken && <span className="badge-count warn" title="Not signed in — configure auth">!</span>}</NavLink>
         </nav>
 
         <div className="header-actions">
           <button className="btn" title="Command palette (Cmd+K)" aria-label="Open command palette" onClick={() => { setPaletteOpen(true); setQuery(''); setActiveIdx(0); }}>⌘K</button>
           <button className="btn" title="Keyboard shortcuts" aria-label="Show keyboard shortcuts" onClick={() => setShortcutsOpen(true)}>?</button>
-          <button className="btn" title={`Undo (${undoDepth} in stack)`} aria-label="Undo" onClick={undo} disabled={!canUndo}>↩</button>
-          <button className="btn" title={`Redo (${redoDepth} in stack)`} aria-label="Redo" onClick={redo} disabled={!canRedo}>↪</button>
+          {isCanvas && (
+            <>
+              <button className="btn" title={`Undo (${undoDepth} in stack)`} aria-label="Undo" onClick={undo} disabled={!canUndo}>↩</button>
+              <button className="btn" title={`Redo (${redoDepth} in stack)`} aria-label="Redo" onClick={redo} disabled={!canRedo}>↪</button>
+            </>
+          )}
           <select className="theme-select" value={theme} onChange={(e) => setTheme(e.target.value as ThemeName)} aria-label="Theme">
             <option value="light">☀️ Engineering Light</option>
             <option value="blueprint">📐 Cyber Blueprint</option>
@@ -293,6 +340,59 @@ export default function AppShell() {
           <button className="btn btn-primary" onClick={exportArch}>
             <span>Export .arch</span>
           </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              className="btn"
+              aria-label={authToken ? `Account (${displayName.trim() || 'signed in'})` : 'Account (guest)'}
+              aria-haspopup="menu"
+              aria-expanded={userOpen}
+              title={authToken ? 'Account' : 'Guest — sign in'}
+              onClick={() => setUserOpen((v) => !v)}
+              style={{ position: 'relative' }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 18, height: 18, borderRadius: '50%', display: 'inline-flex',
+                  alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800,
+                  background: 'var(--bg-panel-subtle)', border: '1px solid var(--border-panel)',
+                }}
+              >
+                {userInitial}
+              </span>
+              <span
+                aria-hidden="true"
+                title={authToken ? 'Signed in' : 'Guest'}
+                style={{
+                  position: 'absolute', top: 2, right: 2, width: 8, height: 8,
+                  borderRadius: '50%', background: authToken ? '#16A34A' : '#D97706',
+                  border: '1px solid var(--bg-panel)',
+                }}
+              />
+            </button>
+            {userOpen && (
+              <>
+                <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setUserOpen(false)} aria-hidden="true" />
+                <div role="menu" aria-label="Account" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 91, minWidth: 190, background: 'var(--bg-panel)', border: '1px solid var(--border-panel)', borderRadius: 10, boxShadow: 'var(--panel-shadow)', padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '6px 8px', fontFamily: 'var(--mono-font)' }}>
+                    {authToken ? (displayName.trim() || 'Signed in') : 'Guest mode'}
+                  </div>
+                  <button className="btn-xs" role="menuitem" style={{ textAlign: 'left' }} onClick={() => { setUserOpen(false); navigate('/settings/team'); }}>
+                    👥 Profile & Team
+                  </button>
+                  {authToken ? (
+                    <button className="btn-xs" role="menuitem" style={{ textAlign: 'left', color: 'var(--accent-rose)' }} onClick={signOut}>
+                      ⎋ Sign out
+                    </button>
+                  ) : (
+                    <button className="btn-xs btn-xs-primary" role="menuitem" style={{ textAlign: 'left' }} onClick={() => { setUserOpen(false); navigate('/login'); }}>
+                      → Sign in
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 

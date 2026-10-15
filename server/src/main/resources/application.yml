@@ -2,12 +2,16 @@
 # DDL lives exclusively in db/ (manual psql). Hibernate NEVER creates schema.
 server:
   port: ${PORT:3001}
+  servlet:
+    session:
+      cookie:
+        secure: ${SESSION_COOKIE_SECURE:true}
+        same-site: ${SESSION_COOKIE_SAME_SITE:lax}
+        http-only: true
+        max-age: 2592000 # 30 days
 
 spring:
   main:
-    # Degraded boot: stay up (health + typed 503/500 JSON) even when tables are
-    # absent. JPA/Hibernate boots lazily on first DB touch; every service entry
-    # point guards via SchemaReadinessService (to_regclass check) first.
     lazy-initialization: true
   mvc:
     throw-exception-if-no-handler-found: true
@@ -15,14 +19,10 @@ spring:
     deserialization:
       fail-on-unknown-properties: false
   datasource:
-    # Primary: SPRING_DATASOURCE_URL/USERNAME/PASSWORD (relaxed binding).
-    # Fallback: DATABASE_URL (postgresql://...) converted by
-    # DatabaseUrlEnvironmentPostProcessor. Dev default: local postgres.
     url: ${SPRING_DATASOURCE_URL:}
     username: ${SPRING_DATASOURCE_USERNAME:}
     password: ${SPRING_DATASOURCE_PASSWORD:}
     hikari:
-      # Never crash boot because the DB is down/absent; /ready reports 503.
       initialization-fail-timeout: 0
       connection-timeout: 3000
       maximum-pool-size: 10
@@ -30,8 +30,6 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
-    # Repository proxies (and therefore the EMF) must not initialize at
-    # startup: degraded boot has to survive a missing schema.
     repositories:
       bootstrap-mode: lazy
     properties:
@@ -44,13 +42,111 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
 
+  # OAuth2 / OIDC / SAML2 (single security key — YAML last-wins would drop oauth2 otherwise)
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:}
+            client-secret: ${GITHUB_CLIENT_SECRET:}
+            redirect-uri: "{baseUrl}/login/oauth2/code/github"
+            scope: read:user,user:email,repo
+            authorization-grant-type: authorization_code
+            client-name: GitHub
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope: openid,email,profile
+            authorization-grant-type: authorization_code
+            client-name: Google
+            provider: google
+          oidc:
+            client-id: ${OIDC_CLIENT_ID:}
+            client-secret: ${OIDC_CLIENT_SECRET:}
+            redirect-uri: "{baseUrl}/login/oauth2/code/oidc"
+            scope: openid,email,profile
+            authorization-grant-type: authorization_code
+            client-name: SSO
+            provider: oidc
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
+          google:
+            issuer-uri: https://accounts.google.com
+            user-name-attribute: sub
+          oidc:
+            issuer-uri: ${OIDC_ISSUER_URI:https://auth.example.com/realms/archflux}
+            user-name-attribute: sub
+    saml2:
+      relyingparty:
+        registration:
+          archflux:
+            entity-id: ${SAML_ENTITY_ID:https://archflux.example.com}
+            assertion-consumer-service:
+              location: "{baseUrl}/login/saml2/sso/archflux"
+              binding: POST
+            singlelogout:
+              url: "{baseUrl}/logout/saml2/slo"
+              binding: REDIRECT
+            signing:
+              credentials:
+                - private-key-location: ${SAML_PRIVATE_KEY_LOCATION:}
+                  certificate-location: ${SAML_CERT_LOCATION:}
+            assertingparty:
+              entity-id: ${SAML_IDP_ENTITY_ID:https://dev-123456.okta.com}
+              singlesignon:
+                url: ${SAML_IDP_SSO_URL:https://dev-123456.okta.com/app/archflux/sso/saml}
+                binding: POST
+              singlelogout:
+                url: ${SAML_IDP_SLO_URL:https://dev-123456.okta.com/app/archflux/slo/saml}
+                binding: REDIRECT
+              verification:
+                credentials:
+                  - certificate-location: ${SAML_IDP_CERT_LOCATION:}
+
+  # Redis for session storage & magic link tokens
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  # Session storage in Redis
+  session:
+    store-type: redis
+    redis:
+      namespace: "archflux:sessions:"
+      flush-mode: on_save
+    timeout: 30d
+
 app:
-  # Primary token env: APP_API_TOKEN. Fallback: API_TOKEN (compose). Blank here
-  # means "unset" — code applies the non-prod default (and logs that a default
-  # is in use, never the value) or fails fast when profile=prod.
   api-token: ${APP_API_TOKEN:${API_TOKEN:}}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  jwt-secret: ${JWT_SECRET:dev-secret-change-in-production}
+  magic-link-ttl-minutes: 15
+
+  # Magic link email service
+  email:
+    provider: ${EMAIL_PROVIDER:mock} # mock, sendgrid, resend, ses
+    from: ${EMAIL_FROM:noreply@archflux.io}
+    sendgrid-api-key: ${SENDGRID_API_KEY:}
+    resend-api-key: ${RESEND_API_KEY:}
 
 logging:
   level:
     com.archflux: INFO
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
     org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator: WARN

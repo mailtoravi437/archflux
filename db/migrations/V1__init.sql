@@ -17,21 +17,28 @@
 -- cannot complete until both extensions exist.
 
 -- ---------------------------------------------------------------- 0. Extensions
+-- These extensions are REQUIRED for the schema to function.
+-- On managed hosts (RDS/Neon/Supabase), the deploying role must have CREATE EXTENSION privilege
+-- or extensions must be pre-installed by an admin before running this migration.
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pgcrypto') THEN
-    BEGIN
-      CREATE EXTENSION pgcrypto WITH SCHEMA public;
-    EXCEPTION WHEN insufficient_privilege THEN
-      RAISE NOTICE 'MANAGED-HOST FALLBACK: pgcrypto could not be installed by the current role. Ask an admin to run: CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public; then re-run V1__init.sql.';
-    END;
+    CREATE EXTENSION pgcrypto WITH SCHEMA public;
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'citext') THEN
-    BEGIN
-      CREATE EXTENSION citext WITH SCHEMA public;
-    EXCEPTION WHEN insufficient_privilege THEN
-      RAISE NOTICE 'MANAGED-HOST FALLBACK: citext could not be installed by the current role. Ask an admin to run: CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public; then re-run V1__init.sql.';
-    END;
+    CREATE EXTENSION citext WITH SCHEMA public;
+  END IF;
+END
+$$;
+
+-- Verify extensions are available (fail fast if not)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pgcrypto') THEN
+    RAISE EXCEPTION 'REQUIRED EXTENSION MISSING: pgcrypto. On managed hosts, ask admin to run: CREATE EXTENSION pgcrypto WITH SCHEMA public;';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'citext') THEN
+    RAISE EXCEPTION 'REQUIRED EXTENSION MISSING: citext. On managed hosts, ask admin to run: CREATE EXTENSION citext WITH SCHEMA public;';
   END IF;
 END
 $$;

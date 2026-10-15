@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /** HTTP contract tests: auth, CRUD, validation, pagination cap, engines, export. */
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestInfraMocks.class)
 @Transactional
 class DiagramControllerTest extends PostgresIT {
 
@@ -245,6 +247,94 @@ class DiagramControllerTest extends PostgresIT {
             .header("Authorization", bearer()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data.length()", is(1)));
+  }
+
+  @Test
+  void checkpointRestoreBranchDeleteFlow() throws Exception {
+    String id = createDiagram("versioned-" + UUID.randomUUID());
+
+    MvcResult cp = mockMvc.perform(post("/api/v1/diagrams/" + id + "/checkpoints")
+            .header("Authorization", bearer())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"title\":\"v1\",\"meta\":\"m\",\"branch\":\"main\"}"))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.data.branch", is("main")))
+        .andExpect(jsonPath("$.data.snapshot.nodes.length()", is(1)))
+        .andReturn();
+    String cid = mapper.readTree(cp.getResponse().getContentAsString()).get("data").get("id").asText();
+
+    // Mutate to 2 nodes, then restore back to the 1-node snapshot.
+    mockMvc.perform(put("/api/v1/diagrams/" + id).header("Authorization", bearer())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"nodes\":[{\"id\":\"a\",\"label\":\"A\"},{\"id\":\"b\",\"label\":\"B\"}]}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.nodes.length()", is(2)));
+
+    mockMvc.perform(post("/api/v1/diagrams/" + id + "/checkpoints/" + cid + "/restore")
+            .header("Authorization", bearer()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.nodes.length()", is(1)));
+
+    // Branch duplicates the diagram with a parent link.
+    MvcResult branch = mockMvc.perform(post("/api/v1/diagrams/" + id + "/branches")
+            .header("Authorization", bearer())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"title\":\"feature branch\",\"branchName\":\"feature/x\"}"))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.data.branchName", is("feature/x")))
+        .andExpect(jsonPath("$.data.parentDiagramId", is(id)))
+        .andExpect(jsonPath("$.data.nodes.length()", is(1)))
+        .andReturn();
+    assertThat(mapper.readTree(branch.getResponse().getContentAsString()).get("data").get("id").asText())
+        .isNotEqualTo(id);
+
+    // Delete the checkpoint; restoring it afterwards is 404.
+    mockMvc.perform(delete("/api/v1/diagrams/" + id + "/checkpoints/" + cid)
+            .header("Authorization", bearer()))
+        .andExpect(status().isNoContent());
+
+    mockMvc.perform(get("/api/v1/diagrams/" + id + "/checkpoints").header("Authorization", bearer()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()", is(0)));
+
+    mockMvc.perform(post("/api/v1/diagrams/" + id + "/checkpoints/" + cid + "/restore")
+            .header("Authorization", bearer()))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void checkpointBranchFilter() throws Exception {
+    String id = createDiagram("branched-" + UUID.randomUUID());
+
+    mockMvc.perform(post("/api/v1/diagrams/" + id + "/checkpoints")
+            .header("Authorization", bearer())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"title\":\"main-cp\",\"branch\":\"main\"}"))
+        .andExpect(status().isCreated());
+
+    mockMvc.perform(post("/api/v1/diagrams/" + id + "/checkpoints")
+            .header("Authorization", bearer())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"title\":\"feature-cp\",\"branch\":\"feature/x\"}"))
+        .andExpect(status().isCreated());
+
+    mockMvc.perform(get("/api/v1/diagrams/" + id + "/checkpoints").header("Authorization", bearer()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()", is(2)));
+
+    mockMvc.perform(get("/api/v1/diagrams/" + id + "/checkpoints").param("branch", "main").header("Authorization", bearer()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()", is(1)))
+        .andExpect(jsonPath("$.data[0].title", is("main-cp")));
+
+    mockMvc.perform(get("/api/v1/diagrams/" + id + "/checkpoints").param("branch", "feature/x").header("Authorization", bearer()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()", is(1)))
+        .andExpect(jsonPath("$.data[0].title", is("feature-cp")));
+
+    mockMvc.perform(get("/api/v1/diagrams/" + id + "/checkpoints").param("branch", "nope").header("Authorization", bearer()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.length()", is(0)));
   }
 
   private static void assertThatJson(MvcResult result, String title) throws Exception {

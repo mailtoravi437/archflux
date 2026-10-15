@@ -52,7 +52,7 @@ cp .env.example .env          # fill REAL secrets (secret manager in real prod)
 docker compose -f compose.yml config --quiet   # validate (no override)
 docker compose -f compose.yml up -d --build
 docker compose -f compose.yml ps               # all healthy
-curl -s http://localhost:8080/api/health       # {"status":"ok",...}
+curl -s http://localhost:8080/api/health       # {"status":"UP",...}
 curl -s http://localhost:8080/api/ready         # DB-backed readiness
 curl -s http://localhost:8080/                  # frontend 200 (SPA)
 ```
@@ -83,7 +83,7 @@ Secrets only via env. Never baked into images: `.dockerignore` keeps
 
 ## Health endpoints
 
-- `GET /api/health` → `200 {"status":"ok"}` (liveness; direct `:3001` or via proxy `:8080/api/health`)
+- `GET /api/health` → `200 {"status":"UP"}` (liveness; direct `:3001` or via proxy `:8080/api/health`)
 - `GET /api/ready` → `200` only when the DB is reachable (readiness)
 - `GET /` on web → `200` SPA shell (`try_files` fallback serves deep links)
 - `GET /config.json` → `200 {"apiUrl":"/api"}` (`Cache-Control: no-store`)

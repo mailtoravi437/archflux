@@ -9,6 +9,8 @@ public class CheckpointCreateRequest {
 
   private String meta;
 
+  private String branch;
+
   public String getTitle() {
     return title;
   }
@@ -23,5 +25,13 @@ public class CheckpointCreateRequest {
 
   public void setMeta(String meta) {
     this.meta = meta;
+  }
+
+  public String getBranch() {
+    return branch;
+  }
+
+  public void setBranch(String branch) {
+    this.branch = branch;
   }
 }

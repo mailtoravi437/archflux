@@ -9,7 +9,7 @@ import { useDiagram } from '../useDiagram';
 // paintCalls counts mutating paint ops to prove repaints happen live.
 export const paintCalls = { n: 0 };
 export const paintLog: { op: string; args: unknown[] }[] = [];
-const PAINT_OPS = new Set(['fillRect', 'clearRect', 'fillText', 'strokeRect', 'fill', 'stroke']);
+const PAINT_OPS = new Set(['fillRect', 'clearRect', 'fillText', 'strokeRect', 'fill', 'stroke', 'roundRect']);
 function stub2d() {
   const makeCtx = () =>
     new Proxy(
@@ -20,6 +20,7 @@ function stub2d() {
           if (p === 'getImageData') return () => ({ data: [] });
           if (p === 'createLinearGradient' || p === 'createRadialGradient' || p === 'createPattern')
             return () => ({ addColorStop: () => {} });
+          if (p === 'roundRect') return () => undefined;
           if (typeof p === 'string')
             return (...args: unknown[]) => {
               if (PAINT_OPS.has(p)) {
@@ -102,8 +103,9 @@ describe('canvas node dragging', () => {
 
     const after = api().nodes.find((n) => n.id === 'client');
     // pointerdown world (100,170): dx=20, dy=10. pointermove world (150,220)
-    // → node lands at (130,210).
-    expect(after?.x).toBe(130);
+    // → raw target (130,210), but the alignment snap pulls the right edge
+    // (290) to envoy's left edge (300, d=10 ≤ threshold) → lands at (140,210).
+    expect(after?.x).toBe(140);
     expect(after?.y).toBe(210);
   });
 

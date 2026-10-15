@@ -65,45 +65,51 @@ public abstract class PostgresIT {
     registry.add("spring.datasource.password", DB::getPassword);
   }
 
-  /** Applies the real V1 migration file with a single multi-statement execute. */
+  /** Applies the real db/migrations/*.sql files (V1..Vn) in order. */
   public static final class TestSchema {
 
     private TestSchema() {
     }
 
     public static void applyV1(String jdbcUrl, String username, String password) {
-      Path migration = locateMigration();
-      try {
-        String sql = Files.readString(migration);
-        PGSimpleDataSource ds = new PGSimpleDataSource();
-        ds.setUrl(jdbcUrl);
-        ds.setUser(username);
-        ds.setPassword(password);
-        try (Connection connection = ds.getConnection();
-            Statement statement = connection.createStatement()) {
-          // pgjdbc simple-query protocol runs the whole script, DO blocks included.
-          statement.execute(sql);
+      for (Path migration : locateMigrations()) {
+        try {
+          String sql = Files.readString(migration);
+          PGSimpleDataSource ds = new PGSimpleDataSource();
+          ds.setUrl(jdbcUrl);
+          ds.setUser(username);
+          ds.setPassword(password);
+          try (Connection connection = ds.getConnection();
+              Statement statement = connection.createStatement()) {
+            // pgjdbc simple-query protocol runs the whole script, DO blocks included.
+            statement.execute(sql);
+          }
+        } catch (Exception e) {
+          throw new IllegalStateException("Failed to apply " + migration + ": " + e.getMessage(), e);
         }
-      } catch (Exception e) {
-        throw new IllegalStateException("Failed to apply " + migration + ": " + e.getMessage(), e);
       }
     }
 
-    static Path locateMigration() {
-      // Tests run with user.dir = server/ -> ../db/migrations/V1__init.sql
-      Path[] candidates = {
-          Path.of(System.getProperty("user.dir"), "..", "db", "migrations", "V1__init.sql").normalize(),
-          Path.of("/Users/ravikumar/archflux/db/migrations/V1__init.sql"),
-          Path.of("..", "db", "migrations", "V1__init.sql").toAbsolutePath().normalize(),
+    static java.util.List<Path> locateMigrations() {
+      // Tests run with user.dir = server/ -> ../db/migrations/Vn__*.sql
+      Path[] dirs = {
+          Path.of(System.getProperty("user.dir"), "..", "db", "migrations").normalize(),
+          Path.of("/Users/ravikumar/archflux/db/migrations"),
+          Path.of("..", "db", "migrations").toAbsolutePath().normalize(),
       };
-      for (Path candidate : candidates) {
-        if (Files.isRegularFile(candidate)) {
-          return candidate;
+      for (Path dir : dirs) {
+        try (var stream = Files.list(dir)) {
+          var found = stream.filter(p -> p.getFileName().toString().matches("V\\d+__.*\\.sql"))
+              .sorted().toList();
+          if (!found.isEmpty()) {
+            return found;
+          }
+        } catch (Exception ignored) {
+          // try next candidate
         }
       }
-      // Last resort: classpath copy (not the source of truth).
       throw new IllegalStateException(
-          "Could not locate db/migrations/V1__init.sql from user.dir=" + System.getProperty("user.dir"));
+          "Could not locate db/migrations/V*__*.sql from user.dir=" + System.getProperty("user.dir"));
     }
   }
 

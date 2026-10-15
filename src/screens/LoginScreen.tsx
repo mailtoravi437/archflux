@@ -5,7 +5,7 @@ import { getSession, setSession } from "../session";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Tab = "email" | "sso";
+type Tab = "email" | "magic-link" | "google" | "saml" | "oidc" | "sso";
 
 export default function LoginScreen() {
   const navigate = useNavigate();
@@ -75,6 +75,36 @@ export default function LoginScreen() {
     }, 600);
   };
 
+  const submitMagicLink = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setError(null);
+    if (!EMAIL_RE.test(email.trim())) {
+      setError("Invalid email format — expected name@company.com");
+      return;
+    }
+    setBusy(true);
+    // Call backend to send magic link
+    const backendUrl = import.meta.env.VITE_API_URL || "/api";
+    fetch(`${backendUrl}/auth/magic-link`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim() }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to send magic link");
+        return res.json();
+      })
+      .then(() => {
+        setBusy(false);
+        pushToast(`Magic link sent to ${email.trim()}`);
+        pushLog(`Magic link sent to ${email.trim()}`);
+      })
+      .catch((err) => {
+        setBusy(false);
+        setError(err.message);
+      });
+  };
+
   const verifyOtp = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!/^\d{6}$/.test(otp.trim())) {
@@ -105,28 +135,63 @@ export default function LoginScreen() {
   };
 
   const [busyGithub, setBusyGithub] = useState(false);
-  const github = (cancelled = false) => {
-    if (cancelled) {
-      setError(
-        "OAuth scope denied — ArchFlux needs repository read/write scope for .arch commits",
-      );
-      return;
-    }
-    // Simulated OAuth popup flow with state token handling.
+  const [busyGoogle, setBusyGoogle] = useState(false);
+  const [busySaml, setBusySaml] = useState(false);
+  const [busyOidc, setBusyOidc] = useState(false);
+  const github = () => {
+    // Real GitHub OAuth redirect
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    const redirectUri = `${frontendUrl}/auth/callback?provider=github`;
+    const backendUrl = import.meta.env.VITE_API_URL || "/api";
+    const oauthUrl = `${backendUrl}/auth/login/github?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
     setBusyGithub(true);
-    const state = Math.random().toString(36).slice(2);
-    window.setTimeout(() => {
-      setBusyGithub(false);
-      try {
-        sessionStorage.setItem("archflux:oauth-state", state);
-      } catch {
-        /* ignore */
-      }
-      setSession({ mode: "github" });
-      pushLog("Signed in with GitHub (repo scope granted)");
-      pushToast("GitHub connected — repo scope granted");
-      navigate(wasOnboarded() ? "/canvas" : "/onboarding", { replace: true });
-    }, 700);
+    pushToast("Redirecting to GitHub...");
+    
+    // Redirect to backend OAuth endpoint which will redirect to GitHub
+    window.location.href = oauthUrl;
+  };
+
+  const google = () => {
+    // Real Google OAuth redirect
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    const redirectUri = `${frontendUrl}/auth/callback?provider=google`;
+    const backendUrl = import.meta.env.VITE_API_URL || "/api";
+    const oauthUrl = `${backendUrl}/auth/login/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
+    setBusyGoogle(true);
+    pushToast("Redirecting to Google...");
+    
+    // Redirect to backend OAuth endpoint which will redirect to Google
+    window.location.href = oauthUrl;
+  };
+
+  const saml = () => {
+    // Real SAML OAuth redirect
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    const redirectUri = `${frontendUrl}/auth/callback?provider=saml`;
+    const backendUrl = import.meta.env.VITE_API_URL || "/api";
+    const samlUrl = `${backendUrl}/auth/login/saml?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
+    setBusySaml(true);
+    pushToast("Redirecting to SAML Identity Provider...");
+    
+    // Redirect to backend SAML endpoint which will redirect to IdP
+    window.location.href = samlUrl;
+  };
+
+  const oidc = () => {
+    // Real OIDC redirect
+    const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+    const redirectUri = `${frontendUrl}/auth/callback?provider=oidc`;
+    const backendUrl = import.meta.env.VITE_API_URL || "/api";
+    const oidcUrl = `${backendUrl}/auth/login/oidc?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    
+    setBusyOidc(true);
+    pushToast("Redirecting to OIDC Identity Provider...");
+    
+    // Redirect to backend OIDC endpoint which will redirect to IdP
+    window.location.href = oidcUrl;
   };
 
   const submitSso = (e?: React.FormEvent) => {
@@ -143,6 +208,18 @@ export default function LoginScreen() {
       pushToast("SSO verified — workspace ready");
       navigate(wasOnboarded() ? "/canvas" : "/onboarding", { replace: true });
     }, 700);
+  };
+
+  const submitSaml = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setBusy(true);
+    saml();
+  };
+
+  const submitOidc = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setBusy(true);
+    oidc();
   };
 
   return (
@@ -294,7 +371,7 @@ export default function LoginScreen() {
             style={{ display: "flex", gap: 6, marginBottom: 14 }}
             role="tablist"
             aria-label="Sign-in method">
-            {(["email", "sso"] as Tab[]).map((t) => (
+            {(["email", "magic-link", "google", "saml", "oidc", "sso"] as Tab[]).map((t) => (
               <button
                 key={t}
                 role="tab"
@@ -304,7 +381,7 @@ export default function LoginScreen() {
                   setTab(t);
                   setError(null);
                 }}>
-                {t === "email" ? "Work Email" : "Single Sign-On (SAML)"}
+                {t === "email" ? "Work Email" : t === "magic-link" ? "Magic Link" : t === "google" ? "Google" : t === "saml" ? "SAML" : t === "oidc" ? "OIDC" : "Single Sign-On (SAML)"}
               </button>
             ))}
           </div>
@@ -312,25 +389,27 @@ export default function LoginScreen() {
           <button
             className="btn btn-primary"
             style={{ width: "100%", justifyContent: "center", marginBottom: 6 }}
-            onClick={() => github(false)}
+            onClick={github}
             disabled={busyGithub}
             aria-busy={busyGithub}>
             {busyGithub ? "Connecting…" : "⬢ Continue with GitHub"}
-          </button>
-          <div
-            style={{
-              fontSize: 10,
-              color: "var(--text-muted)",
-              marginBottom: 12,
-            }}>
-            Requests repository read/write scope for .arch commits.{" "}
+</button>
             <button
-              className="btn-xs"
-              style={{ marginLeft: 4 }}
-              onClick={() => github(true)}>
-              Simulate denied scope
-            </button>
-          </div>
+            className="btn"
+            style={{ width: "100%", justifyContent: "center", marginBottom: 6 }}
+            onClick={google}
+            disabled={busyGoogle}
+            aria-busy={busyGoogle}>
+            {busyGoogle ? "Connecting…" : "🌐 Continue with Google"}
+</button>
+            <div
+              style={{
+                fontSize: 10,
+                color: "var(--text-muted)",
+                marginBottom: 12,
+              }}>
+              Requests repository read/write scope for .arch commits.
+            </div>
 
           {tab === "email" && !otpSent && (
             <form onSubmit={submitEmail}>
@@ -446,11 +525,77 @@ export default function LoginScreen() {
                 }}
                 disabled={busy}
                 aria-busy={busy}>
-                {busy ? "Verifying…" : "Continue with SSO"}
+{busy ? "Verifying…" : "Continue with SSO"}
               </button>
             </form>
           )}
-
+          {tab === "magic-link" && (
+            <form onSubmit={submitMagicLink}>
+              <label style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                Work email
+                <input
+                  ref={emailRef}
+                  type="email"
+                  className="doc-title-input"
+                  style={{
+                    width: "100%",
+                    background: "var(--bg-panel-subtle)",
+                    border: "1px solid var(--border-panel)",
+                    borderRadius: 6,
+                    padding: "8px 10px",
+                    marginTop: 4,
+                  }}
+                  placeholder="you@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={busy}
+                  aria-label="Work email"
+                />
+              </label>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  marginTop: 10,
+                }}
+                disabled={busy}
+                aria-busy={busy}>
+                {busy ? "Sending…" : "Send magic link"}
+              </button>
+            </form>
+          )}
+          {tab === "saml" && (
+            <form onSubmit={submitSaml}>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8 }}>
+                Redirects to your SAML Identity Provider (Okta, Azure AD, etc.)
+              </p>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ width: "100%", justifyContent: "center", marginTop: 10 }}
+                disabled={busy}
+                aria-busy={busy}>
+                {busySaml ? "Redirecting…" : "Continue with SAML"}
+              </button>
+            </form>
+          )}
+          {tab === "oidc" && (
+            <form onSubmit={submitOidc}>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8 }}>
+                Redirects to your OIDC provider (Keycloak, Auth0, etc.)
+              </p>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                style={{ width: "100%", justifyContent: "center", marginTop: 10 }}
+                disabled={busyOidc}
+                aria-busy={busyOidc}>
+                {busyOidc ? "Redirecting…" : "Continue with OIDC"}
+              </button>
+            </form>
+          )}
           {error && (
             <div
               role="alert"

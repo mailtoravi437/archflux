@@ -14,6 +14,7 @@ function stub2d() {
       {
         get: (_t, p) => {
           if (p === 'measureText') return () => ({ width: 10 });
+          if (p === 'roundRect') return () => undefined;
           if (typeof p === 'string') return () => undefined;
           return undefined;
         },
@@ -88,13 +89,14 @@ beforeEach(() => {
 describe('drag persistence across refresh', () => {
   it('writes the dragged position to storage (debounced persist)', async () => {
     const { canvas, unmount } = setupCanvas();
-    // 'client' starts at (80,160); drag to world (150,220) → node at (130,210).
+    // 'client' starts at (80,160); drag to world (150,220) → raw (130,210),
+    // but alignment snap pulls the right edge to envoy's left edge → (140,210).
     dragNode(canvas, 150, 210, 200, 260);
-    expect(api().nodes.find((n) => n.id === 'client')).toMatchObject({ x: 130, y: 210 });
+    expect(api().nodes.find((n) => n.id === 'client')).toMatchObject({ x: 140, y: 210 });
     await act(async () => {
       await sleep(450);
     });
-    expect(storedActiveNodes().find((n) => n.id === 'client')).toMatchObject({ x: 130, y: 210 });
+    expect(storedActiveNodes().find((n) => n.id === 'client')).toMatchObject({ x: 140, y: 210 });
     unmount();
   });
 
@@ -107,7 +109,7 @@ describe('drag persistence across refresh', () => {
     first.unmount();
     // Simulate refresh: fresh provider reads from localStorage.
     setupCanvas();
-    expect(api().nodes.find((n) => n.id === 'client')).toMatchObject({ x: 130, y: 210 });
+    expect(api().nodes.find((n) => n.id === 'client')).toMatchObject({ x: 140, y: 210 });
   });
 
   it('restores pan and zoom on reload', async () => {
@@ -134,7 +136,7 @@ describe('drag persistence across refresh', () => {
     act(() => {
       window.dispatchEvent(new Event('beforeunload'));
     });
-    expect(storedActiveNodes().find((n) => n.id === 'client')).toMatchObject({ x: 130, y: 210 });
+    expect(storedActiveNodes().find((n) => n.id === 'client')).toMatchObject({ x: 140, y: 210 });
     unmount();
   });
 });

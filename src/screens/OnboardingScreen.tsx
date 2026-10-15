@@ -1,7 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDiagram } from '../useDiagram';
-import { blueprintGraph, mockBlueprints } from '../mocks';
+import { blueprintGraph, libraryShapes, mockBlueprints } from '../mocks';
+
+const PROVIDER_ALIASES: Record<string, string[]> = {
+  AWS: ['aws'],
+  'Google Cloud': ['gcp', 'google'],
+  Azure: ['azure'],
+  Kubernetes: ['k8s', 'kubernetes', 'gke', 'aks', 'eks'],
+  Kafka: ['kafka'],
+  Snowflake: ['snowflake'],
+};
+
+/** Shapes visible for the selected stacks (empty selection = everything). Exported for tests. */
+export function previewShapesForProviders(providers: string[]) {
+  if (providers.length === 0) return libraryShapes;
+  const needles = providers.flatMap((p) => PROVIDER_ALIASES[p] ?? [p.toLowerCase()]);
+  return libraryShapes.filter((s) => {
+    const hay = `${s.provider ?? ''} ${s.tag ?? ''} ${s.label ?? ''}`.toLowerCase();
+    return needles.some((n) => hay.includes(n.toLowerCase()));
+  });
+}
 
 const ONBOARDED_KEY = 'archflux:onboarded';
 const PROVIDERS_KEY = 'archflux:providers';
@@ -14,6 +33,28 @@ const PERSONAS = [
 ];
 
 const PROVIDERS = ['AWS', 'Google Cloud', 'Azure', 'Kubernetes', 'Kafka', 'Snowflake'];
+
+function LibraryPreview({ providers }: { providers: string[] }) {
+  const shapes = previewShapesForProviders(providers);
+  const shown = shapes.slice(0, 6);
+  return (
+    <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)' }} role="status" aria-live="polite">
+      Your shape library will show <strong>{shapes.length} {shapes.length === 1 ? 'shape' : 'shapes'}</strong>
+      {providers.length > 0 && <> for {providers.join(', ')}</>}
+      {shown.length > 0 && (
+        <span style={{ marginLeft: 8 }}>
+          {shown.map((s) => (
+            <span key={s.id} title={s.label} style={{ marginRight: 4, fontSize: 15 }}>
+              {s.iconSrc ? <img src={s.iconSrc} alt="" style={{ width: 16, height: 16, verticalAlign: '-3px' }} /> : s.icon}
+            </span>
+          ))}
+          {shapes.length > shown.length && <span>…</span>}
+        </span>
+      )}
+      {shapes.length === 0 && <> — clear the selection to see everything.</>}
+    </div>
+  );
+}
 
 export default function OnboardingScreen() {
   const navigate = useNavigate();
@@ -149,6 +190,7 @@ export default function OnboardingScreen() {
                   </button>
                 ))}
               </div>
+              <LibraryPreview providers={providers} />
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}>
                 <button className="btn-xs" onClick={() => setStep(1)}>← Back</button>
                 <button className="btn btn-primary" onClick={() => setStep(3)}>Continue →</button>

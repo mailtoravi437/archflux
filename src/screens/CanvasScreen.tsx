@@ -5,8 +5,22 @@ import type { CanvasTool } from '../useDiagram';
 import type { ArchEdge, ArchNode, LibraryShape, ShapeCategory } from '../types';
 import { libraryShapes } from '../mocks';
 import { useFocusTrap } from '../useFocusTrap';
+import {
+  clampNodeSize,
+  hitResizeHandle,
+  minimapTransform,
+  miniToWorld,
+  resizeHandles,
+  snapNode,
+  worldToMini,
+  type GuideLine,
+  type ResizeHandleId,
+} from '../canvasGeometry';
+import { ToolPalette } from '../components/ToolPalette';
+import { CollaborationPanel } from '../components/CollaborationPanel';
+import { useCollaboration } from '../hooks/useCollaboration';
 
-const TOOLS: { id: CanvasTool; icon: string; label: string; title: string }[] = [
+export const TOOLS: { id: CanvasTool; icon: string; label: string; title: string }[] = [
   { id: 'select', icon: '/icons/tools/select.svg', label: 'Select', title: 'Select & Move (V)' },
   { id: 'pan', icon: '/icons/tools/pan.svg', label: 'Pan', title: 'Pan / Hand (H) — drag to pan' },
   { id: 'draw', icon: '/icons/tools/draw.svg', label: 'Draw', title: 'Freehand pencil (P) — stays active, Esc to exit' },
@@ -19,10 +33,53 @@ const TOOLS: { id: CanvasTool; icon: string; label: string; title: string }[] = 
   { id: 'comment', icon: '/icons/tools/comment.svg', label: 'Note', title: 'Note (N) — click a node or empty canvas' },
 ];
 
-const LOCKABLE: CanvasTool[] = ['service', 'gateway', 'db', 'stream', 'connector', 'comment'];
+export const LOCKABLE: CanvasTool[] = ['service', 'gateway', 'db', 'stream', 'connector', 'comment'];
+
+const RECENT_SHAPES_KEY = 'archflux:recent-shapes:v1';
+const MAX_RECENT_SHAPES = 8;
+
+/** Pure recency update (most-recent-first, deduped, capped). Exported for tests. */
+export function pushRecentShape(list: string[], id: string): string[] {
+  return [id, ...list.filter((x) => x !== id)].slice(0, MAX_RECENT_SHAPES);
+}
+
+export function loadRecentShapes(): string[] {
+  try {
+    const raw = localStorage.getItem(RECENT_SHAPES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string').slice(0, MAX_RECENT_SHAPES) : [];
+  } catch {
+    return [];
+  }
+}
+
+function recordShapeUse(id: string) {
+  try {
+    localStorage.setItem(RECENT_SHAPES_KEY, JSON.stringify(pushRecentShape(loadRecentShapes(), id)));
+  } catch {
+    /* quota ignore */
+  }
+}
 
 // Freehand ink + vendor icon cache (module-level so remounts don't refetch).
 const iconImgCache = new Map<string, HTMLImageElement>();
+// In-flight draw-cache image loads. Visual tests wait for this to drain so
+// screenshots never catch half-painted vendor icons.
+let pendingIconLoads = 0;
+const iconSettleListeners = new Set<() => void>();
+function noteIconSettled() {
+  pendingIconLoads = Math.max(0, pendingIconLoads - 1);
+  if (pendingIconLoads === 0) iconSettleListeners.forEach((fn) => {
+    try {
+      fn();
+    } catch {
+      /* ignore */
+    }
+  });
+}
+function trackIconLoad() {
+  pendingIconLoads += 1;
+}
 const STROKE_COLORS = ['#1F2937', '#2563EB', '#7C3AED', '#16A34A', '#D97706', '#DC2626'];
 const STROKE_WIDTHS = [2, 4, 6];
 
@@ -218,7 +275,46 @@ export default function CanvasScreen() {
     updateText,
     moveText,
     deleteText,
+    activeDocId,
+    loadGraph,
   } = useDiagram();
+
+  // Real-time collaboration: shared Y.Doc per active document.
+  const collab = useCollaboration(activeDocId ?? null);
+  const applyingRemote = useRef(false);
+  const lastPushed = useRef('');
+  // Push local graph (debounced) — skipped while applying a remote update.
+  useEffect(() => {
+    if (!activeDocId || applyingRemote.current) return;
+    const key = JSON.stringify([nodes, edges, strokes, texts]);
+    if (key === lastPushed.current) return;
+    const timer = window.setTimeout(() => {
+      lastPushed.current = key;
+      collab.pushLocalGraph({ nodes, edges, strokes, texts });
+    }, 400);
+    return () => window.clearTimeout(timer);
+    // pushLocalGraph is stable; collab object identity changes per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodes, edges, strokes, texts, activeDocId]);
+  // Apply remote graph updates (nodes/edges) with echo guard.
+  const lastRemoteVersion = useRef(0);
+  useEffect(() => {
+    const remote = collab.remoteGraph;
+    if (!remote || remote.version <= lastRemoteVersion.current) return;
+    lastRemoteVersion.current = remote.version;
+    const sameNodes = JSON.stringify(remote.nodes) === JSON.stringify(nodes);
+    const sameEdges = JSON.stringify(remote.edges) === JSON.stringify(edges);
+    if (sameNodes && sameEdges) return;
+    applyingRemote.current = true;
+    try {
+      loadGraph(remote.nodes, remote.edges, 'Remote update');
+      lastPushed.current = JSON.stringify([remote.nodes, remote.edges, remote.strokes ?? strokes, remote.texts ?? texts]);
+      pushToast('Applied remote changes');
+    } finally {
+      window.setTimeout(() => { applyingRemote.current = false; }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collab.remoteGraph]);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -273,10 +369,29 @@ export default function CanvasScreen() {
       '/icons/node-icons/mail.svg', '/icons/node-icons/lambda.svg', '/icons/node-icons/globe.svg',
       '/icons/tools/lock.svg', '/icons/tools/more.svg'
     ];
+    let settled = 0;
+    const done = () => {
+      settled += 1;
+      if (settled >= iconUrls.length) {
+        preloadDoneRef.current = true;
+        if (pendingIconLoads === 0) setIconsReady(true);
+      }
+    };
     iconUrls.forEach(url => {
       const img = new Image();
+      img.onload = done;
+      img.onerror = done;
       img.src = url;
     });
+    // Draw-cache images settle independently of the preload above.
+    const checkCacheDrained = () => {
+      if (preloadDoneRef.current && pendingIconLoads === 0) setIconsReady(true);
+    };
+    iconSettleListeners.add(checkCacheDrained);
+    checkCacheDrained();
+    return () => {
+      iconSettleListeners.delete(checkCacheDrained);
+    };
   }, []);
 
   // Dual visual style engine: sketchy brainstorming vs clean architectural.
@@ -301,11 +416,21 @@ export default function CanvasScreen() {
   }
   // Shape library drawer (functional categories).
   const [libOpen, setLibOpen] = useState(false);
+  const [recentShapeIds, setRecentShapeIds] = useState<string[]>(() => loadRecentShapes());
+  const placeShapeRecorded = (shape: LibraryShape, x: number, y: number) => {
+    recordShapeUse(shape.id);
+    setRecentShapeIds(loadRecentShapes());
+    placeShape(shape, x, y);
+  };
   const [libQuery, setLibQuery] = useState('');
   const [libCategory, setLibCategory] = useState<'all' | ShapeCategory>('all');
   // Unified right utility dock (v2.4): Tab A Inspector / Tab B Linter.
   // Selection auto-switches to Inspector; the left dock keeps canvas-wide tools.
-  const [dockTab, setDockTab] = useState<'inspector' | 'linter'>('inspector');
+  const [dockTab, setDockTab] = useState<'inspector' | 'linter' | 'collab'>('inspector');
+  // Collapsible dock: closed by default on phones so the canvas stays usable.
+  const [dockOpen, setDockOpen] = useState<boolean>(
+    () => typeof window === 'undefined' || window.innerWidth > 600,
+  );
   // Excalidraw-style: add-tools are single-use unless locked (re-click / Q).
   const [lockedTool, setLockedTool] = useState<CanvasTool | null>(null);
   const spaceDown = useRef(false);
@@ -314,6 +439,9 @@ export default function CanvasScreen() {
   const composerTrap = useFocusTrap<HTMLDivElement>(commentFor !== null);
   // Canvas 2D unavailable (rare): show a fallback instead of a blank.
   const [canvasError, setCanvasError] = useState(false);
+  // Vendor-icon preload completion — visual tests wait on this for stable pixels.
+  const [iconsReady, setIconsReady] = useState(false);
+  const preloadDoneRef = useRef(false);
   // Coalesces inspector focus events: one undo step per selected node.
   const inspectorCkpt = useRef<string | null>(null);
   const checkpointInspector = (id: string) => {
@@ -323,7 +451,7 @@ export default function CanvasScreen() {
     }
   };
   const dragRef = useRef<{
-    mode: 'node' | 'pan' | 'stroke' | 'text' | null;
+    mode: 'node' | 'pan' | 'stroke' | 'text' | 'resize' | null;
     nodeId: string | null;
     strokeId: string | null;
     textId: string | null;
@@ -335,6 +463,11 @@ export default function CanvasScreen() {
     ly: number;
     moved: boolean;
     group: { id: string; ox: number; oy: number }[] | null;
+    handle?: ResizeHandleId | null;
+    sx?: number;
+    sy?: number;
+    sw?: number;
+    sh?: number;
   }>({
     mode: null,
     nodeId: null,
@@ -349,6 +482,45 @@ export default function CanvasScreen() {
     moved: false,
     group: null,
   });
+  // Live alignment guides painted while a snapped drag is in flight.
+  const guidesRef = useRef<GuideLine[]>([]);
+  // Minimap: toggleable 160px overview. Default on for content-rich diagrams
+  // on wide screens; always user-overridable. Toggle persists per browser.
+  const [miniOpen, setMiniOpen] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('archflux:minimap:v1');
+      if (stored === 'open') return true;
+      if (stored === 'closed') return false;
+    } catch {
+      /* ignore */
+    }
+    return nodes.length >= 6 && (typeof window === 'undefined' || window.innerWidth > 900);
+  });
+  const setMiniOpenPersisted = (v: boolean | ((prev: boolean) => boolean)) => {
+    setMiniOpen((prev) => {
+      const next = typeof v === 'function' ? (v as (p: boolean) => boolean)(prev) : v;
+      try {
+        localStorage.setItem('archflux:minimap:v1', next ? 'open' : 'closed');
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+  const miniCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  // Dock tab scroll positions survive tab switches (CAN-R20).
+  const dockScrollRef = useRef<Record<string, number>>({});
+  useEffect(() => {
+    const el =
+      dockTab === 'inspector'
+        ? document.querySelector('#linterDrawer [aria-label="Contextual inspector"]')
+        : dockTab === 'linter'
+          ? document.getElementById('linterCardsContainer')
+          : document.querySelector('#linterDrawer [aria-label="Live collaborators"]');
+    if (el instanceof HTMLElement && dockScrollRef.current[dockTab] !== undefined) {
+      el.scrollTop = dockScrollRef.current[dockTab];
+    }
+  }, [dockTab]);
   const stateRef = useRef({ nodes, edges, strokes, texts, threads, selectedId, selectedEdgeId, selectedStrokeId, selectedTextId, textDraft, multiSel, theme, zoom, pan, orthogonal, pendingFrom, tool, lockedTool, sketchy, gridStyle, snapThreshold, connectorCurve });
   // Sync latest state for native listeners (effect, not render, to respect ref rules).
   useEffect(() => {
@@ -445,6 +617,11 @@ export default function CanvasScreen() {
       cx = selectedText.x + w / 2; topW = selectedText.y - selectedText.fontSize * 1.4; botW = selectedText.y;
     } else {
       return null;
+    }
+    // Phones: dock the toolbar to the bottom edge (above the FAB zone)
+    // instead of floating — floating bars cover the selection on 390px.
+    if (vw < 600) {
+      return { left: Math.min(Math.max(vw / 2, 80), Math.max(80, vw - 80)), top: Math.max(8, vh - 170) };
     }
     const sx = cx * zoom + pan.x;
     // Toolbar is capped at 700px wide (half = 350); keep the whole bar on-screen,
@@ -699,8 +876,9 @@ export default function CanvasScreen() {
             let img = iconImgCache.get(node.iconSrc);
             if (!img) {
               img = new Image();
-              img.onload = () => setIconTick((t) => t + 1);
-              img.onerror = () => iconImgCache.delete(node.iconSrc!);
+              trackIconLoad();
+              img.onload = () => { setIconTick((t) => t + 1); noteIconSettled(); };
+              img.onerror = () => { iconImgCache.delete(node.iconSrc!); noteIconSettled(); };
               iconImgCache.set(node.iconSrc, img);
               img.src = node.iconSrc;
             }
@@ -783,9 +961,11 @@ export default function CanvasScreen() {
               let img = iconImgCache.get(node.iconSrc);
               if (!img) {
                 img = new Image();
-                img.onload = () => setIconTick((t) => t + 1);
+                trackIconLoad();
+                img.onload = () => { setIconTick((t) => t + 1); noteIconSettled(); };
                 img.onerror = () => {
                   iconImgCache.delete(node.iconSrc!);
+                  noteIconSettled();
                 };
                 iconImgCache.set(node.iconSrc, img);
                 img.src = node.iconSrc;
@@ -1001,6 +1181,40 @@ export default function CanvasScreen() {
 
       s.nodes.forEach(drawNode);
 
+      // Resize grips + alignment guides for the selected node (single-select).
+      {
+        const sel = s.selectedId ? s.nodes.find((n) => n.id === s.selectedId) : undefined;
+        if (sel && s.multiSel.length <= 1) {
+          ctx.save();
+          for (const h of resizeHandles(sel, s.zoom)) {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.strokeStyle = '#2563EB';
+            ctx.lineWidth = 1.5 / s.zoom;
+            ctx.fillRect(h.x - h.size / 2, h.y - h.size / 2, h.size, h.size);
+            ctx.strokeRect(h.x - h.size / 2, h.y - h.size / 2, h.size, h.size);
+          }
+          ctx.restore();
+        }
+        if (guidesRef.current.length > 0) {
+          ctx.save();
+          ctx.strokeStyle = '#22D3EE';
+          ctx.lineWidth = 1.5 / s.zoom;
+          ctx.setLineDash([6 / s.zoom, 4 / s.zoom]);
+          for (const g of guidesRef.current) {
+            ctx.beginPath();
+            if (g.vertical) {
+              ctx.moveTo(g.at, vy0);
+              ctx.lineTo(g.at, vy1);
+            } else {
+              ctx.moveTo(vx0, g.at);
+              ctx.lineTo(vx1, g.at);
+            }
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      }
+
       // Freehand ink strokes (committed + in-progress), drawn above shapes.
       const inkPass = (pts: { x: number; y: number }[], color: string, width: number, selected: boolean) => {
         if (pts.length === 0) return;
@@ -1183,6 +1397,21 @@ export default function CanvasScreen() {
       if (spaceDown.current || e.button === 1 || activeTool === 'pan') {
         dragRef.current = { mode: 'pan', nodeId: null, strokeId: null, textId: null, dx: 0, dy: 0, px: e.clientX - cur.pan.x, py: e.clientY - cur.pan.y, lx: 0, ly: 0, moved: false, group: null };
         return;
+      }
+      // Resize grips on the selected node (select tool only).
+      if (activeTool === 'select' && cur.selectedId) {
+        const sel = cur.nodes.find((node) => node.id === cur.selectedId);
+        if (sel) {
+          const grip = hitResizeHandle(x, y, sel, cur.zoom);
+          if (grip) {
+            dragRef.current = {
+              mode: 'resize', nodeId: sel.id, strokeId: null, textId: null,
+              dx: 0, dy: 0, px: 0, py: 0, lx: 0, ly: 0, moved: false, group: null,
+              handle: grip, sx: x, sy: y, sw: sel.w, sh: sel.h,
+            };
+            return;
+          }
+        }
       }
       // Click-away finishes any open text draft (blur is unreliable: remounts,
       // focus steals, and unmount-blurs must never destroy or duplicate text).
@@ -1377,6 +1606,30 @@ const n = cur.nodes.find((node) => node.id === hit);
         drag.ly = wy;
         return;
       }
+      if (drag.mode === 'resize' && drag.nodeId && drag.handle) {
+        const rect = cv.getBoundingClientRect();
+        const wx = (e.clientX - rect.left - s.pan.x) / s.zoom;
+        const wy = (e.clientY - rect.top - s.pan.y) / s.zoom;
+        if (!drag.moved) {
+          drag.moved = true;
+          checkpoint(false);
+        }
+        const dw = wx - (drag.sx ?? wx);
+        const dh = wy - (drag.sy ?? wy);
+        const sw = drag.sw ?? 170;
+        const sh = drag.sh ?? 70;
+        let nw = sw + ((drag.handle === 'e' || drag.handle === 'se') ? dw : 0);
+        let nh = sh + ((drag.handle === 's' || drag.handle === 'se') ? dh : 0);
+        if (e.shiftKey && sw > 0 && sh > 0) {
+          // Shift locks the aspect ratio to the grab-time shape.
+          const ratio = sw / sh;
+          if (drag.handle === 's') nw = nh * ratio;
+          else nh = nw / ratio;
+        }
+        const clamped = clampNodeSize(nw, nh);
+        updateNode(drag.nodeId, { w: Math.round(clamped.w), h: Math.round(clamped.h) });
+        return;
+      }
       if (drag.mode === 'node' && drag.nodeId) {
         const rect = cv.getBoundingClientRect();
         const wx = (e.clientX - rect.left - s.pan.x) / s.zoom;
@@ -1386,9 +1639,30 @@ const n = cur.nodes.find((node) => node.id === hit);
           checkpoint(false);
         }
         if (drag.group && drag.group.length > 0) {
+          guidesRef.current = [];
           drag.group.forEach((m) => moveNode(m.id, wx + m.ox, wy + m.oy));
         } else {
-          moveNode(drag.nodeId, wx - drag.dx, wy - drag.dy);
+          // Alignment snap: single-node drags snap edges within the snap
+          // threshold (0 disables; holding Alt suspends it for this drag).
+          let tx = wx - drag.dx;
+          let ty = wy - drag.dy;
+          const threshold = e.altKey ? 0 : (s.snapThreshold ?? 10);
+          if (threshold > 0) {
+            const self = s.nodes.find((n) => n.id === drag.nodeId);
+            if (self) {
+              const res = snapNode(
+                { x: tx, y: ty, w: self.w, h: self.h },
+                s.nodes.filter((n) => n.id !== drag.nodeId),
+                threshold,
+              );
+              tx = res.x;
+              ty = res.y;
+              guidesRef.current = res.guides;
+            }
+          } else {
+            guidesRef.current = [];
+          }
+          moveNode(drag.nodeId, tx, ty);
         }
       } else if (drag.mode === 'pan') {
         setPan({ x: e.clientX - drag.px, y: e.clientY - drag.py });
@@ -1412,6 +1686,10 @@ const n = cur.nodes.find((node) => node.id === hit);
         setPendingFrom(null);
       }
       dragRef.current = { mode: null, nodeId: null, strokeId: null, textId: null, dx: 0, dy: 0, px: 0, py: 0, lx: 0, ly: 0, moved: false, group: null };
+      if (guidesRef.current.length > 0) {
+        guidesRef.current = [];
+        drawRef.current();
+      }
     };
     cv.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
@@ -1599,7 +1877,7 @@ const n = cur.nodes.find((node) => node.id === hit);
           inspectorCkpt.current = key;
           checkpoint(false);
         }
-        const step = e.shiftKey ? 20 : 5;
+        const step = e.shiftKey ? 10 : 1;
         const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
         const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
         const n = stateRef.current.nodes.find((nn) => nn.id === nid);
@@ -1636,7 +1914,11 @@ const n = cur.nodes.find((node) => node.id === hit);
           setPendingFrom(null);
         }
       } else if (k === 'f') {
-        fitContent();
+        // F frames the selection; with nothing selected it fits all content.
+        if (stateRef.current.selectedId) panToNode(stateRef.current.selectedId);
+        else fitContent();
+      } else if (k === 'm') {
+        setMiniOpenPersisted((v) => !v);
       } else if (k === keyFor('Library')) {
         setLibOpen((v) => !v);
       }
@@ -1656,6 +1938,8 @@ const n = cur.nodes.find((node) => node.id === hit);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
     };
+    // panToNode/setMiniOpenPersisted read live refs/state; subscribing once is intentional.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [undo, redo, deleteSelected, deleteNodes, duplicateSelected, setSelectedId, setTool, resetView, fitContent, deleteEdge, deleteStroke, deleteText, moveNode, checkpoint, pushToast, finishTextDraft]);
 
   // Double-click a node jumps straight into renaming it.
@@ -1718,21 +2002,7 @@ const n = cur.nodes.find((node) => node.id === hit);
     const s = stateRef.current;
     const cx = (v?.clientWidth ?? 800) / 2;
     const cy = (v?.clientHeight ?? 600) / 2;
-    placeShape(shape, (cx - s.pan.x) / s.zoom - 85, (cy - s.pan.y) / s.zoom - 35);
-  };
-
-  const pickTool = (id: CanvasTool) => {
-    // Re-clicking the active add-tool locks it for repeat placement.
-    if (tool === id && LOCKABLE.includes(id)) {
-      const locking = lockedTool !== id;
-      setLockedTool(locking ? id : null);
-      pushToast(locking ? `${id} tool locked — re-click or Esc to unlock` : `${id} tool unlocked`);
-    } else {
-      if (tool !== id && id === 'text') pushToast('Text tool — click anywhere on canvas and start typing');
-      setTool(id);
-      setLockedTool(null);
-    }
-    setPendingFrom(null);
+    placeShapeRecorded(shape, (cx - s.pan.x) / s.zoom - 85, (cy - s.pan.y) / s.zoom - 35);
   };
 
   const dropToWorld = (clientX: number, clientY: number) => {
@@ -1760,12 +2030,71 @@ const n = cur.nodes.find((node) => node.id === hit);
     return () => window.clearTimeout(announceTimer.current);
   }, [selectedId, selectedEdgeId, multiSel.length, remaining, nodes.length, edges.length, strokes.length, texts.length, selected, selectedEdge]);
 
+  // Minimap click-to-navigate: center the main canvas on the clicked world point.
+  const onMinimapClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const mc = miniCanvasRef.current;
+    const v = viewportRef.current;
+    if (!mc || !v) return;
+    const r = mc.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return;
+    const mx = ((e.clientX - r.left) / r.width) * 160;
+    const my = ((e.clientY - r.top) / r.height) * 100;
+    const t = minimapTransform(nodes, 160, 100);
+    const wpt = miniToWorld(mx, my, t);
+    setPan({ x: v.clientWidth / 2 - wpt.x * zoom, y: v.clientHeight / 2 - wpt.y * zoom });
+  };
+
+  // Minimap repaint: nodes/edges/viewport as a 160x100 overview.
+  useEffect(() => {
+    if (!miniOpen) return;
+    const mc = miniCanvasRef.current;
+    if (!mc) return;
+    const mctx = mc.getContext('2d');
+    if (!mctx) return;
+    const MW = 160;
+    const MH = 100;
+    const t = minimapTransform(nodes, 160, 100);
+    const isDarkMap = theme === 'dark';
+    mctx.clearRect(0, 0, MW, MH);
+    mctx.fillStyle = isDarkMap ? '#1F2937' : '#FFFFFF';
+    mctx.fillRect(0, 0, MW, MH);
+    mctx.strokeStyle = isDarkMap ? '#4B5563' : '#CBD5E1';
+    mctx.lineWidth = 1;
+    edges.forEach((edge) => {
+      const a = nodes.find((n) => n.id === edge.from);
+      const b = edge.to ? nodes.find((n) => n.id === edge.to) : null;
+      if (!a || !b) return;
+      const p1 = worldToMini(a.x + a.w / 2, a.y + a.h / 2, t);
+      const p2 = worldToMini(b.x + b.w / 2, b.y + b.h / 2, t);
+      mctx.beginPath();
+      mctx.moveTo(p1.x, p1.y);
+      mctx.lineTo(p2.x, p2.y);
+      mctx.stroke();
+    });
+    nodes.forEach((n) => {
+      const p = worldToMini(n.x, n.y, t);
+      mctx.fillStyle = n.stroke ?? '#2563EB';
+      mctx.fillRect(p.x, p.y, Math.max(2.5, n.w * t.s), Math.max(2.5, n.h * t.s));
+    });
+    const v = viewportRef.current;
+    if (v && zoom > 0) {
+      const tl = worldToMini((0 - pan.x) / zoom, (0 - pan.y) / zoom, t);
+      mctx.strokeStyle = '#2563EB';
+      mctx.lineWidth = 1.5;
+      mctx.strokeRect(tl.x, tl.y, (v.clientWidth / zoom) * t.s, (v.clientHeight / zoom) * t.s);
+    }
+  }, [nodes, edges, theme, miniOpen, zoom, pan]);
+
   return (
     <div className="screen-view active">
       <div
         className={`canvas-layout${gridStyle === 'lines' ? ' grid-lines' : gridStyle === 'none' ? ' grid-none' : ''}`}
         ref={viewportRef}
         id="canvasViewport"
+        data-testid="canvas-status"
+        data-nodes={nodes.length}
+        data-edges={edges.length}
+        data-icons-ready={iconsReady}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -1778,7 +2107,7 @@ const n = cur.nodes.find((node) => node.id === hit);
               const shape = JSON.parse(raw) as LibraryShape;
               if (shape && typeof shape.id === 'string' && typeof shape.label === 'string') {
                 const known = libraryShapes.find((s) => s.id === shape.id);
-                placeShape(known ?? { ...shape, provider: 'General', kind: 'service' }, pt.x - 85, pt.y - 35);
+                placeShapeRecorded(known ?? { ...shape, provider: 'General', kind: 'service' }, pt.x - 85, pt.y - 35);
                 return;
               }
             }
@@ -1839,7 +2168,7 @@ const n = cur.nodes.find((node) => node.id === hit);
             {nodes.map((n) => {
               const conns = edges.filter((e) => e.from === n.id || e.to === n.id);
               return (
-                <li key={n.id}>
+                <li key={n.id} data-testid={`canvas-node-${n.id}`}>
                   <button
                     type="button"
                     onClick={() => {
@@ -1856,7 +2185,7 @@ const n = cur.nodes.find((node) => node.id === hit);
           </ul>
           <ul aria-label="Routes">
             {edges.map((e) => (
-              <li key={e.id}>
+              <li key={e.id} data-testid={`canvas-route-${e.id}`}>
                 Route {e.label}: {e.from} to {e.to ?? 'unresolved'}
               </li>
             ))}
@@ -1866,92 +2195,16 @@ const n = cur.nodes.find((node) => node.id === hit);
           {announcement}
         </div>
 
-        <div className="vertical-tool-rail" role="toolbar" aria-label="Canvas tools" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <button
-            className={`rail-btn${libOpen ? ' active' : ''}`}
-            title="Shape library — Compute, Storage, Database, Network, Messaging (L)"
-            aria-label="Open shape library"
-            onClick={() => setLibOpen((v) => !v)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 10px' }}
-          >
-            <img src="/icons/general/database.svg" alt="" style={{ width: 16, height: 16 }} />
-            <span className="rail-label">Shapes</span>
-          </button>
-          <div className="rail-divider" style={{ margin: '4px 0', borderTop: '1px solid var(--border-panel)' }} />
-          <div className="rail-group-label" style={{ fontSize: 10, color: 'var(--text-muted)', padding: '0 8px', textTransform: 'uppercase' }}>Navigate</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4 }}>
-            {TOOLS.filter((t) => ['select', 'pan'].includes(t.id)).map((t) => (
-              <button
-                key={t.id}
-                className={`rail-btn${tool === t.id ? ' active' : ''}`}
-                data-tool={t.id}
-                title={t.title}
-                aria-label={t.title}
-                onClick={() => pickTool(t.id)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '7px 4px', justifyContent: 'center' }}
-              >
-                <img src={t.icon} alt="" style={{ width: 20, height: 20 }} />
-                <span className="rail-label" style={{ fontSize: 11 }}>{t.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="rail-divider" style={{ margin: '4px 0', borderTop: '1px solid var(--border-panel)' }} />
-          <div className="rail-group-label" style={{ fontSize: 10, color: 'var(--text-muted)', padding: '0 8px', textTransform: 'uppercase' }}>Shapes</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4 }}>
-            {TOOLS.filter((t) => ['service', 'gateway', 'db', 'stream'].includes(t.id)).map((t) => (
-              <button
-                key={t.id}
-                className={`rail-btn${tool === t.id ? ' active' : ''}`}
-                data-tool={t.id}
-                title={t.title}
-                aria-label={t.title}
-                onClick={() => pickTool(t.id)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '7px 4px', justifyContent: 'center' }}
-              >
-                <img src={t.icon} alt="" style={{ width: 20, height: 20 }} />
-                <span className="rail-label" style={{ fontSize: 11 }}>{t.label}</span>
-                {lockedTool === t.id && <span className="rail-lock" aria-label="locked"><img src="/icons/tools/lock.svg" alt="" style={{ width: 10, height: 10 }} /></span>}
-              </button>
-            ))}
-          </div>
-          <div className="rail-divider" style={{ margin: '4px 0', borderTop: '1px solid var(--border-panel)' }} />
-          <div className="rail-group-label" style={{ fontSize: 10, color: 'var(--text-muted)', padding: '0 8px', textTransform: 'uppercase' }}>Create</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4 }}>
-            {TOOLS.filter((t) => ['draw', 'text'].includes(t.id)).map((t) => (
-              <button
-                key={t.id}
-                className={`rail-btn${tool === t.id ? ' active' : ''}`}
-                data-tool={t.id}
-                title={t.title}
-                aria-label={t.title}
-                onClick={() => pickTool(t.id)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '7px 4px', justifyContent: 'center' }}
-              >
-                <img src={t.icon} alt="" style={{ width: 20, height: 20 }} />
-                <span className="rail-label" style={{ fontSize: 11 }}>{t.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="rail-divider" style={{ margin: '4px 0', borderTop: '1px solid var(--border-panel)' }} />
-          <div className="rail-group-label" style={{ fontSize: 10, color: 'var(--text-muted)', padding: '0 8px', textTransform: 'uppercase' }}>Annotate</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 4 }}>
-            {TOOLS.filter((t) => ['connector', 'comment'].includes(t.id)).map((t) => (
-              <button
-                key={t.id}
-                className={`rail-btn${tool === t.id ? ' active' : ''}`}
-                data-tool={t.id}
-                title={t.title}
-                aria-label={t.title}
-                onClick={() => pickTool(t.id)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '7px 4px', justifyContent: 'center' }}
-              >
-                <img src={t.icon} alt="" style={{ width: 20, height: 20 }} />
-                <span className="rail-label" style={{ fontSize: 11 }}>{t.label}</span>
-                {lockedTool === t.id && <span className="rail-lock" aria-label="locked"><img src="/icons/tools/lock.svg" alt="" style={{ width: 10, height: 10 }} /></span>}
-              </button>
-            ))}
-          </div>
-        </div>
+<ToolPalette
+          tool={tool}
+          setTool={setTool}
+          lockedTool={lockedTool}
+          setLockedTool={setLockedTool}
+          setPendingFrom={setPendingFrom}
+          pushToast={pushToast}
+          libOpen={libOpen}
+          setLibOpen={setLibOpen}
+        />
 
         {libOpen && (
           <div className="library-drawer" role="dialog" aria-label="Shape library">
@@ -1973,9 +2226,41 @@ const n = cur.nodes.find((node) => node.id === hit);
                 onChange={(e) => setLibQuery(e.target.value)}
                 aria-label="Search shapes"
               />
+              {recentShapeIds.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>Recently used</div>
+                  <div style={{ display: 'flex', gap: 4, overflowX: 'auto', paddingBottom: 2 }} role="group" aria-label="Recently used shapes">
+                    {recentShapeIds.map((id) => {
+                      const s = libraryShapes.find((sh) => sh.id === id);
+                      if (!s) return null;
+                      return (
+                        <button
+                          key={id}
+                          className="btn-xs"
+                          title={`${s.label} — ${s.tag}`}
+                          aria-label={`Place recent shape ${s.label}, ${s.category} category`}
+                          onClick={() => placeShapeAtCenter(s)}
+                          style={{ flexShrink: 0 }}
+                        >
+                          {s.iconSrc ? (
+                            <img src={s.iconSrc} alt="" style={{ width: 18, height: 18, display: 'block' }} />
+                          ) : (
+                            <span aria-hidden="true">{s.icon}</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }} role="tablist" aria-label="Shape categories">
                 {(['all', 'general', 'compute', 'storage', 'database', 'network', 'messaging', 'observability'] as const).map((cat) => {
-                  const count = cat === 'all' ? libraryShapes.length : libraryShapes.filter((s) => s.category === cat).length;
+                  // Live counts reflect the current search (LIB-R2).
+                  const inSearch = (s: LibraryShape) =>
+                    !libQ || `${s.label} ${s.tag} ${s.provider} ${s.category}`.toLowerCase().includes(libQ);
+                  const count = cat === 'all'
+                    ? libraryShapes.filter(inSearch).length
+                    : libraryShapes.filter((s) => s.category === cat && inSearch(s)).length;
                   return (
                     <button
                       key={cat}
@@ -2017,7 +2302,7 @@ const n = cur.nodes.find((node) => node.id === hit);
           </div>
         )}
 
-        <div className="linter-inspector" id="linterDrawer">
+        <div className="linter-inspector" id="linterDrawer" style={dockOpen ? undefined : { display: 'none' }}>
           <div className="utility-tabbar" role="tablist" aria-label="Right utility dock">
             <button
               role="tab"
@@ -2035,13 +2320,70 @@ const n = cur.nodes.find((node) => node.id === hit);
             >
               🔍 Linter <span className="badge-count warn" id="linterCountBadge">{remaining}</span>
             </button>
+            <button
+              role="tab"
+              aria-selected={dockTab === 'collab'}
+              className={`utility-tab${dockTab === 'collab' ? ' active' : ''}`}
+              onClick={() => setDockTab('collab')}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 8, height: 8, borderRadius: '50%', display: 'inline-block',
+                  background: collab.connected ? 'var(--accent-emerald)' : 'var(--text-dim)',
+                }}
+              />
+              Live{collab.users.length > 0 ? ` ${collab.users.length}` : ''}
+            </button>
+            <span style={{ flex: 1 }} />
+            <button
+              className="btn-xs"
+              aria-label="Collapse inspector dock"
+              title="Collapse dock (more canvas space)"
+              onClick={() => setDockOpen(false)}
+            >
+              ✕
+            </button>
           </div>
           <div className="utility-split">
             {dockTab === 'inspector' && (
-              <div className="linter-body" role="tabpanel" aria-label="Contextual inspector" style={{ maxHeight: '50%' }}>
+              <div className="linter-body" role="tabpanel" aria-label="Contextual inspector" style={{ maxHeight: '50%' }} onScroll={(e) => { dockScrollRef.current.inspector = e.currentTarget.scrollTop; }}>
               {!selected && !selectedEdge && (
                 <div className="callout-block">Nothing selected — click a node or route to edit its properties here.</div>
               )}
+              <details style={{ marginTop: 6 }}>
+                <summary style={{ fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+                  Diagram outline ({nodes.length})
+                </summary>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 4, maxHeight: 180, overflowY: 'auto' }} role="list" aria-label="Diagram outline, top to bottom">
+                  {[...nodes]
+                    .sort((a, b) => a.y - b.y || a.x - b.x)
+                    .map((n) => {
+                      const conns = edges.filter((e) => e.from === n.id || e.to === n.id).length;
+                      return (
+                        <button
+                          key={n.id}
+                          role="listitem"
+                          className={`btn-xs${n.id === selectedId ? ' btn-xs-primary' : ''}`}
+                          aria-current={n.id === selectedId}
+                          aria-label={`${n.label}, ${n.tag}, ${conns} connections`}
+                          title={`${n.label} — ${n.tag} (${conns} connections). Activate to inspect.`}
+                          style={{ textAlign: 'left', justifyContent: 'flex-start' }}
+                          onClick={() => {
+                            setSelectedId(n.id);
+                            setSelectedEdgeId(null);
+                            panToNode(n.id);
+                          }}
+                        >
+                          {n.label} · {conns}↔
+                        </button>
+                      );
+                    })}
+                  {nodes.length === 0 && (
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>No nodes yet.</div>
+                  )}
+                </div>
+              </details>
               {selected && (
               <div>
                 <div className="dock-headline"><span>Inspector</span><span>{selected.type}</span></div>
@@ -2320,6 +2662,11 @@ const n = cur.nodes.find((node) => node.id === hit);
               </div>
               </div>
             )}
+            {dockTab === 'collab' && (
+              <div className="linter-body" role="tabpanel" aria-label="Live collaborators" style={{ padding: 0, overflow: 'hidden' }} onScroll={(e) => { dockScrollRef.current.collab = e.currentTarget.scrollTop; }}>
+                <CollaborationPanel diagramId={activeDocId} embedded />
+              </div>
+            )}
             {dockTab === 'linter' && (
             <>
           <div className="linter-header">
@@ -2332,7 +2679,7 @@ const n = cur.nodes.find((node) => node.id === hit);
               </button>
             </div>
           </div>
-          <div className="linter-body" id="linterCardsContainer" role="tabpanel" aria-label="Architecture linter">
+          <div className="linter-body" id="linterCardsContainer" role="tabpanel" aria-label="Architecture linter" onScroll={(e) => { dockScrollRef.current.linter = e.currentTarget.scrollTop; }}>
             {remaining === 0 ? (
               <div className="lint-card" style={{ borderLeft: '3px solid var(--accent-emerald)' }}>
                 <div className="lint-head" style={{ color: 'var(--accent-emerald)' }}>
@@ -2388,6 +2735,43 @@ const n = cur.nodes.find((node) => node.id === hit);
         )}
         </div>
         </div>
+
+        {miniOpen ? (
+          <div className="minimap-wrap">
+            <div className="minimap-head">
+              <span>Map</span>
+              <button
+                className="btn-xs"
+                data-testid="minimap-toggle"
+                onClick={() => setMiniOpenPersisted(false)}
+                aria-label="Hide minimap"
+                title="Hide minimap"
+              >
+                ✕
+              </button>
+            </div>
+            <canvas
+              ref={miniCanvasRef}
+              id="minimapCanvas"
+              width={160}
+              height={100}
+              onClick={onMinimapClick}
+              style={{ width: 160, height: 100, display: 'block', cursor: 'pointer' }}
+              role="img"
+              aria-label="Minimap overview — activate to center the canvas here"
+            />
+          </div>
+        ) : (
+          <button
+            className="minimap-toggle"
+            data-testid="minimap-toggle"
+            onClick={() => setMiniOpenPersisted(true)}
+            aria-label="Show minimap"
+            title="Minimap overview"
+          >
+            🗺
+          </button>
+        )}
 
         {pendingFrom && (
           <div className="connect-hint" role="status">
@@ -2623,6 +3007,17 @@ const n = cur.nodes.find((node) => node.id === hit);
           </div>
         )}
       </div>
+      {!dockOpen && (
+        <button
+          className="panel-reopen"
+          data-testid="dock-reopen"
+          aria-label="Open inspector dock"
+          title="Open inspector dock"
+          onClick={() => setDockOpen(true)}
+        >
+          ▤ Inspector
+        </button>
+      )}
     </div>
   );
 }

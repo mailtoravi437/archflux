@@ -1,9 +1,62 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HonestyBadge from '../components/HonestyBadge';
+import { sourceModeForDoc, sourceModeLabel, sourceModeTooltip } from '../honesty';
 import { useDiagram } from '../useDiagram';
 
 type SortKey = 'modified' | 'created' | 'nodes' | 'alpha';
 type View = 'grid' | 'table';
+
+const DASH_VIEW_KEY = 'archflux:dashboard:view:v1';
+
+function loadDashView(): { view: View; sort: SortKey } {
+  try {
+    const raw = localStorage.getItem(DASH_VIEW_KEY);
+    if (!raw) return { view: 'grid', sort: 'modified' };
+    const parsed = JSON.parse(raw) as { view?: unknown; sort?: unknown };
+    return {
+      view: parsed.view === 'table' ? 'table' : 'grid',
+      sort: parsed.sort === 'created' || parsed.sort === 'nodes' || parsed.sort === 'alpha' ? parsed.sort : 'modified',
+    };
+  } catch {
+    return { view: 'grid', sort: 'modified' };
+  }
+}
+
+/** Storage meter with warn/error thresholds and a free-up action (DSH-R4). */
+export function StorageCard({ docCount, usedKB, onFreeUp, onManage }: {
+  docCount: number;
+  usedKB: string;
+  onFreeUp: () => void;
+  onManage: () => void;
+}) {
+  const pct = Math.min(100, (docCount / 25) * 100);
+  const bar = pct >= 95 ? 'var(--accent-rose)' : pct >= 80 ? 'var(--accent-amber, #D97706)' : 'var(--accent-cyan, #2563EB)';
+  return (
+    <div className="content-card" style={{ maxWidth: 340 }} aria-label="Storage quota">
+      <div className="card-title" style={{ fontSize: 12 }}>
+        Storage — {docCount}/25 Diagrams · {usedKB} KB used
+        {pct >= 95 ? ' — full' : pct >= 80 ? ' — nearly full' : ''}
+      </div>
+      <div
+        style={{ height: 8, borderRadius: 4, background: 'var(--bg-panel-subtle)', overflow: 'hidden', marginTop: 8 }}
+        role="progressbar"
+        aria-valuenow={Math.round(pct)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Diagram storage used"
+      >
+        <div style={{ width: `${pct}%`, height: '100%', background: bar }} />
+      </div>
+      <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+        {pct >= 80 && (
+          <button className="btn-xs btn-xs-primary" onClick={onFreeUp}>Free up space</button>
+        )}
+        <button className="btn-xs" onClick={onManage}>Manage storage →</button>
+      </div>
+    </div>
+  );
+}
 
 function relTime(ts: number): string {
   const s = Math.max(0, Math.floor((Date.now() - ts) / 1000));
@@ -19,8 +72,23 @@ export default function DashboardScreen() {
   const navigate = useNavigate();
   const { docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, exportArch, exportPNG, importArch, pushToast, freshness } = useDiagram();
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<SortKey>('modified');
-  const [view, setView] = useState<View>('grid');
+  const [sort, setSortState] = useState<SortKey>(() => loadDashView().sort);
+  const [view, setViewState] = useState<View>(() => loadDashView().view);
+  const persistDashView = (nextView: View, nextSort: SortKey) => {
+    try {
+      localStorage.setItem(DASH_VIEW_KEY, JSON.stringify({ view: nextView, sort: nextSort }));
+    } catch {
+      /* ignore */
+    }
+  };
+  const setSort = (s: SortKey) => {
+    setSortState(s);
+    persistDashView(view, s);
+  };
+  const setView = (v: View) => {
+    setViewState(v);
+    persistDashView(v, sort);
+  };
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [tagEditingId, setTagEditingId] = useState<string | null>(null);
   const [tagText, setTagText] = useState('');
@@ -136,6 +204,12 @@ export default function DashboardScreen() {
   const open = (id: string) => {
     openDoc(id);
     navigate('/canvas');
+  };
+
+  const freeUpSpace = () => {
+    setSelectMode(true);
+    setSelectedIds(new Set());
+    pushToast('Select diagrams to delete, then use Delete in select mode');
   };
 
   const exportPngFor = (id: string) => {
@@ -326,13 +400,7 @@ export default function DashboardScreen() {
               </div>
             </div>
           )}
-          <div className="content-card" style={{ maxWidth: 340 }} aria-label="Storage quota">
-            <div className="card-title" style={{ fontSize: 12 }}>Storage — {docs.length}/25 Diagrams · {usedKB} KB used</div>
-            <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-panel-subtle)', overflow: 'hidden', marginTop: 8 }}>
-              <div style={{ width: `${Math.min(100, (docs.length / 25) * 100)}%`, height: '100%', background: 'var(--accent-cyan, #2563EB)' }} />
-            </div>
-            <button className="btn-xs" style={{ marginTop: 8 }} onClick={() => navigate('/settings/storage')}>Manage storage →</button>
-          </div>
+          <StorageCard docCount={docs.length} usedKB={usedKB} onFreeUp={freeUpSpace} onManage={() => navigate('/settings/storage')} />
         </div>
       </div>
     );
@@ -389,6 +457,12 @@ export default function DashboardScreen() {
                     )}
                     <div style={{ display: 'flex', gap: 6, fontSize: 10, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)', flexWrap: 'wrap', alignItems: 'center' }}>
                       <span style={{ border: '1px solid var(--border-panel)', borderRadius: 4, padding: '0 4px' }} title="Git tracking branch">[git:main]</span>
+                      {(() => {
+                        const mode = sourceModeForDoc(d.id);
+                        return (
+                          <HonestyBadge label={sourceModeLabel(mode)} tone={mode === 'local' ? 'neutral' : 'info'} title={sourceModeTooltip(mode)} />
+                        );
+                      })()}
                       <span>{d.nodes.length}n</span><span>{d.edges.length}e</span><span>{relTime(d.updatedAt)}</span>
                     </div>
                     {(d.tags ?? []).length > 0 && (
@@ -406,13 +480,7 @@ export default function DashboardScreen() {
               );
             })}
           </div>
-          <div className="content-card" style={{ maxWidth: 340 }} aria-label="Storage quota">
-            <div className="card-title" style={{ fontSize: 12 }}>Storage — {docs.length}/25 Diagrams · {usedKB} KB used</div>
-            <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-panel-subtle)', overflow: 'hidden', marginTop: 8 }}>
-              <div style={{ width: `${Math.min(100, (docs.length / 25) * 100)}%`, height: '100%', background: 'var(--accent-cyan, #2563EB)' }} />
-            </div>
-            <button className="btn-xs" style={{ marginTop: 8 }} onClick={() => navigate('/settings/storage')}>Manage storage →</button>
-          </div>
+          <StorageCard docCount={docs.length} usedKB={usedKB} onFreeUp={freeUpSpace} onManage={() => navigate('/settings/storage')} />
         </div>
       </div>
     );
@@ -483,6 +551,12 @@ export default function DashboardScreen() {
                   <div className="blueprint-info">
                     <strong style={{ fontSize: 13 }}>{d.title} {d.id === activeDocId && <span className="badge-count cyan">open</span>}</strong>
                     <div style={{ display: 'flex', gap: 6, fontSize: 10, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)', flexWrap: 'wrap', alignItems: 'center' }}>
+                      {(() => {
+                        const mode = sourceModeForDoc(d.id);
+                        return (
+                          <HonestyBadge label={sourceModeLabel(mode)} tone={mode === 'local' ? 'neutral' : 'info'} title={sourceModeTooltip(mode)} />
+                        );
+                      })()}
                       <span>{d.nodes.length}n</span><span>{d.edges.length}e</span><span>{relTime(d.updatedAt)}</span>
                     </div>
                     <span className="badge-count" style={{ width: 'fit-content', background: freshness === 'fresh' ? '#DCFCE7' : '#FEF3C7', color: freshness === 'fresh' ? '#16A34A' : '#D97706' }}>
@@ -548,11 +622,35 @@ export default function DashboardScreen() {
 
         {/* Table view (empty + grid handled by early returns above) */}
         <div className="content-card" role="table" aria-label="Diagrams table">
+          <div role="row" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '4px 4px 8px', borderBottom: '1px solid var(--border-panel)', fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            {([
+              { key: 'alpha', label: 'Title' },
+              { key: 'nodes', label: 'Size' },
+              { key: 'modified', label: 'Updated' },
+            ] as const).map((col) => (
+              <button
+                key={col.key}
+                role="columnheader"
+                aria-sort={sort === col.key ? (col.key === 'alpha' ? 'ascending' : 'descending') : 'none'}
+                onClick={() => setSort(col.key)}
+                title={`Sort by ${col.label}`}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', color: sort === col.key ? 'var(--accent-cyan)' : 'inherit', padding: 0 }}
+              >
+                {col.label}{sort === col.key ? (col.key === 'alpha' ? ' ↑' : ' ↓') : ''}
+              </button>
+            ))}
+          </div>
           {filtered.map((d) => {
             if (!d) return null;
             return (
                 <div key={d.id} role="row" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '8px 4px', borderBottom: '1px solid var(--border-panel)', position: 'relative' }} aria-label={`${d.title} — ${d.nodes.length} nodes, ${d.edges.length} edges, updated ${relTime(d.updatedAt)}`}>
                   <button style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }} onClick={() => open(d.id)}>{d.title}</button>
+                  {(() => {
+                    const mode = sourceModeForDoc(d.id);
+                    return (
+                      <HonestyBadge label={sourceModeLabel(mode)} tone={mode === 'local' ? 'neutral' : 'info'} title={sourceModeTooltip(mode)} />
+                    );
+                  })()}
                 {(d.tags ?? []).map((t) => <span key={t} style={{ fontSize: 10, color: 'var(--accent-cyan)' }}>#{t}</span>)}
                 <span style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)' }} aria-label={`${d.nodes.length} nodes, ${d.edges.length} edges`}>{d.nodes.length}n · {d.edges.length}e</span>
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }} aria-label="Last updated">{relTime(d.updatedAt)}</span>
