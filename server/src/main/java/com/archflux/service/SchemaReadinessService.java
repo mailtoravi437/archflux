@@ -67,4 +67,31 @@ public class SchemaReadinessService {
       throw ApiException.dbUnavailable();
     }
   }
+
+  /**
+   * Migration version for readiness/observability: the latest successfully
+   * applied Flyway version ({@code flyway_schema_history} by install order),
+   * or {@code "unmanaged"} when Flyway never ran here (e.g. JDBC-applied test
+   * schemas). Never throws — readiness probes must not crash on metadata.
+   */
+  public String schemaVersion() {
+    try {
+      String history = jdbc.queryForObject(
+          "SELECT to_regclass('public.flyway_schema_history')", String.class);
+      if (history == null) {
+        return "unmanaged";
+      }
+      List<String> versions = jdbc.queryForList(
+          "SELECT version FROM public.flyway_schema_history WHERE success = true "
+              + "ORDER BY installed_rank DESC LIMIT 1",
+          String.class);
+      if (versions.isEmpty() || versions.get(0) == null) {
+        return "unmanaged";
+      }
+      return versions.get(0);
+    } catch (DataAccessException e) {
+      log.debug("Schema version probe failed (host/db unreachable?)");
+      return "unmanaged";
+    }
+  }
 }

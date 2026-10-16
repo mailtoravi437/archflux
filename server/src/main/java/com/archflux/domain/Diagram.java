@@ -30,6 +30,13 @@ public class Diagram {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private User owner;
 
+  // Owning workspace (NOT NULL since V6). Assigned explicitly by
+  // WorkspaceService on the service path; rows persisted without one are
+  // backstopped by DiagramWorkspaceIntegrator (personal workspace).
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "workspace_id", nullable = false)
+  private Workspace workspace;
+
   @Column(name = "title", nullable = false)
   private String title = "";
 
@@ -112,7 +119,25 @@ public class Diagram {
     this.owner = owner;
   }
 
-  // Non-bean name on purpose: a getOwnerId() getter would shadow the
+  public Workspace getWorkspace() {
+    return workspace;
+  }
+
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  // Non-bean name on purpose (same reason as ownerId()): avoids shadowing
+  // the workspace.id traversal in Spring Data derived queries. Returns null
+  // when the association is unavailable instead of throwing.
+  public UUID workspaceId() {
+    try {
+      if (workspace == null) return null;
+      return workspace.getId();
+    } catch (Exception e) {
+      return null;
+    }
+  }  // Non-bean name on purpose: a getOwnerId() getter would shadow the
   // owner.id traversal in Spring Data derived queries.
   public UUID ownerId() {
     return owner == null ? null : owner.getId();

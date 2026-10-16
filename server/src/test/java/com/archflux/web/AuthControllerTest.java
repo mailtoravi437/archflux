@@ -9,6 +9,7 @@ import com.archflux.service.SyncService;
 import com.archflux.auth.JwtService;
 import com.archflux.auth.MagicLinkService;
 import com.archflux.auth.UserSessionService;
+import com.archflux.service.WorkspaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,29 +18,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.time.Instant;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -74,6 +68,11 @@ class AuthControllerTest extends PostgresIT {
     @MockitoBean
     private OAuth2AuthorizedClientService authorizedClientService;
 
+    // Real bean on purpose: the OAuth tests exercise the actual
+    // SECURITY DEFINER provisioning path (user + workspace), not a mock.
+    @Autowired
+    private WorkspaceService workspaceService;
+
     @MockitoBean
     private JwtDecoder jwtDecoder;
 
@@ -99,21 +98,35 @@ class AuthControllerTest extends PostgresIT {
         testUserId = user.getId();
     }
 
+    private com.archflux.web.AuthController controllerWithDevCookies(
+            com.archflux.web.AuthController controller) {
+        org.springframework.test.util.ReflectionTestUtils.setField(controller, "frontendUrl", "http://localhost:5173");
+        org.springframework.test.util.ReflectionTestUtils.setField(controller, "cookieSecure", false);
+        return controller;
+    }
+
     @Test
     void testGetCurrentUserWithJwt() throws Exception {
-        // Create JWT token
         String token = "test.jwt.token";
-        
-        // Mock JWT claims
-        var claims = io.jsonwebtoken.Jwts.claims()
-            .subject(testUserId.toString())
-            .add("email", testEmail)
-            .add("role", "member")
-            .build();
-        when(jwtService.validateToken(token)).thenReturn(claims);
+        when(jwtService.getUserId(token)).thenReturn(testUserId);
 
         mockMvc.perform(get("/api/v1/auth/me")
                 .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.email").value(testEmail))
+            .andExpect(jsonPath("$.id").value(testUserId.toString()))
+            .andExpect(jsonPath("$.name").value("Test User"))
+            .andExpect(jsonPath("$.role").value("member"))
+            .andExpect(jsonPath("$.provider").value("github"));
+    }
+
+    @Test
+    void testGetCurrentUserWithCookie() throws Exception {
+        String token = "cookie.jwt.token";
+        when(jwtService.getUserId(token)).thenReturn(testUserId);
+
+        mockMvc.perform(get("/api/v1/auth/me")
+                .cookie(new jakarta.servlet.http.Cookie("ARCHFLUX_TOKEN", token)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.email").value(testEmail));
     }
@@ -121,7 +134,18 @@ class AuthControllerTest extends PostgresIT {
     @Test
     void testGetCurrentUserUnauthorized() throws Exception {
         mockMvc.perform(get("/api/v1/auth/me"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.error.code").value("UNAUTHENTICATED"));
+    }
+
+    @Test
+    void testGetCurrentUserGarbageJwt() throws Exception {
+        when(jwtService.getUserId(anyString())).thenThrow(new RuntimeException("bad signature"));
+
+        mockMvc.perform(get("/api/v1/auth/me")
+                .header("Authorization", "Bearer garbage.jwt.token"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.error.code").value("UNAUTHENTICATED"));
     }
 
     @Test
@@ -149,51 +173,109 @@ class AuthControllerTest extends PostgresIT {
     void testVerifyMagicLink() throws Exception {
         String token = "test-magic-link-token";
         when(magicLinkService.verifyToken(token)).thenReturn(Optional.of(testEmail));
-        when(jwtService.generateToken(any(), anyString())).thenReturn("generated-jwt-token");
+        when(userSessionService.createSession(any(User.class), any())).thenReturn("test-session");
+        when(jwtService.generateToken(any(User.class), anyString())).thenReturn("generated-jwt-token");
 
-        mockMvc.perform(get("/api/v1/auth/verify")
+        MvcResult result = mockMvc.perform(get("/api/v1/auth/verify")
                 .param("token", token))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("**/auth/callback*"));
+            .andExpect(redirectedUrl("http://localhost:5173/auth/callback?provider=email"))
+            .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("ARCHFLUX_TOKEN=generated-jwt-token")))
+            .andReturn();
+
+        String location = result.getResponse().getRedirectedUrl();
+        assertNotNull(location);
+        assertFalse(location.contains("token="), "redirect must not carry a token: " + location);
+        String setCookie = result.getResponse().getHeader("Set-Cookie");
+        assertNotNull(setCookie);
+        assertTrue(setCookie.contains("HttpOnly"), "cookie must be HttpOnly: " + setCookie);
+        assertTrue(setCookie.contains("Path=/"), "cookie must set Path=/: " + setCookie);
+        assertTrue(setCookie.contains("SameSite=Lax"), "cookie must be SameSite=Lax: " + setCookie);
     }
 
     @Test
     void testVerifyMagicLinkInvalidToken() throws Exception {
         when(magicLinkService.verifyToken(anyString())).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/v1/auth/verify")
+        MvcResult result = mockMvc.perform(get("/api/v1/auth/verify")
                 .param("token", "invalid-token"))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrlPattern("**/login*"));
+            .andExpect(redirectedUrl("http://localhost:5173/login?error=invalid_token"))
+            .andReturn();
+
+        assertTrue(result.getResponse().getHeader("Set-Cookie") == null
+            || !result.getResponse().getHeader("Set-Cookie").contains("ARCHFLUX_TOKEN="));
     }
 
     @Test
     void testLogout() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/logout")
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/logout")
                 .header("X-Session-ID", "test-session-id"))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Logged out successfully"))
+            .andReturn();
+
+        verify(userSessionService).deleteSession("test-session-id");
+        String setCookie = result.getResponse().getHeader("Set-Cookie");
+        assertNotNull(setCookie, "logout must clear the auth cookie");
+        assertTrue(setCookie.contains("ARCHFLUX_TOKEN="), "must clear ARCHFLUX_TOKEN: " + setCookie);
+        assertTrue(setCookie.contains("Max-Age=0"), "cleared cookie must expire immediately: " + setCookie);
+        assertTrue(setCookie.contains("Path=/"), "cleared cookie must keep Path=/: " + setCookie);
+        assertTrue(setCookie.contains("SameSite=Lax"), "cleared cookie must keep SameSite: " + setCookie);
+    }
+
+    @Test
+    void testLogoutViaJwtSession() throws Exception {
+        String token = "valid.jwt.token";
+        when(jwtService.getSessionIdFromToken(token)).thenReturn("jwt-session-9");
+
+        mockMvc.perform(post("/api/v1/auth/logout")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("Logged out successfully"));
+
+        verify(userSessionService).deleteSession("jwt-session-9");
     }
 
     @Test
     void testRefreshToken() throws Exception {
         String token = "valid.jwt.token";
-        var claims = io.jsonwebtoken.Jwts.claims()
-            .subject(testUserId.toString())
-            .add("sessionId", "test-session")
-            .build();
-        when(jwtService.validateToken(token)).thenReturn(claims);
+        when(jwtService.getUserId(token)).thenReturn(testUserId);
+        when(jwtService.getSessionIdFromToken(token)).thenReturn("test-session");
         when(jwtService.generateToken(any(), anyString())).thenReturn("new-jwt-token");
+        when(jwtService.getAccessTokenTtlSeconds()).thenReturn(3600L);
 
-        mockMvc.perform(post("/api/v1/auth/refresh")
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/refresh")
                 .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.token").value("new-jwt-token"));
+            .andExpect(jsonPath("$.token").value("new-jwt-token"))
+            .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("ARCHFLUX_TOKEN=new-jwt-token")))
+            .andReturn();
+
+        String setCookie = result.getResponse().getHeader("Set-Cookie");
+        assertNotNull(setCookie);
+        assertTrue(setCookie.contains("HttpOnly"));
+        assertTrue(setCookie.contains("SameSite=Lax"));
+    }
+
+    @Test
+    void testRefreshTokenViaCookie() throws Exception {
+        String token = "cookie.jwt.token";
+        when(jwtService.getUserId(token)).thenReturn(testUserId);
+        when(jwtService.getSessionIdFromToken(token)).thenReturn("test-session");
+        when(jwtService.generateToken(any(), anyString())).thenReturn("rotated-jwt");
+        when(jwtService.getAccessTokenTtlSeconds()).thenReturn(3600L);
+
+        mockMvc.perform(post("/api/v1/auth/refresh")
+                .cookie(new jakarta.servlet.http.Cookie("ARCHFLUX_TOKEN", token)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.token").value("rotated-jwt"))
+            .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("ARCHFLUX_TOKEN=rotated-jwt")));
     }
 
     @Test
     void testRefreshTokenInvalid() throws Exception {
-        when(jwtService.validateToken(anyString())).thenThrow(new RuntimeException("Invalid token"));
+        when(jwtService.getUserId(anyString())).thenThrow(new RuntimeException("Invalid token"));
 
         mockMvc.perform(post("/api/v1/auth/refresh")
                 .header("Authorization", "Bearer invalid.token"))
@@ -202,12 +284,20 @@ class AuthControllerTest extends PostgresIT {
     }
 
     @Test
+    void testRefreshTokenMissing() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/refresh"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.error").value("Missing token"));
+    }
+
+    @Test
     void testOAuth2SuccessHandler() throws Exception {
         // Create mock OAuth2 user
         Map<String, Object> attributes = Map.of(
             "email", "oauth@test.com",
             "name", "OAuth User",
-            "id", "98765"
+            "id", "98765",
+            "avatar_url", "https://avatars.example.com/u/98765"
         );
         DefaultOAuth2User oauth2User = new DefaultOAuth2User(
             Collections.emptyList(), attributes, "email"
@@ -241,24 +331,58 @@ class AuthControllerTest extends PostgresIT {
         try {
         when(userSessionService.createSession(any(User.class), any())).thenReturn("test-session");
         when(jwtService.generateToken(any(User.class), any())).thenReturn("test-jwt");
-        com.archflux.web.AuthController controller = new com.archflux.web.AuthController(
-            userRepository, userSessionService, magicLinkService, jwtService, authorizedClientService);
-        org.springframework.test.util.ReflectionTestUtils.setField(controller, "frontendUrl", "http://localhost:5173");
+        when(jwtService.getAccessTokenTtlSeconds()).thenReturn(3600L);
+        com.archflux.web.AuthController controller = controllerWithDevCookies(
+            new com.archflux.web.AuthController(
+                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, authorizedClientService));
         var httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
         when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
         var httpRes = new org.springframework.mock.web.MockHttpServletResponse();
         controller.handleSuccess(oauth2User, httpReq, httpRes);
 
         var redirected = httpRes.getRedirectedUrl();
-        assert redirected != null && redirected.contains("/auth/callback")
-            : "expected callback redirect, got: " + redirected;
+        assertNotNull(redirected);
+        assertTrue(redirected.contains("/auth/callback"),
+            "expected callback redirect, got: " + redirected);
+        assertTrue(redirected.contains("provider=github"),
+            "expected provider in redirect, got: " + redirected);
+        assertFalse(redirected.contains("token="),
+            "redirect must not carry a token, got: " + redirected);
+
+        String setCookie = httpRes.getHeader("Set-Cookie");
+        assertNotNull(setCookie, "OAuth success must set the auth cookie");
+        assertTrue(setCookie.contains("ARCHFLUX_TOKEN=test-jwt"), "unexpected Set-Cookie: " + setCookie);
+        assertTrue(setCookie.contains("HttpOnly"), "unexpected Set-Cookie: " + setCookie);
+        assertTrue(setCookie.contains("SameSite=Lax"), "unexpected Set-Cookie: " + setCookie);
 
         // Verify user was created/updated (real repository — assert DB state)
         var saved = userRepository.findByEmailIgnoreCase("oauth@test.com");
-        assert saved.isPresent() : "OAuth user should be persisted";
+        assertTrue(saved.isPresent(), "OAuth user should be persisted");
+        assertTrue("https://avatars.example.com/u/98765".equals(saved.get().getAvatarUrl()),
+            "avatar should be stored, got: " + saved.get().getAvatarUrl());
         verify(jwtService).generateToken(any(User.class), any());
         } finally {
             org.springframework.security.core.context.SecurityContextHolder.clearContext();
         }
+    }
+
+    @Test
+    void testOAuth2SuccessWithoutEmail() throws Exception {
+        Map<String, Object> attributes = Map.of("id", "no-email-id", "login", "ghost");
+        DefaultOAuth2User oauth2User = new DefaultOAuth2User(
+            Collections.emptyList(), attributes, "id"
+        );
+
+        com.archflux.web.AuthController controller = controllerWithDevCookies(
+            new com.archflux.web.AuthController(
+                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, authorizedClientService));
+        var httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
+        when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
+        var httpRes = new org.springframework.mock.web.MockHttpServletResponse();
+        controller.handleSuccess(oauth2User, httpReq, httpRes);
+
+        assertTrue(httpRes.getRedirectedUrl() != null
+            && httpRes.getRedirectedUrl().contains("/login?error=no_email"),
+            "expected no_email redirect, got: " + httpRes.getRedirectedUrl());
     }
 }

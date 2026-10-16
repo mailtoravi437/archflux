@@ -99,13 +99,16 @@ server/src/main/java/com/archflux/
 | `V3__production_hardening.sql` | RLS policies + helpers, audit_log + audit triggers, soft deletes, CHECK constraints, helper functions |
 | `V4__oauth_fields.sql` | OAuth columns on users (provider, provider_id, avatar_url, access_token, last_login_at) |
 | `V5__versioning_branching.sql` | `parent_diagram_id`, `branch_name` on diagrams; `branch`, `active` on checkpoints |
+| `V6__workspaces.sql` | `workspaces` + `workspace_memberships` (tenant boundary), `diagrams.workspace_id` + backfill, RLS + `is_workspace_member()`, audit/app grants, `provision_user()` login-provisioning function, provider allow-list widening |
 
 ### Key Tables
 
 | Table | Purpose |
 |-------|---------|
 | `users` | Authentication + OAuth profile |
-| `diagrams` | Architecture diagrams (JSONB graph + metadata) |
+| `workspaces` | Tenant boundary (one personal workspace per user, more later) |
+| `workspace_memberships` | Roster: (workspace, user) + role + status |
+| `diagrams` | Architecture diagrams (JSONB graph + metadata + `workspace_id`) |
 | `checkpoints` | Version snapshots (JSONB snapshot + branch + active flag) |
 | `threads` | Review comments pinned to nodes |
 | `replies` | Thread replies |
@@ -137,7 +140,15 @@ Base: `/api/v1`
 | `/auth/failure` | GET | OAuth2 failure redirect |
 | `/login/github\|google\|saml\|oidc` | GET | Initiate OAuth2/SAML login |
 
-**Auth schemes:** Bearer JWT (dev-token or OAuth2), OAuth2 Authorization Code, SAML2 SP, Magic Link.
+**Auth schemes (Phase 1, PROD-001/011):** user JWT in the `ARCHFLUX_TOKEN` cookie
+(HttpOnly, Path=/, SameSite=Lax, Secure per `app.cookie-secure`) or `Authorization: Bearer <user-JWT>` fallback.
+JWTs carry validated signature/issuer/audience/expiry with previous-secret rotation; `sub` is the real user UUID
+(auto-provisioned with a personal workspace via the SECURITY DEFINER `provision_user()` function — the only
+login-time user writer, since auth paths run with no RequestUser yet). Redirects never carry tokens
+(success → `/auth/callback?provider=`, failure → `/login?error=`). The static API token is a service credential
+accepted **only** on `POST /api/v1/sync/webhook/git` and authenticates nobody. State-changing `/api/v1/**`
+requests with a foreign Origin/Referer are rejected 403 (CSRF posture for cookie auth); `POST /auth/magic-link`
+is rate-limited. OAuth `defaultSuccessUrl` is `/api/v1/auth/success` (matches the controller).
 
 ### Diagrams
 
@@ -417,12 +428,14 @@ tags instead of title-LIKE (currently duplicates diagrams).
 
 | Aspect | Implementation |
 |--------|----------------|
-| JWT | HS256, ≥256-bit secret, `realm_access.roles` → `ROLE_*`, `scope` → `SCOPE_*` |
-| Sessions | Redis-backed, 30-day TTL, `HttpOnly; Secure; SameSite=Lax` |
+| JWT | HS256, iss/aud/exp enforced, previous-secret rotation, `sub` = real user UUID |
+| Sessions | Redis-backed, 30-day TTL, `HttpOnly; Secure; SameSite=Lax` (+ `ARCHFLUX_TOKEN` cookie session) |
 | CORS | `allowedOriginPatterns: *`, `allowCredentials: true` (dev) |
 | Rate limiting | `RateLimitFilter` (configurable) |
 | Payload limit | `PayloadLimitFilter` (configurable) |
-| Dev-token | `AppProperties.api-token` + `DEV_USER_ID` (test only) |
+| CSRF | Origin/Referer allow-check on state-changing `/api/v1/**` (403 on foreign origin) |
+| Service token | Static token accepted only on the GitHub webhook path; never a user identity |
+| Flyway | `flyway-core` + `flyway-database-postgresql` (v10+ split artifacts); owner migrates, app is DML-only |
 
 ---
 

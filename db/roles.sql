@@ -90,5 +90,71 @@ $$;
 ALTER DEFAULT PRIVILEGES FOR ROLE archflux_migrator IN SCHEMA public
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO archflux_app;
 
+-- ---------------------------------------------------------- 3. V6 workspace grants (mirror of V6__workspaces.sql §6–7)
+-- Operator-run manual bootstraps: same grants V6 applies when the role exists,
+-- so running roles.sql after V6 converges fresh installs and upgrades alike.
+-- Re-runnable: every block is to_regclass/pg_proc-guarded; GRANTs idempotent.
+DO $$
+BEGIN
+  IF to_regclass('public.workspaces') IS NOT NULL
+     AND to_regclass('public.workspace_memberships') IS NOT NULL THEN
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspaces TO archflux_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.workspace_memberships TO archflux_app;
+    GRANT ALL PRIVILEGES ON public.workspaces TO archflux_migrator;
+    GRANT ALL PRIVILEGES ON public.workspace_memberships TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: workspaces/workspace_memberships not present yet — apply V6__workspaces.sql first, then re-run roles.sql.';
+  END IF;
+
+  IF to_regclass('public.audit_log') IS NOT NULL THEN
+    -- Trigger writes run as the SECURITY DEFINER owner, so the app role needs
+    -- no write path of its own; SELECT covers read-back, INSERT covers
+    -- operator-driven manual inserts. (audit_log itself has no RLS.)
+    GRANT SELECT, INSERT ON public.audit_log TO archflux_app;
+    GRANT ALL PRIVILEGES ON public.audit_log TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.audit_log not present yet — apply V3__production_hardening.sql first, then re-run roles.sql.';
+  END IF;
+
+  IF to_regclass('public.audit_log_id_seq') IS NOT NULL THEN
+    GRANT USAGE, SELECT ON SEQUENCE public.audit_log_id_seq TO archflux_app;
+    GRANT ALL PRIVILEGES ON SEQUENCE public.audit_log_id_seq TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.audit_log_id_seq not present yet — apply V3 first, then re-run roles.sql.';
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM pg_proc
+             WHERE proname = 'audit_trigger_fn' AND pronamespace = 'public'::regnamespace) THEN
+    GRANT EXECUTE ON FUNCTION public.audit_trigger_fn() TO archflux_app;
+    GRANT EXECUTE ON FUNCTION public.audit_trigger_fn() TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.audit_trigger_fn() missing — apply V3 first, then re-run roles.sql.';
+  END IF;
+
+  -- V6 RLS membership helper (SECURITY DEFINER; policies cannot subquery
+  -- their own table). Same EXECUTE surface as the audit trigger.
+  IF EXISTS (SELECT 1 FROM pg_proc
+             WHERE proname = 'is_workspace_member' AND pronamespace = 'public'::regnamespace) THEN
+    GRANT EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) TO archflux_app;
+    GRANT EXECUTE ON FUNCTION public.is_workspace_member(uuid, uuid) TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.is_workspace_member(uuid, uuid) missing — apply V6 first, then re-run roles.sql.';
+  END IF;
+
+  -- V6 login provisioning (SECURITY DEFINER): the ONLY writer for login-time
+  -- user upserts, which run outside @Transactional service scope with no
+  -- RequestUser yet (users_modify_admin would deny them to non-admins).
+  IF EXISTS (SELECT 1 FROM pg_proc
+             WHERE proname = 'provision_user' AND pronamespace = 'public'::regnamespace) THEN
+    GRANT EXECUTE ON FUNCTION
+      public.provision_user(uuid, text, text, text, text, text, text, text) TO archflux_app;
+    GRANT EXECUTE ON FUNCTION
+      public.provision_user(uuid, text, text, text, text, text, text, text) TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.provision_user missing — apply V6 first, then re-run roles.sql.';
+  END IF;
+END
+$$;
+
 -- Belt-and-braces: the app role must never hold schema CREATE (DDL).
 REVOKE CREATE ON SCHEMA public FROM archflux_app;

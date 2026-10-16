@@ -1,7 +1,11 @@
 /**
- * API client with offline fallback to localStorage.
- * Base URL configurable via VITE_API_URL (build) or /config.json (runtime).
+ * API client for the cookie-session backend (PROD-001/003/011).
+ * Auth relies on the HttpOnly `ARCHFLUX_TOKEN` cookie set by the server on
+ * OAuth/magic-link success — never on a bearer in localStorage. Every
+ * request sends `credentials: 'include'` so the cookie flows automatically.
  */
+import { getSession, clearSession } from './session';
+
 const API_BASE = (() => {
   try {
     return (window as any).__ARCHFLUX_API_URL__ || '/api';
@@ -12,15 +16,80 @@ const API_BASE = (() => {
 
 let currentCorrelationId: string | null = null;
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('archflux:auth_token');
+export interface UnauthorizedInfo {
+  hadSession: boolean;
+  path: string;
+  status: number;
+}
+
+export type UnauthorizedHandler = (info: UnauthorizedInfo) => void;
+
+let unauthorizedHandler: UnauthorizedHandler | null = null;
+let unauthorizedNotified = false;
+
+export function setUnauthorizedHandler(h: UnauthorizedHandler | null) {
+  unauthorizedHandler = h;
+}
+
+/** Reset the single-flight 401 latch (login success, sign-out, tests). */
+export function resetAuthFailure() {
+  unauthorizedNotified = false;
+}
+
+const PROBE_MATCHERS = ['/auth/me', '/v1/auth/me'];
+
+/**
+ * True for auth-probing requests (e.g. GET /api/v1/auth/me) that must NOT
+ * trigger the global 401 single-flight redirect. Screens mark probes either
+ * by path convention or with the explicit `{ probe: true }` request option.
+ */
+export function isAuthProbe(path: string): boolean {
+  return PROBE_MATCHERS.some((m) => path.includes(m));
+}
+
+interface RequestOpts {
+  /** Mark this request as a probe: 401s reject locally with no side effects. */
+  probe?: boolean;
+}
+
+function redirectToLogin() {
+  try {
+    window.location.hash = '#/login';
+  } catch {
+    /* ignore */
+  }
+}
+
+function handleUnauthorized(path: string, status: number) {
+  if (unauthorizedNotified) return;
+  unauthorizedNotified = true;
+  const s = getSession();
+  const hadSession = !!s && s.mode !== 'guest';
+  if (hadSession) {
+    try {
+      clearSession();
+    } catch {
+      /* ignore */
+    }
+  }
+  const info: UnauthorizedInfo = { hadSession, path, status };
+  if (unauthorizedHandler) {
+    try {
+      unauthorizedHandler(info);
+    } catch {
+      /* ignore */
+    }
+  } else {
+    redirectToLogin();
+  }
+}
+
+async function request<T>(path: string, options: RequestInit = {}, opts: RequestOpts = {}): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string> || {}),
+    ...((options.headers as Record<string, string>) || {}),
   };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  delete headers['Authorization'];
   if (currentCorrelationId) {
     headers['X-Correlation-ID'] = currentCorrelationId;
   }
@@ -30,11 +99,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (respCorrelationId) {
     currentCorrelationId = respCorrelationId;
   }
+  if (res.status === 401 && !opts.probe && !isAuthProbe(path)) {
+    handleUnauthorized(path, res.status);
+  }
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
     try {
       const err = await res.json();
-      msg = err.error?.message || msg;
+      msg = err.error?.message || err.message || msg;
     } catch { /* ignore */ }
     throw new Error(msg);
   }
@@ -47,10 +119,34 @@ export function getCorrelationId(): string | null {
 }
 
 export const api = {
-  // Auth
-  getToken: () => localStorage.getItem('archflux:auth_token'),
-  setToken: (t: string) => localStorage.setItem('archflux:auth_token', t),
-  clearToken: () => localStorage.removeItem('archflux:auth_token'),
+  // Auth — cookie sessions. Token helpers below are deprecated no-ops kept
+  // only so old imports fail soft; they never touch localStorage writes.
+  /** @deprecated Cookie sessions only — always returns null. */
+  getToken: (): string | null => null,
+  /** @deprecated Cookie sessions only — no-op. */
+  setToken: (_t: string) => {},
+  /** @deprecated Cookie sessions only — removes any legacy leftover, no-op otherwise. */
+  clearToken: () => {
+    try {
+      localStorage.removeItem('archflux:auth_token');
+    } catch {
+      /* ignore */
+    }
+  },
+
+  /** Cookie probe — must NOT trigger the global 401 redirect. */
+  me: (probe = true) =>
+    request<{ data?: { email?: string; id?: string }; email?: string; id?: string }>('/v1/auth/me', {}, { probe }),
+
+  /** Server clears the ARCHFLUX_TOKEN cookie. Callers ignore failure. */
+  logout: () =>
+    request<void>('/v1/auth/logout', { method: 'POST' }, { probe: true }),
+
+  sendMagicLink: (email: string) =>
+    request<{ data?: unknown }>('/v1/auth/magic-link', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
 
   // Diagrams
   listDiagrams: (page = 1, limit = 20, q?: string) =>
@@ -195,8 +291,9 @@ async function processQueue() {
     try {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        ...(item.options.headers as Record<string, string> || {}),
+        ...((item.options.headers as Record<string, string>) || {}),
       };
+      delete headers['Authorization'];
       if (currentCorrelationId) {
         headers['X-Correlation-ID'] = currentCorrelationId;
       }
@@ -204,6 +301,9 @@ async function processQueue() {
       const respCorrelationId = res.headers.get('X-Correlation-ID');
       if (respCorrelationId) {
         currentCorrelationId = respCorrelationId;
+      }
+      if (res.status === 401 && !isAuthProbe(item.path)) {
+        handleUnauthorized(item.path, res.status);
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       item.resolve(await res.json());

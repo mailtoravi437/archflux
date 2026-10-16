@@ -7,6 +7,42 @@ import { libraryShapes } from '../mocks';
 import { useDiagram, useDiagramUI } from '../useDiagram';
 import { useFocusTrap } from '../useFocusTrap';
 import { ErrorBoundary } from '../ErrorBoundary';
+import { api, setUnauthorizedHandler } from '../api';
+import { getSession, setSession } from '../session';
+
+// Cached cookie-session probe: one GET /api/v1/auth/me per mount at most,
+// shared across AppShell instances. Guest/null sessions never hit network.
+let meProbeInflight: Promise<boolean> | null = null;
+let meProbeCached: boolean | null = null;
+
+export function probeAuthSession(): Promise<boolean> {
+  if (meProbeCached !== null) return Promise.resolve(meProbeCached);
+  if (meProbeInflight) return meProbeInflight;
+  const s = getSession();
+  if (!s || s.mode === 'guest') {
+    meProbeCached = false;
+    return Promise.resolve(false);
+  }
+  meProbeInflight = api
+    .me()
+    .then(() => {
+      meProbeCached = true;
+      return true;
+    })
+    .catch(() => {
+      meProbeCached = false;
+      return false;
+    })
+    .finally(() => {
+      meProbeInflight = null;
+    });
+  return meProbeInflight;
+}
+
+export function resetMeProbeCache() {
+  meProbeCached = null;
+  meProbeInflight = null;
+}
 
 const ROUTE_TITLES: Record<string, string> = {
   '/': 'Document Library',
@@ -63,24 +99,55 @@ export default function AppShell() {
   const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, displayName } = useDiagram();
   const isCanvas = location.pathname === '/canvas';
   const [userOpen, setUserOpen] = useState(false);
-  const authToken = (() => {
-    try {
-      return localStorage.getItem('archflux:auth_token');
-    } catch {
-      return null;
+  // Token-free account presence: local session mode + a cached /me probe
+  // on mount when a non-guest session exists.
+  const [signedIn, setSignedIn] = useState(() => {
+    const s = getSession();
+    return !!s && s.mode !== 'guest';
+  });
+  useEffect(() => {
+    const s = getSession();
+    if (!s || s.mode === 'guest') {
+      setSignedIn(false);
+      return;
     }
-  })();
+    let cancelled = false;
+    void probeAuthSession().then((ok) => {
+      if (!cancelled) setSignedIn(ok);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  useEffect(() => {
+    setUnauthorizedHandler((info) => {
+      if (info.hadSession) pushToast('Session expired — sign in again');
+      setSignedIn(false);
+      navigate('/login');
+    });
+    return () => setUnauthorizedHandler(null);
+  }, [pushToast, navigate]);
   const userInitial = ((displayName ?? '').trim()[0] ?? 'G').toUpperCase();
   const signOut = () => {
-    try {
-      localStorage.removeItem('archflux:auth_token');
-      localStorage.setItem('archflux:session', JSON.stringify({ mode: 'guest' }));
-    } catch {
-      /* ignore */
-    }
-    setUserOpen(false);
-    pushToast('Signed out — guest mode');
-    navigate('/login');
+    void (async () => {
+      try {
+        await api.logout();
+      } catch {
+        /* ignore logout failure — still drop to guest locally */
+      }
+      try {
+        resetMeProbeCache();
+        setSession({ mode: 'guest' });
+        // Hygiene: drop any legacy pre-cookie bearer leftover.
+        api.clearToken();
+      } catch {
+        /* ignore */
+      }
+      setSignedIn(false);
+      setUserOpen(false);
+      pushToast('Signed out — guest mode');
+      navigate('/login');
+    })();
   };
   const { lintCount } = useDiagramUI();
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -317,7 +384,7 @@ export default function AppShell() {
             )}
           </NavLink>
           <NavLink to="/blueprints" className={({ isActive }) => `screen-tab-btn${isActive ? ' active' : ''}`}><img src="/icons/general/blueprint.svg" alt="" style={{width:16,height:16,marginRight:6}}/> Blueprints</NavLink>
-          <NavLink to="/settings/general" className={() => `screen-tab-btn${location.pathname.startsWith('/settings') ? ' active' : ''}`} aria-current={location.pathname.startsWith('/settings') ? 'page' : undefined}><img src="/icons/tools/settings.svg" alt="" style={{width:16,height:16,marginRight:6}}/> Settings{!authToken && <span className="badge-count warn" title="Not signed in — configure auth">!</span>}</NavLink>
+          <NavLink to="/settings/general" className={() => `screen-tab-btn${location.pathname.startsWith('/settings') ? ' active' : ''}`} aria-current={location.pathname.startsWith('/settings') ? 'page' : undefined}><img src="/icons/tools/settings.svg" alt="" style={{width:16,height:16,marginRight:6}}/> Settings{!signedIn && <span className="badge-count warn" title="Not signed in — configure auth">!</span>}</NavLink>
         </nav>
 
         <div className="header-actions">
@@ -343,10 +410,10 @@ export default function AppShell() {
           <div style={{ position: 'relative' }}>
             <button
               className="btn"
-              aria-label={authToken ? `Account (${displayName.trim() || 'signed in'})` : 'Account (guest)'}
+              aria-label={signedIn ? `Account (${displayName.trim() || 'signed in'})` : 'Account (guest)'}
               aria-haspopup="menu"
               aria-expanded={userOpen}
-              title={authToken ? 'Account' : 'Guest — sign in'}
+              title={signedIn ? 'Account' : 'Guest — sign in'}
               onClick={() => setUserOpen((v) => !v)}
               style={{ position: 'relative' }}
             >
@@ -362,10 +429,10 @@ export default function AppShell() {
               </span>
               <span
                 aria-hidden="true"
-                title={authToken ? 'Signed in' : 'Guest'}
+                title={signedIn ? 'Signed in' : 'Guest'}
                 style={{
                   position: 'absolute', top: 2, right: 2, width: 8, height: 8,
-                  borderRadius: '50%', background: authToken ? '#16A34A' : '#D97706',
+                  borderRadius: '50%', background: signedIn ? '#16A34A' : '#D97706',
                   border: '1px solid var(--bg-panel)',
                 }}
               />
@@ -375,12 +442,12 @@ export default function AppShell() {
                 <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setUserOpen(false)} aria-hidden="true" />
                 <div role="menu" aria-label="Account" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 91, minWidth: 190, background: 'var(--bg-panel)', border: '1px solid var(--border-panel)', borderRadius: 10, boxShadow: 'var(--panel-shadow)', padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '6px 8px', fontFamily: 'var(--mono-font)' }}>
-                    {authToken ? (displayName.trim() || 'Signed in') : 'Guest mode'}
+                    {signedIn ? (displayName.trim() || 'Signed in') : 'Guest mode'}
                   </div>
                   <button className="btn-xs" role="menuitem" style={{ textAlign: 'left' }} onClick={() => { setUserOpen(false); navigate('/settings/team'); }}>
                     👥 Profile & Team
                   </button>
-                  {authToken ? (
+                  {signedIn ? (
                     <button className="btn-xs" role="menuitem" style={{ textAlign: 'left', color: 'var(--accent-rose)' }} onClick={signOut}>
                       ⎋ Sign out
                     </button>

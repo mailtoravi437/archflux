@@ -1,5 +1,6 @@
 package com.archflux.repo;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -29,5 +30,23 @@ public interface DiagramRepository extends JpaRepository<Diagram, UUID> {
   @Query("SELECT COUNT(d) FROM Diagram d WHERE d.owner.id = :ownerId "
       + "AND LOWER(d.title) LIKE LOWER(:pattern) ESCAPE '\\' ")
   long countSearchByOwnerAndTitle(@Param("ownerId") UUID ownerId,
+      @Param("pattern") String pattern);
+
+  /**
+   * Workspace-scoped feed (Phase 1 isolation): diagrams in any of the given
+   * workspaces. Owner-scoped finders above are retained for compatibility.
+   */
+  Page<Diagram> findByWorkspace_IdIn(Collection<UUID> workspaceIds, Pageable pageable);
+
+  long countByWorkspace_IdIn(Collection<UUID> workspaceIds);
+
+  @Query("SELECT d FROM Diagram d WHERE d.workspace.id IN :workspaceIds "
+      + "AND LOWER(d.title) LIKE LOWER(:pattern) ESCAPE '\\' ")
+  Page<Diagram> searchByWorkspacesAndTitle(@Param("workspaceIds") Collection<UUID> workspaceIds,
+      @Param("pattern") String pattern, Pageable pageable);
+
+  @Query("SELECT COUNT(d) FROM Diagram d WHERE d.workspace.id IN :workspaceIds "
+      + "AND LOWER(d.title) LIKE LOWER(:pattern) ESCAPE '\\' ")
+  long countSearchByWorkspacesAndTitle(@Param("workspaceIds") Collection<UUID> workspaceIds,
       @Param("pattern") String pattern);
 }

@@ -24,13 +24,18 @@ public class HealthController {
   @GetMapping("/api/ready")
   public org.springframework.http.ResponseEntity<Map<String, Object>> ready() {
     List<String> missing = readiness.missingTables();
+    String schemaVersion = readiness.schemaVersion();
     if (missing.isEmpty()) {
-      return org.springframework.http.ResponseEntity.ok(Map.of("ready", true));
+      Map<String, Object> body = new LinkedHashMap<>();
+      body.put("ready", true);
+      body.put("schemaVersion", schemaVersion);
+      return org.springframework.http.ResponseEntity.ok(body);
     }
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("ready", false);
     body.put("missing", missing);
     body.put("reason", "Database schema not applied — apply db/migrations/V1__init.sql with psql, then retry.");
+    body.put("schemaVersion", schemaVersion);
     return org.springframework.http.ResponseEntity.status(503).body(body);
   }
 }

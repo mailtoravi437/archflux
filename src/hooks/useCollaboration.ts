@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
+import { getSession } from '../session';
 
 interface CollaborationState {
   connected: boolean;
@@ -31,7 +32,7 @@ interface SharedSession {
 
 const sessions = new Map<string, SharedSession>();
 
-function getSession(diagramId: string, auth_token: string): SharedSession {
+function getSharedSession(diagramId: string): SharedSession {
   const existing = sessions.get(diagramId);
   if (existing) {
     existing.refs += 1;
@@ -39,6 +40,8 @@ function getSession(diagramId: string, auth_token: string): SharedSession {
   }
   const ydoc = new Y.Doc();
   const wsUrl = `${import.meta.env.VITE_WS_URL || 'ws://localhost:3001'}/ws`;
+  // Cookie session: the browser sends ARCHFLUX_TOKEN on the WS handshake
+  // automatically — no token query param, nothing from localStorage.
   const provider = new WebsocketProvider(
     wsUrl,
     `diagram-${diagramId}`,
@@ -46,7 +49,6 @@ function getSession(diagramId: string, auth_token: string): SharedSession {
     {
       connect: true,
       params: {
-        token: auth_token,
         diagramId: diagramId,
       }
     }
@@ -94,7 +96,11 @@ function snapshotMaps(session: SharedSession): Omit<SharedGraph, 'version'> {
 }
 
 export function useCollaboration(diagramId: string | null) {
-  const auth_token = localStorage.getItem('archflux:auth_token');
+  // Guest-first: guests stay fully local — no socket, no snapshot fetch.
+  const authed = (() => {
+    const s = getSession();
+    return !!s && s.mode !== 'guest';
+  })();
 
   const [state, setState] = useState<CollaborationState>({
     connected: false,
@@ -110,10 +116,10 @@ export function useCollaboration(diagramId: string | null) {
 
   // Initialize shared session + presence + graph observers
   useEffect(() => {
-    if (!diagramId || !auth_token) return;
+    if (!diagramId || !authed) return;
     hydratedRef.current = false;
 
-    const session = getSession(diagramId, auth_token);
+    const session = getSharedSession(diagramId);
     sessionRef.current = session;
 
     // Set up awareness
@@ -138,7 +144,7 @@ export function useCollaboration(diagramId: string | null) {
       }));
       if (event.status === 'synced' && !hydratedRef.current) {
         hydratedRef.current = true;
-        void hydrateFromServer(session, diagramId, auth_token);
+        void hydrateFromServer(session, diagramId);
       }
     };
     session.provider.on('status', onStatus);
@@ -195,7 +201,7 @@ export function useCollaboration(diagramId: string | null) {
       sessionRef.current = null;
       releaseSession(diagramId);
     };
-  }, [diagramId, auth_token]);
+  }, [diagramId, authed]);
 
   // Push the local canvas graph into the shared Y.Doc (debounced by caller).
   const pushLocalGraph = useCallback((graph: { nodes: any[]; edges: any[]; strokes?: any[]; texts?: any[] }) => {
@@ -273,12 +279,12 @@ function structuredCloneSafe<T>(value: T): T {
 }
 
 // Hydrate empty shared maps from the server snapshot on first sync.
-async function hydrateFromServer(session: SharedSession, diagramId: string, auth_token: string) {
+async function hydrateFromServer(session: SharedSession, diagramId: string) {
   try {
     // Skip when collaborators already populated the doc.
     if (session.yNodes.size + session.yEdges.size + session.yStrokes.size + session.yTexts.size > 0) return;
     const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/v1/diagrams/${diagramId}`, {
-      headers: { 'Authorization': `Bearer ${auth_token}` }
+      credentials: 'include',
     });
     if (!response.ok) return;
     const body = await response.json();
@@ -302,14 +308,17 @@ async function hydrateFromServer(session: SharedSession, diagramId: string, auth
 
 // Hook for presence/awareness only (lighter weight, shares the session doc)
 export function usePresence(diagramId: string | null) {
-  const auth_token = localStorage.getItem('archflux:auth_token');
+  const authed = (() => {
+    const s = getSession();
+    return !!s && s.mode !== 'guest';
+  })();
   const [users, setUsers] = useState<Map<string, any>>(new Map());
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (!diagramId || !auth_token) return;
+    if (!diagramId || !authed) return;
 
-    const session = getSession(diagramId, auth_token);
+    const session = getSharedSession(diagramId);
     const awareness = session.provider.awareness;
 
     const onStatus = (event: { status: string }) => {
@@ -341,7 +350,7 @@ export function usePresence(diagramId: string | null) {
       }
       releaseSession(diagramId);
     };
-  }, [diagramId, auth_token]);
+  }, [diagramId, authed]);
 
   return { users: Array.from(users.values()), connected };
 }

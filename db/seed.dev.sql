@@ -3,6 +3,7 @@
 --   psql "host=localhost port=5432 dbname=archflux user=postgres" \
 --     -v ON_ERROR_STOP=1 -f db/seed.dev.sql
 --
+-- Requires V1..V6 applied (diagrams.workspace_id is NOT NULL since V6).
 -- Idempotent: fixed UUIDs + bare ON CONFLICT DO NOTHING on every row, so re-running
 -- never raises duplicate-key errors (second run inserts 0 rows).
 -- Contents: 1 demo user + 1 diagram (small checkout mesh: 3 nodes / 2 edges) +
@@ -20,11 +21,30 @@ INSERT INTO public.users (id, email, name, role)
 VALUES ('11111111-1111-1111-1111-111111111111', 'dev@archflux.local', 'Dev User', 'admin')
 ON CONFLICT DO NOTHING;
 
+-- Personal workspaces for the seed users (V6 tenant boundary; fixed ids so
+-- FK targets are stable across re-runs).
+INSERT INTO public.workspaces (id, name, plan)
+VALUES ('aa333333-3333-4333-8333-333333333333', 'Demo User''s workspace', 'member')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO public.workspaces (id, name, plan)
+VALUES ('11001100-1100-4110-8110-110011001100', 'Dev User''s workspace', 'member')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO public.workspace_memberships (workspace_id, user_id, role, status)
+VALUES ('aa333333-3333-4333-8333-333333333333', 'a1111111-1111-4111-8111-111111111111', 'admin', 'active')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO public.workspace_memberships (workspace_id, user_id, role, status)
+VALUES ('11001100-1100-4110-8110-110011001100', '11111111-1111-1111-1111-111111111111', 'admin', 'active')
+ON CONFLICT DO NOTHING;
+
 -- Demo diagram: small checkout mesh, 3 nodes / 2 edges.
-INSERT INTO public.diagrams (id, owner_id, title, tags, graph)
+INSERT INTO public.diagrams (id, owner_id, workspace_id, title, tags, graph)
 VALUES (
   'b2222222-2222-4222-8222-222222222222',
   'a1111111-1111-4111-8111-111111111111',
+  'aa333333-3333-4333-8333-333333333333',
   'Checkout mesh (dev seed)',
   ARRAY['demo', 'checkout'],
   $${

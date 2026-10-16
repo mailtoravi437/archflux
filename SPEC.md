@@ -156,11 +156,15 @@ acceptance criteria + operational evidence are met — otherwise it is labeled P
 | P0-4 | Honest-labeling: Demo/Preview/Not-connected badges on simulated surfaces | frontend | resync, connectors, approvals, sandbox labeled; no green "Healthy" for form-validated connectors |
 | P0-5 | Feature flags / remove misleading entry points | frontend | incomplete paths gated or removed |
 
-### Phase 1 — Secure single-user cloud product (planned)
+### Phase 1 — Secure single-user cloud product (✅ implemented + proven live 2026-10-15)
 
-Real validated identity (PROD-001); OAuth callback/session fix; secrets out of browser storage (PROD-011);
-Redis decision; user/workspace scoping (PROD-002); migration/RLS/readiness fixes (PROD-005);
-two-user save/reload + export/import + isolation E2E.
+Real JWT identity + HttpOnly cookie session (PROD-001); OAuth callback/session fix; secrets out of browser
+storage (PROD-011); Redis provisioned; user/workspace scoping with RLS defense-in-depth (PROD-002);
+V3–V6 migration defects fixed, least-privilege grants, `provision_user()` login provisioning, schema-version
+readiness (PROD-005); Flyway-as-owner automation + db-init roles + compose verification.
+Proof: backend 77/77 (two-user isolation, app-role, V6 upgrade), frontend 90 + 126 E2E, AND a fresh
+compose stack booting clean (SAML/OAuth2 offline-safe defaults, JWT fail-fast) with a live two-user
+magic-link → cookie → CRUD + isolation + logout run under the `archflux_app` role (exit met).
 
 ### Phase 2+ — tracked in PRODUCTIZATION_SPEC.md §§16–19
 Data integrity → GitHub/review → first real connector → collaboration decision → beta.

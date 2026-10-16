@@ -15,7 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * In-memory per-IP token buckets for POST /api/v1/sync and POST /api/v1/lint.
+ * In-memory per-IP token buckets for POST /api/v1/sync, POST /api/v1/lint,
+ * and POST /api/v1/auth/magic-link (the last slows magic-link email abuse).
  * Fail-open: any internal error lets the request through.
  */
 @Component
@@ -24,7 +25,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
   private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
 
-  static final Set<String> LIMITED_PATHS = Set.of("/api/v1/sync", "/api/v1/lint");
+  static final Set<String> LIMITED_PATHS =
+      Set.of("/api/v1/sync", "/api/v1/lint", "/api/v1/auth/magic-link");
   static final double CAPACITY = 60.0;
   static final double REFILL_PER_SECOND = 1.0;
 

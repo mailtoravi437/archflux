@@ -34,13 +34,15 @@ public class SyncService {
 
   private final SyncLogRepository syncLogRepository;
   private final DiagramRepository diagramRepository;
+  private final WorkspaceService workspaceService;
   private final SchemaReadinessService readiness;
   private final ObjectMapper mapper = JsonCanonicals.baseMapper();
 
   public SyncService(SyncLogRepository syncLogRepository, DiagramRepository diagramRepository,
-      SchemaReadinessService readiness) {
+      WorkspaceService workspaceService, SchemaReadinessService readiness) {
     this.syncLogRepository = syncLogRepository;
     this.diagramRepository = diagramRepository;
+    this.workspaceService = workspaceService;
     this.readiness = readiness;
   }
 
@@ -97,8 +99,9 @@ public class SyncService {
   }
 
   /**
-   * Resolves the {@code diagram} payload to an owned row. Returns null when no
-   * id was supplied (stateless sync). Throws 404/403 for unknown/foreign ids.
+   * Resolves the {@code diagram} payload to a member-visible row. Returns null
+   * when no id was supplied (stateless sync). Throws 404/403 for
+   * unknown/foreign ids (workspace membership gate).
    */
   private Diagram resolveDiagramRef(UUID ownerId, JsonNode diagram) {
     if (diagram == null || diagram.isNull() || !diagram.isObject()) {
@@ -118,8 +121,8 @@ public class SyncService {
     if (row.isEmpty()) {
       throw ApiException.notFound("Diagram not found: " + id);
     }
-    if (!ownerId.equals(row.get().ownerId())) {
-      throw ApiException.forbidden("Diagram belongs to another user: " + id);
+    if (!workspaceService.isMember(ownerId, row.get().workspaceId())) {
+      throw ApiException.forbidden("Diagram belongs to another workspace: " + id);
     }
     return row.get();
   }

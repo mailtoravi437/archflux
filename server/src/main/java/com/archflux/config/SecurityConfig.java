@@ -40,6 +40,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // Bridges the JWT identity validated by the outer AuthFilter into
+            // the SecurityContext (cookie-authenticated requests carry no
+            // Bearer header for the resource-server filter to consume).
+            .addFilterAfter(new com.archflux.security.RequestUserBridgeFilter(), org.springframework.security.web.context.SecurityContextHolderFilter.class)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session
@@ -57,22 +61,23 @@ public class SecurityConfig {
                     endpoint.baseUri("/oauth2/authorize"))
                 .redirectionEndpoint(endpoint ->
                     endpoint.baseUri("/login/oauth2/code/*"))
-                .defaultSuccessUrl("/auth/success", true)
+                .defaultSuccessUrl("/api/v1/auth/success", true)
                 .failureUrl("/login?error")
             )
             .saml2Login(saml2 -> saml2
                 .loginPage("/login")
             )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-            )
+            // NOTE: no oauth2ResourceServer JWT configurer — user JWTs are
+            // validated by the outer AuthFilter (JJWT) and promoted into the
+            // SecurityContext by RequestUserBridgeFilter. A resource-server
+            // decoder would need its own bean and would double-authenticate
+            // our cookie/header credentials against the wrong issuer.
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID", "SESSION")
+                .deleteCookies("JSESSIONID", "SESSION", "ARCHFLUX_TOKEN")
             )
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))

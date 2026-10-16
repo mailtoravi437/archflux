@@ -56,7 +56,7 @@ src/
 │   └── useFocusTrap.ts
 ├── store.tsx            # 5 split React Contexts + persistence
 ├── types.ts             # Shared domain types (ArchNode, ArchEdge, etc.)
-├── api.ts               # Fetch wrapper with auth token + mutation queue
+├── api.ts               # Cookie-based fetch wrapper + offline mutation queue
 ├── contracts.ts         # API contract derivation (local-first)
 ├── canvasGeometry.ts    # Pure canvas math: resize grips, snap, minimap
 └── mocks.ts             # Seed diagram data
@@ -102,11 +102,29 @@ src/
 | Key | Content |
 |-----|---------|
 | `archflux:v2-light` | Full document set + activeDocId + UI prefs + review state + pan/zoom |
-| `archflux:session` | Auth mode (guest/token) |
+| `archflux:session` | Auth mode (guest/email/github/sso — never a credential) |
 | `archflux:onboarded` | Boolean |
 | `archflux:pending-draft` | Uncommitted text editor rescue |
 
 **Debounce:** 300ms on graph changes; synchronous flush on `beforeunload`.
+
+> Phase 1: `archflux:auth_token` is retired — no credential is stored in browser storage (legacy leftovers are wiped
+> on sign-out). See [API Client & Session](#api-client--session) below.
+
+---
+
+## API Client & Session
+
+**File:** `src/api.ts` + `src/session.ts` (+ `AuthCallbackScreen.tsx`, `AppShell.tsx` sign-out).
+
+| Behavior | Implementation |
+|----------|----------------|
+| Transport auth | `ARCHFLUX_TOKEN` cookie (`credentials: 'include'`); no `Authorization` header, no localStorage token |
+| Login | OAuth/magic-link redirects set the cookie; callback screen probes `GET /api/v1/auth/me`, then `setSession({mode, email})` |
+| Logout | `POST /api/v1/auth/logout` → guest session + legacy-token wipe → `#/login` |
+| Expiry | Single-flight 401: non-probe requests clear a non-guest session once, toast once, route `#/login`; probes (`/me`, logout) never redirect |
+| Guest | Zero network: no socket, no fetches, no probes |
+| Correlation | `X-Correlation-ID` propagated request→request; server messages surface `err.error?.message` |
 
 ---
 
@@ -249,10 +267,11 @@ with field ownership, conflict behavior, and last successful source revision. Ne
 `importArch` must validate schema, payload size, entity counts, IDs, references, and supported version
 **before** mutation; failure leaves the previous graph unchanged and reports unsupported fields (PROD-007).
 
-### Secrets hygiene (PROD-011, Phase 1)
+### Secrets hygiene (PROD-011, Phase 1 — shipped)
 
-`archflux:auth_token` and connector PATs must leave browser `localStorage` for server-side session/credential
-storage. Until then, settings screens state that secrets are stored locally and never validated server-side.
+The user JWT lives in the HttpOnly `ARCHFLUX_TOKEN` cookie, never in browser storage
+(`archflux:auth_token` retired; legacy leftovers wiped on sign-out). Connector PATs remain local-only
+with explicit never-validated copy until the server-side credential vault (Phase 1–3).
 
 ---
 

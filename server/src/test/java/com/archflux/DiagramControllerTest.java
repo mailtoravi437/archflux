@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
-import com.archflux.config.AppProperties;
+import com.archflux.auth.JwtService;
 import com.archflux.domain.Diagram;
 import com.archflux.domain.User;
 import com.archflux.repo.DiagramRepository;
@@ -42,7 +43,7 @@ class DiagramControllerTest extends PostgresIT {
   private MockMvc mockMvc;
 
   @Autowired
-  private AppProperties appProperties;
+  private JwtService jwtService;
 
   @Autowired
   private UserRepository users;
@@ -52,8 +53,19 @@ class DiagramControllerTest extends PostgresIT {
 
   private final ObjectMapper mapper = new ObjectMapper();
 
+  private String userJwt;
+
+  @BeforeEach
+  void setUpUser() {
+    User user = new User(UUID.randomUUID(),
+        "diagram-" + UUID.randomUUID() + "@archflux.local", "Diagram Tester", "member");
+    user.setProvider("email");
+    users.saveAndFlush(user);
+    userJwt = jwtService.generateToken(user, "session-diagram-test");
+  }
+
   private String bearer() {
-    return "Bearer " + appProperties.effectiveToken();
+    return "Bearer " + userJwt;
   }
 
   private String createDiagram(String title) throws Exception {

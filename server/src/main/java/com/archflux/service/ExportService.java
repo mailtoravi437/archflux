@@ -19,19 +19,22 @@ public class ExportService {
   private final DiagramRepository diagrams;
   private final SchemaReadinessService readiness;
   private final DiagramService diagramService;
+  private final WorkspaceService workspaceService;
 
   public ExportService(DiagramRepository diagrams, SchemaReadinessService readiness,
-      DiagramService diagramService) {
+      DiagramService diagramService, WorkspaceService workspaceService) {
     this.diagrams = diagrams;
     this.readiness = readiness;
     this.diagramService = diagramService;
+    this.workspaceService = workspaceService;
   }
 
   @Transactional(readOnly = true)
   public Map<String, Object> exportDiagram(UUID ownerId, UUID diagramId) {
     readiness.requireReady();
-    Optional<Diagram> row = diagrams.findByIdAndOwner_Id(diagramId, ownerId);
-    if (row.isEmpty()) {
+    Optional<Diagram> row = diagrams.findById(diagramId);
+    // Scoped read: missing and foreign diagrams are both 404 (no existence leak).
+    if (row.isEmpty() || !workspaceService.isMember(ownerId, row.get().workspaceId())) {
       throw ApiException.notFound("Diagram not found: " + diagramId);
     }
     Diagram diagram = row.get();

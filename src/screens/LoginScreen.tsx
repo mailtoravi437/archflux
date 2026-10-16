@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDiagram } from "../useDiagram";
 import { getSession, setSession } from "../session";
+import { api } from "../api";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -17,12 +18,16 @@ export default function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
+  const [magicSent, setMagicSent] = useState(false);
   const emailRef = useRef<HTMLInputElement | null>(null);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     emailRef.current?.focus();
     if (getSession()) navigate("/dashboard", { replace: true });
-  }, [navigate]);
+    const err = searchParams.get("error");
+    if (err) setError(`Sign-in failed: ${err}`);
+  }, [navigate, searchParams]);
 
   const wasOnboarded = () => {
     try {
@@ -83,23 +88,17 @@ export default function LoginScreen() {
       return;
     }
     setBusy(true);
-    // Call backend to send magic link
-    const backendUrl = import.meta.env.VITE_API_URL || "/api";
-    fetch(`${backendUrl}/auth/magic-link`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email.trim() }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to send magic link");
-        return res.json();
-      })
+    // Real cookie-session magic link: server emails a single-use link that
+    // sets HttpOnly ARCHFLUX_TOKEN and lands on #/auth/callback?provider=.
+    void api
+      .sendMagicLink(email.trim())
       .then(() => {
         setBusy(false);
+        setMagicSent(true);
         pushToast(`Magic link sent to ${email.trim()}`);
         pushLog(`Magic link sent to ${email.trim()}`);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         setBusy(false);
         setError(err.message);
       });
@@ -413,6 +412,16 @@ export default function LoginScreen() {
 
           {tab === "email" && !otpSent && (
             <form onSubmit={submitEmail}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                <span
+                  className="badge-count warn"
+                  title="Frontend-simulated demo sign-in — no server involved">
+                  Demo
+                </span>
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                  Simulated locally — for real sign-in use the Magic Link tab.
+                </span>
+              </div>
               <label style={{ fontSize: 11, color: "var(--text-muted)" }}>
                 Work email
                 <input
@@ -450,6 +459,16 @@ export default function LoginScreen() {
           )}
           {tab === "email" && otpSent && (
             <form onSubmit={verifyOtp}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                <span
+                  className="badge-count warn"
+                  title="Frontend-simulated demo sign-in — no server involved">
+                  Demo
+                </span>
+                <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                  Simulated locally — for real sign-in use the Magic Link tab.
+                </span>
+              </div>
               <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
                 Enter the 6-digit code sent to <strong>{email}</strong>.
               </p>
@@ -531,6 +550,23 @@ export default function LoginScreen() {
           )}
           {tab === "magic-link" && (
             <form onSubmit={submitMagicLink}>
+              <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "0 0 8px" }}>
+                Note: with the mock email provider the link is only server-logged — check the server logs.
+              </p>
+              {magicSent ? (
+                <div role="status" style={{ fontSize: 13, padding: "10px 0" }}>
+                  Check your email — click the sign-in link to finish.
+                  <div style={{ marginTop: 8 }}>
+                    <button
+                      type="button"
+                      className="btn-xs"
+                      onClick={() => setMagicSent(false)}>
+                      ← Use a different email
+                    </button>
+                  </div>
+                </div>
+              ) : (
+              <>
               <label style={{ fontSize: 11, color: "var(--text-muted)" }}>
                 Work email
                 <input
@@ -564,6 +600,8 @@ export default function LoginScreen() {
                 aria-busy={busy}>
                 {busy ? "Sending…" : "Send magic link"}
               </button>
+              </>
+              )}
             </form>
           )}
           {tab === "saml" && (

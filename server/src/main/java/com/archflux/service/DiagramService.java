@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.archflux.domain.Diagram;
 import com.archflux.domain.User;
+import com.archflux.domain.Workspace;
 import com.archflux.repo.DiagramRepository;
 import com.archflux.repo.UserRepository;
 import com.archflux.util.JsonCanonicals;
@@ -22,8 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 
 /**
- * Diagram CRUD scoped to the requesting owner. Reads of foreign/missing rows
- * are 404 (scoped query); writes to foreign rows are 403.
+ * Diagram CRUD scoped to the requesting user's workspaces. Reads of
+ * foreign/missing rows are 404 (scoped query); writes to foreign rows
+ * are 403. Response shapes are unchanged by the workspace scoping.
  */
 @Service
 public class DiagramService {
@@ -33,6 +35,7 @@ public class DiagramService {
 
   private final DiagramRepository diagrams;
   private final UserRepository users;
+  private final WorkspaceService workspaceService;
   private final SchemaReadinessService readiness;
   private final EntityManager entityManager;
   private final ObjectMapper mapper = JsonCanonicals.baseMapper();
@@ -42,9 +45,11 @@ public class DiagramService {
   }
 
   public DiagramService(DiagramRepository diagrams, UserRepository users,
-      SchemaReadinessService readiness, EntityManager entityManager) {
+      WorkspaceService workspaceService, SchemaReadinessService readiness,
+      EntityManager entityManager) {
     this.diagrams = diagrams;
     this.users = users;
+    this.workspaceService = workspaceService;
     this.readiness = readiness;
     this.entityManager = entityManager;
   }
@@ -59,15 +64,19 @@ public class DiagramService {
     int safePage = Math.max(page, 1);
     PageRequest pageable = PageRequest.of(safePage - 1, safeLimit,
         Sort.by(Sort.Direction.DESC, "updatedAt"));
+    List<UUID> workspaceIds = workspaceService.workspaceIdsFor(ownerId);
+    if (workspaceIds.isEmpty()) {
+      return new PageResult<>(List.of(), 0);
+    }
     Page<Diagram> result;
     long total;
     if (q == null || q.isBlank()) {
-      result = diagrams.findByOwner_Id(ownerId, pageable);
-      total = diagrams.countByOwner_Id(ownerId);
+      result = diagrams.findByWorkspace_IdIn(workspaceIds, pageable);
+      total = diagrams.countByWorkspace_IdIn(workspaceIds);
     } else {
       String pattern = "%" + LikeEscape.escape(q) + "%";
-      result = diagrams.searchByOwnerAndTitle(ownerId, pattern, pageable);
-      total = diagrams.countSearchByOwnerAndTitle(ownerId, pattern);
+      result = diagrams.searchByWorkspacesAndTitle(workspaceIds, pattern, pageable);
+      total = diagrams.countSearchByWorkspacesAndTitle(workspaceIds, pattern);
     }
     List<Map<String, Object>> items = result.getContent().stream().map(this::toJson).toList();
     return new PageResult<>(items, total);
@@ -80,12 +89,15 @@ public class DiagramService {
     if (title == null || title.isBlank()) {
       throw ApiException.validation("title is required");
     }
+    // Personal workspace first: also provisions the User row for brand-new ids.
+    Workspace workspace = workspaceService.resolvePersonalWorkspace(ownerId);
     User owner = users.findById(ownerId).orElseGet(() -> {
       User created = new User(ownerId, "dev@archflux.local", "Dev User", "admin");
       return users.save(created);
     });
     Diagram diagram = new Diagram();
     diagram.setOwner(owner);
+    diagram.setWorkspace(workspace);
     diagram.setTitle(title);
     diagram.setTags(tags == null ? List.of() : tags);
     diagram.setGraph(JsonCanonicals.toCanonicalJson(
@@ -97,8 +109,11 @@ public class DiagramService {
   @Transactional(readOnly = true)
   public Map<String, Object> get(UUID ownerId, UUID id) {
     readiness.requireReady();
-    Diagram diagram = diagrams.findByIdAndOwner_Id(id, ownerId)
+    Diagram diagram = diagrams.findById(id)
         .orElseThrow(() -> ApiException.notFound("Diagram not found: " + id));
+    if (!workspaceService.isMember(ownerId, diagram.workspaceId())) {
+      throw ApiException.notFound("Diagram not found: " + id);
+    }
     return toJson(diagram);
   }
 
@@ -112,8 +127,8 @@ public class DiagramService {
       throw ApiException.notFound("Diagram not found: " + id);
     }
     Diagram diagram = any.get();
-    if (!ownerId.equals(diagram.ownerId())) {
-      throw ApiException.forbidden("Diagram belongs to another user: " + id);
+    if (!workspaceService.isMember(ownerId, diagram.workspaceId())) {
+      throw ApiException.forbidden("Diagram belongs to another workspace: " + id);
     }
     if (title != null) {
       if (title.isBlank()) {
@@ -143,21 +158,24 @@ public class DiagramService {
     if (any.isEmpty()) {
       throw ApiException.notFound("Diagram not found: " + id);
     }
-    if (!ownerId.equals(any.get().ownerId())) {
-      throw ApiException.forbidden("Diagram belongs to another user: " + id);
+    if (!workspaceService.isMember(ownerId, any.get().workspaceId())) {
+      throw ApiException.forbidden("Diagram belongs to another workspace: " + id);
     }
     diagrams.delete(any.get());
   }
 
-  /** Loads the owned diagram or throws 404 (scoped reads) — for nested routes. */
+  /** Loads the member-visible diagram or throws 404 (scoped reads) — for nested routes. */
   @Transactional(readOnly = true)
   public Diagram requireOwnedForRead(UUID ownerId, UUID id) {
     readiness.requireReady();
-    return diagrams.findByIdAndOwner_Id(id, ownerId)
-        .orElseThrow(() -> ApiException.notFound("Diagram not found: " + id));
+    Optional<Diagram> any = diagrams.findById(id);
+    if (any.isEmpty() || !workspaceService.isMember(ownerId, any.get().workspaceId())) {
+      throw ApiException.notFound("Diagram not found: " + id);
+    }
+    return any.get();
   }
 
-  /** Loads the owned diagram or throws 404/403 — for nested writes. */
+  /** Loads the member-visible diagram or throws 404/403 — for nested writes. */
   @Transactional(readOnly = true)
   public Diagram requireOwnedForWrite(UUID ownerId, UUID id) {
     readiness.requireReady();
@@ -165,9 +183,7 @@ public class DiagramService {
     if (any.isEmpty()) {
       throw ApiException.notFound("Diagram not found: " + id);
     }
-    if (!ownerId.equals(any.get().ownerId())) {
-      throw ApiException.forbidden("Diagram belongs to another user: " + id);
-    }
+    workspaceService.requireMember(ownerId, any.get().workspaceId());
     return any.get();
   }
 
@@ -181,6 +197,7 @@ public class DiagramService {
     User owner = users.findById(ownerId).orElseThrow(() -> ApiException.notFound("User not found"));
     Diagram branch = new Diagram();
     branch.setOwner(owner);
+    branch.setWorkspace(source.getWorkspace());
     branch.setTitle(title);
     branch.setTags(source.getTags());
     branch.setGraph(source.getGraph());

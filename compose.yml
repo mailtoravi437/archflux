@@ -12,8 +12,15 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-archflux}
       POSTGRES_USER: ${POSTGRES_USER:-archflux}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres-pw}
+      # Consumed by docker/db-init/01-roles.sh on FIRST init only (fresh volume).
+      # Dev defaults are flagged DEV ONLY — prod must come from the secret manager.
+      DB_APP_USER: ${DB_APP_USER:-archflux_app}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-dev-app-only}
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Self-provisions the least-privilege app role on fresh volumes.
+      # Runs once (empty data dir only); Flyway migrates afterwards.
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-archflux} -d $${POSTGRES_DB:-archflux}"]
       interval: 5s
@@ -39,10 +46,22 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_APP_USER:-archflux_app}
       SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:-dev-app-only}
       APP_API_TOKEN: ${API_TOKEN:-dev-token}
-      "spring.flyway.enabled": "false"
+      REDIS_HOST: redis
+      # Automated migrations (Phase 1): Flyway runs at server boot AS THE OWNER
+      # so pgcrypto/citext extensions can install. Tightening to a dedicated
+      # migrator role is a documented follow-up (see DEPLOY.md).
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_USER: ${POSTGRES_USER:-archflux}
+      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres-pw}
+      APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
+      # application.yml currently reads SESSION_COOKIE_SECURE; keep it in sync
+      # with APP_COOKIE_SECURE until the server aligns on one name.
+      SESSION_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     healthcheck:
       # curl probe (installed in the server image); image also bakes its own HEALTHCHECK.
       test: ["CMD", "curl", "-f", "http://127.0.0.1:3001/api/health"]
@@ -70,5 +89,19 @@ services:
         condition: service_healthy
     # Healthcheck is baked into the image (Dockerfile.web HEALTHCHECK).
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # No published ports: reachable only via service DNS (server uses REDIS_HOST=redis).
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 volumes:
   pgdata:
+  redisdata:
