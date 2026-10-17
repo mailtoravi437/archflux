@@ -1,6 +1,5 @@
 export * from './tokens';
 export * from './types';
-export * from './validateTokens';
 export { ThemeProvider, useTheme } from './components/ThemeProvider';
 export { Button } from './components/Button';
 export { Input } from './components/Input';
