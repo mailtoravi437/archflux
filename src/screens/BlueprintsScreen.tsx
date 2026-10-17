@@ -97,7 +97,7 @@ export function BlueprintThumb({ nodes, edges, title }: { nodes: ArchNode[]; edg
 
 function badgeStyleFor(category: string): { className: string; style?: CSSProperties } {
   // Semantic state: category label preserved; no decorative accent colors.
-  return { className: 'badge-count', style: { width: 'fit-content', background: 'var(--bg-panel-subtle)', color: 'var(--text-muted)' } };
+  return { className: `badge-count badge-${category.toLowerCase()}`, style: { width: 'fit-content', background: 'var(--bg-panel-subtle)', color: 'var(--text-muted)' } };
 }
 
 export default function BlueprintsScreen() {
