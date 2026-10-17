@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.archflux.security.RequestUser;
 import com.archflux.service.ApiException;
+import com.archflux.service.AuditService;
+import com.archflux.service.DiagramService;
 import com.archflux.service.ExportService;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -16,9 +18,14 @@ import jakarta.servlet.http.HttpServletRequest;
 public class ExportController {
 
   private final ExportService exportService;
+  private final DiagramService diagrams;
+  private final AuditService audit;
 
-  public ExportController(ExportService exportService) {
+  public ExportController(ExportService exportService, DiagramService diagrams,
+      AuditService audit) {
     this.exportService = exportService;
+    this.diagrams = diagrams;
+    this.audit = audit;
   }
 
   @GetMapping
@@ -33,6 +40,12 @@ public class ExportController {
     } catch (IllegalArgumentException e) {
       throw ApiException.validation("Invalid diagramId: " + diagramId);
     }
-    return exportService.exportDiagram(RequestUser.get(request), id);
+    UUID actorId = RequestUser.get(request);
+    // Scoped read first: foreign diagrams stay 404 here too.
+    com.archflux.domain.Diagram diagram = diagrams.requireOwnedForRead(actorId, id);
+    Map<String, Object> out = exportService.exportDiagram(actorId, id);
+    audit.record(actorId, diagram.workspaceId(), "diagram.export", "diagram",
+        id.toString(), "ok");
+    return out;
   }
 }

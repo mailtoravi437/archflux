@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: lldlens
+      POSTGRES_USER: lldlens
+      POSTGRES_PASSWORD: lldlens
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lldlens"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/lldlens
+      DB_USERNAME: lldlens
+      DB_PASSWORD: lldlens
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me-please-this-needs-to-be-long}
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+
+volumes:
+  pgdata:

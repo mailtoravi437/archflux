@@ -5,6 +5,7 @@ import type { CanvasTool } from '../useDiagram';
 import type { ArchEdge, ArchNode, LibraryShape, ShapeCategory } from '../types';
 import { libraryShapes } from '../mocks';
 import { useFocusTrap } from '../useFocusTrap';
+import { sourceModeForDoc } from '../honesty';
 import {
   clampNodeSize,
   hitResizeHandle,
@@ -37,6 +38,8 @@ export const LOCKABLE: CanvasTool[] = ['service', 'gateway', 'db', 'stream', 'co
 
 const RECENT_SHAPES_KEY = 'archflux:recent-shapes:v1';
 const MAX_RECENT_SHAPES = 8;
+/** Annotation comment length cap (ANN-R15) — MUST match the backend limit. */
+const COMMENT_MAX = 2000;
 
 /** Pure recency update (most-recent-first, deduped, capped). Exported for tests. */
 export function pushRecentShape(list: string[], id: string): string[] {
@@ -80,7 +83,7 @@ function noteIconSettled() {
 function trackIconLoad() {
   pendingIconLoads += 1;
 }
-const STROKE_COLORS = ['#1F2937', '#2563EB', '#7C3AED', '#16A34A', '#D97706', '#DC2626'];
+const STROKE_COLORS = ['#1F2937', '#635BFF', '#635BFF', '#16A34A', '#F0B86E', '#DC2626'];
 const STROKE_WIDTHS = [2, 4, 6];
 
 const NODE_ICONS = [
@@ -100,7 +103,7 @@ const NODE_ICONS = [
 const PROTOCOLS = ['REST', 'gRPC', 'WebSocket', 'Async'];
 const NODE_STROKE_WIDTHS = [1, 1.5, 2.5, 4];
 
-const BORDER_SWATCHES = ['#2563EB', '#7C3AED', '#16A34A', '#D97706', '#DC2626', '#6B7280'];
+const BORDER_SWATCHES = ['#635BFF', '#635BFF', '#16A34A', '#F0B86E', '#DC2626', '#6B7280'];
 const FILL_SWATCHES = ['#FFFFFF', '#DBEAFE', '#DCFCE7', '#FEF3C7', '#FEE2E2', '#EDE9FE'];
 
 function Swatches(props: { values: (string | null)[]; current: string | undefined; nullLabel: string; onPick: (v: string | null) => void; label: string }) {
@@ -318,6 +321,13 @@ export default function CanvasScreen() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
+  // Zoom-adaptive grid: scale background spacing with zoom so dots/lines stay
+  // visually stable (preserves geometry; only CSS background-size changes).
+  useEffect(() => {
+    if (!viewportRef.current) return;
+    const size = Math.max(10, Math.round(20 / (zoom || 1)));
+    viewportRef.current.style.setProperty('--grid-size', `${size}px`);
+  }, [zoom]);
   // Latest paint function, refreshed by the setup effect below. draw() reads
   // live state via stateRef, so re-invoking it repaints current state.
   const drawRef = useRef<() => void>(() => {});
@@ -424,6 +434,16 @@ export default function CanvasScreen() {
   };
   const [libQuery, setLibQuery] = useState('');
   const [libCategory, setLibCategory] = useState<'all' | ShapeCategory>('all');
+  const libSearchRef = useRef<HTMLInputElement | null>(null);
+  // Non-modal drawer: move focus to search on open (SHP-R8); return it to the
+  // rail toggle on close so keyboard users are not stranded.
+  useEffect(() => {
+    if (libOpen) {
+      const t = window.setTimeout(() => libSearchRef.current?.focus(), 0);
+      return () => window.clearTimeout(t);
+    }
+    return undefined;
+  }, [libOpen]);
   // Unified right utility dock (v2.4): Tab A Inspector / Tab B Linter.
   // Selection auto-switches to Inspector; the left dock keeps canvas-wide tools.
   const [dockTab, setDockTab] = useState<'inspector' | 'linter' | 'collab'>('inspector');
@@ -576,8 +596,16 @@ export default function CanvasScreen() {
   useEffect(() => {
     inspectorCkpt.current = null;
   }, [selectedId, selectedEdgeId]);
-  // Auto-switch to Inspector tab when anything selectable is picked.
+  // Suppresses the auto-switch when a selection is made *from* the dock
+  // (e.g. clicking a linter result) so the user stays in the list they are
+  // working through (DCK-R2).
+  const suppressDockAutoSwitch = useRef(false);
+  // Auto-switch to Inspector tab when anything selectable is picked on canvas.
   useEffect(() => {
+    if (suppressDockAutoSwitch.current) {
+      suppressDockAutoSwitch.current = false;
+      return;
+    }
     if (selectedId || selectedEdgeId || selectedStrokeId || selectedTextId) setDockTab('inspector');
   }, [selectedId, selectedEdgeId, selectedStrokeId, selectedTextId]);
   // Node/edge selection clears ink selection and vice versa.
@@ -781,10 +809,12 @@ export default function CanvasScreen() {
     }
 
     const draw = () => {
+      const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const s = stateRef.current;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
       ctx.save();
+      if (reducedMotion) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; }
       ctx.translate(s.pan.x, s.pan.y);
       ctx.scale(s.zoom, s.zoom);
 
@@ -810,10 +840,10 @@ export default function CanvasScreen() {
         const isEdgeSelected = s.selectedEdgeId === edge.id;
 
         ctx.save();
-        ctx.strokeStyle = isEdgeSelected ? '#2563EB' : edge.color || '#2563EB';
+        ctx.strokeStyle = isEdgeSelected ? (isDark ? '#8B83FF' : '#635BFF') : (isDark ? '#4B5363' : '#C7CDD7');
         ctx.lineWidth = isEdgeSelected ? 3 : 2;
         if (isEdgeSelected) {
-          ctx.shadowColor = '#2563EB';
+          ctx.shadowColor = '#635BFF';
           ctx.shadowBlur = 8;
         }
         const lineStyle = edge.lineStyle ?? (edge.dashed ? 'dashed' : 'solid');
@@ -837,7 +867,7 @@ export default function CanvasScreen() {
         };
         const prev = pts[pts.length - 2] ?? pts[0];
         const angle = Math.atan2(endY - prev.y, endX - prev.x);
-        ctx.fillStyle = isEdgeSelected ? '#2563EB' : edge.color || '#2563EB';
+        ctx.fillStyle = isEdgeSelected ? '#635BFF' : (isDark ? '#9CA3AF' : '#6B7280');
         if (arrowMode !== 'none') drawHead(endX, endY, angle);
         if (arrowMode === 'both') {
           const first = pts[1] ?? pts[0];
@@ -862,10 +892,10 @@ export default function CanvasScreen() {
         const hasIcon = node.icon || node.iconSrc;
 
         ctx.save();
-        const nodeBg = node.fill ?? (isDark ? '#1E1E1E' : '#FFFFFF');
-        const strokeColor = isPending ? '#D97706' : isSelected ? '#2563EB' : node.stroke;
+        const nodeBg = node.fill ?? (isDark ? '#191D25' : '#FFFFFF');
+        const strokeColor = isPending ? (isDark ? '#F0B86E' : '#98600A') : isSelected ? (isDark ? '#8B83FF' : '#635BFF') : (node.stroke ?? (isDark ? '#4B5363' : '#C7CDD7'));
         const lineWidth = node.strokeWidth ?? (isSelected || isPending ? 2 : 1);
-        const shadowColor = isPending ? '#D97706' : isSelected ? '#2563EB' : 'transparent';
+        const shadowColor = isPending ? '#F0B86E' : isSelected ? '#635BFF' : 'transparent';
         const shadowBlur = (isSelected || isPending) ? 8 : 0;
 
         if (shape === 'logo') {
@@ -905,7 +935,7 @@ export default function CanvasScreen() {
           }
           // Selection indicator
           if (isSelected) {
-            ctx.strokeStyle = '#2563EB';
+            ctx.strokeStyle = (isDark ? '#8B83FF' : '#635BFF');
             ctx.lineWidth = 2;
             ctx.setLineDash([4, 4]);
             ctx.strokeRect(node.x - 4, node.y - 4, node.w + 8, node.h + 8);
@@ -1188,7 +1218,7 @@ export default function CanvasScreen() {
           ctx.save();
           for (const h of resizeHandles(sel, s.zoom)) {
             ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#2563EB';
+            ctx.strokeStyle = (isDark ? '#8B83FF' : '#635BFF');
             ctx.lineWidth = 1.5 / s.zoom;
             ctx.fillRect(h.x - h.size / 2, h.y - h.size / 2, h.size, h.size);
             ctx.strokeRect(h.x - h.size / 2, h.y - h.size / 2, h.size, h.size);
@@ -1197,7 +1227,7 @@ export default function CanvasScreen() {
         }
         if (guidesRef.current.length > 0) {
           ctx.save();
-          ctx.strokeStyle = '#22D3EE';
+          ctx.strokeStyle = '#635BFF';
           ctx.lineWidth = 1.5 / s.zoom;
           ctx.setLineDash([6 / s.zoom, 4 / s.zoom]);
           for (const g of guidesRef.current) {
@@ -1225,13 +1255,13 @@ export default function CanvasScreen() {
         });
         if (maxX < vx0 || minX > vx1 || maxY < vy0 || minY > vy1) return;
         ctx.save();
-        ctx.strokeStyle = selected ? '#2563EB' : color;
-        ctx.fillStyle = selected ? '#2563EB' : color;
+        ctx.strokeStyle = selected ? '#635BFF' : color;
+        ctx.fillStyle = selected ? '#635BFF' : color;
         ctx.lineWidth = width;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         if (selected) {
-          ctx.shadowColor = '#2563EB';
+          ctx.shadowColor = '#635BFF';
           ctx.shadowBlur = 8;
         }
         if (pts.length === 1) {
@@ -1278,16 +1308,16 @@ export default function CanvasScreen() {
           else ctx.rect(bx, by, bw, bh);
           ctx.fill();
           if (t.border) {
-            ctx.strokeStyle = isSel ? '#2563EB' : t.color;
+            ctx.strokeStyle = isSel ? '#635BFF' : t.color;
             ctx.lineWidth = 1.5;
             ctx.stroke();
           }
         }
-        ctx.fillStyle = isSel ? '#2563EB' : t.color;
+        ctx.fillStyle = isSel ? '#635BFF' : t.color;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'alphabetic';
         if (isSel) {
-          ctx.shadowColor = '#2563EB';
+          ctx.shadowColor = '#635BFF';
           ctx.shadowBlur = 8;
         }
         lines.forEach((line, i) => {
@@ -2002,7 +2032,18 @@ const n = cur.nodes.find((node) => node.id === hit);
     const s = stateRef.current;
     const cx = (v?.clientWidth ?? 800) / 2;
     const cy = (v?.clientHeight ?? 600) / 2;
-    placeShapeRecorded(shape, (cx - s.pan.x) / s.zoom - 85, (cy - s.pan.y) / s.zoom - 35);
+    let x = (cx - s.pan.x) / s.zoom - 85;
+    let y = (cy - s.pan.y) / s.zoom - 35;
+    // Consecutive center placements must not stack exactly (SHP-R16):
+    // step down-right until the spot is free, wrapping after 5 steps.
+    const occupied = () => s.nodes.some((n) => Math.abs(n.x - x) < 8 && Math.abs(n.y - y) < 8);
+    let step = 0;
+    while (occupied() && step < 5) {
+      step += 1;
+      x += 16;
+      y += 16;
+    }
+    placeShapeRecorded(shape, x, y);
   };
 
   const dropToWorld = (clientX: number, clientY: number) => {
@@ -2056,9 +2097,9 @@ const n = cur.nodes.find((node) => node.id === hit);
     const t = minimapTransform(nodes, 160, 100);
     const isDarkMap = theme === 'dark';
     mctx.clearRect(0, 0, MW, MH);
-    mctx.fillStyle = isDarkMap ? '#1F2937' : '#FFFFFF';
+    mctx.fillStyle = isDarkMap ? '#101318' : '#FFFFFF';
     mctx.fillRect(0, 0, MW, MH);
-    mctx.strokeStyle = isDarkMap ? '#4B5563' : '#CBD5E1';
+    mctx.strokeStyle = isDarkMap ? '#292F3A' : '#E0E3EA';
     mctx.lineWidth = 1;
     edges.forEach((edge) => {
       const a = nodes.find((n) => n.id === edge.from);
@@ -2073,13 +2114,13 @@ const n = cur.nodes.find((node) => node.id === hit);
     });
     nodes.forEach((n) => {
       const p = worldToMini(n.x, n.y, t);
-      mctx.fillStyle = n.stroke ?? '#2563EB';
+      mctx.fillStyle = n.stroke ?? '#635BFF';
       mctx.fillRect(p.x, p.y, Math.max(2.5, n.w * t.s), Math.max(2.5, n.h * t.s));
     });
     const v = viewportRef.current;
     if (v && zoom > 0) {
       const tl = worldToMini((0 - pan.x) / zoom, (0 - pan.y) / zoom, t);
-      mctx.strokeStyle = '#2563EB';
+      mctx.strokeStyle = '#635BFF';
       mctx.lineWidth = 1.5;
       mctx.strokeRect(tl.x, tl.y, (v.clientWidth / zoom) * t.s, (v.clientHeight / zoom) * t.s);
     }
@@ -2207,7 +2248,7 @@ const n = cur.nodes.find((node) => node.id === hit);
         />
 
         {libOpen && (
-          <div className="library-drawer" role="dialog" aria-label="Shape library">
+          <div className="library-drawer" id="shape-library-drawer" role="dialog" aria-modal="false" aria-label="Shape library">
             <div className="linter-header">
               <div className="linter-title">
                 <img src="/icons/general/database.svg" alt="" style={{ width: 16, height: 16, marginRight: 6 }} />
@@ -2218,6 +2259,7 @@ const n = cur.nodes.find((node) => node.id === hit);
             </div>
             <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <input
+                ref={libSearchRef}
                 type="search"
                 className="doc-title-input"
                 style={{ background: 'var(--bg-panel-subtle)', border: '1px solid var(--border-panel)', borderRadius: 6, padding: '6px 10px' }}
@@ -2784,17 +2826,25 @@ const n = cur.nodes.find((node) => node.id === hit);
           <div style={{ position: 'absolute', bottom: 76, left: '50%', transform: 'translateX(-50%)', zIndex: 40, width: 380, maxWidth: '92vw' }}>
             <div ref={composerTrap} className="content-card" style={{ padding: 12 }} role="dialog" aria-label={`Comment on ${commentFor.label}`}>
               <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>💬 Pin review on [{commentFor.label}]</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'var(--mono-font)', marginBottom: 6 }} data-testid="comment-location">
+                {sourceModeForDoc(activeDocId) === 'local' ? 'Saved on this device only' : 'Shared with collaborators'}
+              </div>
               <textarea
                 autoFocus
                 rows={3}
+                maxLength={COMMENT_MAX}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="e.g. Should we use outbox pattern here?"
                 aria-label="Review comment text"
+                aria-describedby="comment-counter"
                 style={{ width: '100%', resize: 'vertical', background: 'var(--bg-panel-subtle)', border: '1px solid var(--border-panel)', borderRadius: 6, padding: '6px 8px', fontSize: 14, fontFamily: 'var(--hand-font)', color: 'var(--text-main)' }}
               />
+              <div id="comment-counter" style={{ fontSize: 10, color: 'var(--text-dim)', fontFamily: 'var(--mono-font)', textAlign: 'right', marginTop: 2 }}>
+                {commentText.length}/{COMMENT_MAX}
+              </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 8 }}>
-                <button className="btn-xs" onClick={() => { setCommentFor(null); setCommentText(''); }}>Cancel</button>
+                <button className="btn-xs" onClick={() => setCommentFor(null)}>Cancel</button>
                 <button
                   className="btn-xs btn-xs-primary"
                   disabled={!commentText.trim()}

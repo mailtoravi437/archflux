@@ -4,6 +4,9 @@ import type { ArchEdge, ArchNode, DiagramDoc, FreeStroke, FreeText, FreshnessSta
 import { billingHealEdge, fraudEdge, fraudWorkerNode, mockCheckpoints, mockComment, mockEdges, mockNodes, mockStrokes } from './mocks';
 import type { Checkpoint } from './types';
 import { api } from './api';
+import { buildArchExport, validateArchImport } from './archFormat';
+import { conflictFromError, type ConflictInfo } from './conflict';
+import { offlineSyncFailure } from './syncState';
 
 export interface Toast {
   id: number;
@@ -124,6 +127,8 @@ export interface DiagramUIContextValue {
   resumeToasts: (ids: number[]) => void;
   isOnline: boolean;
   lintCount: number;
+  /** Last resync failure message, if any. Cleared on next attempt/success. */
+  syncError: string | null;
 }
 
 // Document management
@@ -139,6 +144,17 @@ export interface DiagramDocsContextValue {
   setDocTags: (id: string, tags: string[]) => void;
   duplicateDoc: (id: string) => void;
   deleteDoc: (id: string) => void;
+  /** Last server-acknowledged version for the active doc (null when local/unknown). */
+  serverVersion: number | null;
+  /** Pending stale-write conflict, if any. Never resolved silently. */
+  saveConflict: ConflictInfo | null;
+  /** PUT the active graph with optimistic concurrency. Local docs no-op. */
+  saveActiveDoc: () => Promise<'saved' | 'local' | 'conflict' | 'error' | 'offline'>;
+  /** Retry the pending save with force:true (remote preserved as a revision). */
+  forceSaveActiveDoc: () => Promise<'saved' | 'error'>;
+  /** Discard local edits and load the server graph + version. */
+  reloadActiveDoc: () => Promise<'reloaded' | 'error'>;
+  dismissSaveConflict: () => void;
 }
 
 // Collaboration features
@@ -165,7 +181,7 @@ export interface DiagramCollabContextValue {
   healAll: () => void;
   exportArch: () => void;
   exportPNG: () => void;
-  importArch: (data: { nodes: ArchNode[]; edges: ArchEdge[] }) => void;
+  importArch: (data: { nodes: ArchNode[]; edges: ArchEdge[] }) => { imported: boolean; warnings: string[] };
 }
 
 export const DiagramCoreContext = createContext<DiagramCoreContextValue | null>(null);
@@ -339,7 +355,11 @@ function loadPersisted(): {
           const texts = Array.isArray((d as { texts?: unknown }).texts)
             ? ((d as { texts?: unknown }).texts as unknown[]).filter(isValidText)
             : [];
-          return { ...d, nodes: reconcileOrphans(nodes, edges), edges, strokes, texts };
+          // serverVersion is optional: older payloads omit it (no format bump)
+          // and corrupt non-number values are dropped, never trusted.
+          const doc = { ...d, nodes: reconcileOrphans(nodes, edges), edges, strokes, texts };
+          if (typeof doc.serverVersion !== 'number') delete doc.serverVersion;
+          return doc;
         });
       // Blank docs (0 nodes) are valid designs — keep them all.
       if (docs.length === 0) return null;
@@ -544,6 +564,11 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   const docs = docState.docs;
   const activeDocId = docState.activeDocId;
   const [dirty, setDirty] = useState(false);
+  // Stale-write conflict for the active doc (§6.2). Set only on a caught
+  // VERSION_CONFLICT; cleared by an explicit resolution (reload/force/duplicate/dismiss).
+  const [saveConflict, setSaveConflict] = useState<ConflictInfo | null>(null);
+  // Last resync failure (PROD-008). Visible until the next attempt/success.
+  const [syncError, setSyncError] = useState<string | null>(null);
   const seedThreadList = (): ReviewThread[] => [
     {
       id: 't1',
@@ -703,6 +728,32 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
 
   const pushLog = useCallback((text: string) => {
     setSyncLog((prev) => [{ id: logSeq++, text, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 30));
+  }, []);
+
+  // ---- Optimistic-concurrency version tracking (§6.2, PROD-004) ----
+  // serverVersion rides on the doc model (optional, no format bump) and is
+  // sent on PUT when known. Every enveloped DiagramController response flows
+  // through rememberDiagramVersion, which tolerates shapes without one.
+  const serverVersion = useMemo(
+    () => docs.find((d) => d.id === activeDocId)?.serverVersion ?? null,
+    [docs, activeDocId],
+  );
+
+  const setDocServerVersion = useCallback((docId: string, version: number) => {
+    setDocState((prev) => ({
+      ...prev,
+      docs: prev.docs.map((d) => (d.id === docId ? { ...d, serverVersion: version } : d)),
+    }));
+    schedulePersist();
+  }, [schedulePersist]);
+
+  const rememberDiagramVersion = useCallback((docId: string, resp: unknown) => {
+    const v = (resp as { data?: { version?: unknown } } | null | undefined)?.data?.version;
+    if (typeof v === 'number' && Number.isFinite(v)) setDocServerVersion(docId, v);
+  }, [setDocServerVersion]);
+
+  const dismissSaveConflict = useCallback(() => {
+    setSaveConflict(null);
   }, []);
 
   const freshnessRef = useRef(freshness);
@@ -1515,13 +1566,17 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
 
   const resync = useCallback(() => {
     if (!isOnlineRef.current) {
-      setFreshness('drift');
-      setFreshnessLabel('Sync failed — you are offline');
+      // Offline: no attempt is made — the failure stays visible with Retry.
+      const failed = offlineSyncFailure();
+      setFreshness(failed.freshness);
+      setFreshnessLabel(failed.freshnessLabel);
       setDriftCount(1);
+      setSyncError(failed.syncError);
       pushToast('Sync failed — you are offline');
       pushLog('Sync failed: offline, no attempt made');
       return;
     }
+    setSyncError(null);
     setFreshness('syncing');
     setFreshnessLabel('Syncing…');
     pushLog('Sync started: k8s-prod us-east-1');
@@ -1534,6 +1589,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setFreshnessLabel('In sync · us-east-1-prod');
       setDriftCount(0);
       setDirty(false);
+      setSyncError(null);
       const sha = Math.random().toString(16).slice(2, 9);
       pushToast('Synced upstream Fraud Worker into diagram!');
       pushLog(`Sync complete: ${sha} +1 node Fraud Worker, drift=0`);
@@ -1632,24 +1688,15 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         return {} as { embedMetadata?: boolean };
       }
     })();
-    const payload: Record<string, unknown> = {
-      app: 'ArchFlux',
-      version: '1.0-deterministic',
-      spec: 'RFC-Architecture-Graph',
+    // Deterministic local payload with stable element ids (PROD-007).
+    const payload = buildArchExport({
       nodes: nodesRef.current,
       edges: edgesRef.current,
       strokes: strokesRef.current,
       texts: textsRef.current,
-    };
-    if (settings.embedMetadata !== false) {
-      payload.metadata = {
-        exportedAt: new Date().toISOString(),
-        docTitle: docTitleRef.current,
-        nodeCount: nodesRef.current.length,
-        edgeCount: edgesRef.current.length,
-        strokeCount: strokesRef.current.length,
-      };
-    }
+      docTitle: docTitleRef.current,
+      embedMetadata: settings.embedMetadata,
+    });
 
     // If online and we have an active document with server ID, try backend export first
     const online = isOnlineRef.current;
@@ -1659,6 +1706,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     if (online && hasServerId) {
       try {
         const serverExport = await api.exportDiagram(activeDoc!.id);
+        // NOTE: the export payload's `version` is the FILE format version, not
+        // the diagram's optimistic-concurrency version — never tracked as
+        // serverVersion.
         const blob = new Blob([JSON.stringify(serverExport, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const base = archBaseName();
@@ -1734,40 +1784,20 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
 
   const importArch = useCallback(
     (data: any) => {
-      // Handle both formats: {nodes, edges} and server export {app, spec, nodes, edges, metadata}
-      let nodes: any[] = data.nodes;
-      let edges: any[] = data.edges;
-      let strokes: any[] = data.strokes ?? [];
-      let texts: any[] = data.texts ?? [];
-
-      if (!nodes || !edges) {
-        pushToast('Invalid .arch file: missing nodes/edges');
-        return;
+      // Validate fully BEFORE mutation: hard failure leaves the previous
+      // graph unchanged (PROD-006). Soft issues return as warnings.
+      const result = validateArchImport(data);
+      if (!result.ok) {
+        pushToast(`Import failed: ${result.error}`);
+        return { imported: false, warnings: [] as string[] };
       }
-      if (!Array.isArray(nodes) || !Array.isArray(edges)) {
-        pushToast('Invalid .arch file: nodes/edges must be arrays');
-        return;
+      loadGraph(result.nodes, result.edges, `Imported .arch (${result.nodes.length} nodes)`);
+      if (result.strokes.length > 0) setStrokesState(cloneStrokes(result.strokes));
+      if (result.texts.length > 0) setTextsState(cloneTexts(result.texts));
+      if (result.warnings.length > 0) {
+        pushToast(`Imported with ${result.warnings.length} warning${result.warnings.length === 1 ? '' : 's'} — review before saving`);
       }
-
-      // Same shape gate as persisted storage: drop malformed entries so a
-      // bad file can never NaN the canvas.
-      const validNodes = nodes.filter(isValidNode) as ArchNode[];
-      if (validNodes.length === 0) {
-        pushToast('Invalid .arch file: no usable nodes');
-        return;
-      }
-      const ids = new Set(validNodes.map((n) => n.id));
-      const validEdges = edges
-        .filter((e): e is ArchEdge => isValidEdge(e, ids))
-        .map((e) => ({ ...e, targetCoords: e.targetCoords ? { ...e.targetCoords } : undefined }));
-      if (validEdges.length < edges.length) {
-        pushToast(`Imported with ${edges.length - validEdges.length} bad routes dropped`);
-      }
-      const validStrokes = Array.isArray(strokes) ? strokes.filter(isValidStroke) : [];
-      const validTexts = Array.isArray(texts) ? texts.filter(isValidText) : [];
-      loadGraph(validNodes, validEdges, `Imported .arch (${validNodes.length} nodes)`);
-      if (validStrokes.length > 0) setStrokesState(cloneStrokes(validStrokes));
-      if (validTexts.length > 0) setTextsState(cloneTexts(validTexts));
+      return { imported: true, warnings: result.warnings };
     },
     [loadGraph, pushToast],
   );
@@ -1886,12 +1916,15 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       const serverId = serverDiagramId(docId);
       if (serverId) {
         api.createCheckpoint(serverId, name, `local:${docId}`).then(
-          () => pushLog(`Checkpoint synced to server: ${name}`),
+          (resp) => {
+            rememberDiagramVersion(docId, resp);
+            pushLog(`Checkpoint synced to server: ${name}`);
+          },
           (e) => pushToast(`Server checkpoint failed (kept locally): ${e instanceof Error ? e.message : e}`),
         );
       }
     },
-    [pushToast, pushLog, displayName],
+    [pushToast, pushLog, displayName, rememberDiagramVersion],
   );
 
   const restoreCheckpoint = useCallback(
@@ -1902,6 +1935,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       if (serverId && UUID_RE.test(id)) {
         api.restoreCheckpoint(serverId, id).then(
           ({ data }) => {
+            rememberDiagramVersion(docId, { data });
             const graph = data?.graph ?? {};
             loadGraph(graph.nodes ?? [], graph.edges ?? [], `Restored server checkpoint`);
             setStrokesState(cloneStrokes(graph.strokes ?? []));
@@ -1926,7 +1960,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         [docId]: (prev[docId] ?? []).map((c) => ({ ...c, active: c.id === id })),
       }));
     },
-    [loadGraph, pushToast],
+    [loadGraph, pushToast, rememberDiagramVersion],
   );
 
   const deleteCheckpoint = useCallback(
@@ -1947,6 +1981,136 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     [pushToast],
   );
 
+  // ---- Explicit save with conflict resolution (§6.2) ----
+  const activeGraphPatch = useCallback(() => {    const graph = {
+      nodes: cloneNodes(nodesRef.current),
+      edges: cloneEdges(edgesRef.current),
+      strokes: cloneStrokes(strokesRef.current),
+      texts: cloneTexts(textsRef.current),
+    };
+    return {
+      title: docTitleRef.current,
+      graph,
+      nodes: graph.nodes,
+      edges: graph.edges,
+      strokes: graph.strokes,
+      texts: graph.texts,
+    };
+  }, []);
+
+  const saveActiveDoc = useCallback(async (): Promise<'saved' | 'local' | 'conflict' | 'error' | 'offline'> => {
+    const cur = docsRef.current;
+    const active = cur.docs.find((d) => d.id === cur.activeDocId);
+    if (!active) return 'error';
+    const serverId = serverDiagramId(cur.activeDocId);
+    if (!serverId) {
+      pushToast('Local only — save to the server to enable versioned saves');
+      return 'local';
+    }
+    if (!isOnlineRef.current) {
+      pushToast('You are offline — save paused, nothing lost');
+      return 'offline';
+    }
+    const version = typeof active.serverVersion === 'number' ? active.serverVersion : undefined;
+    try {
+      const resp = await api.updateDiagram(serverId, activeGraphPatch(), version !== undefined ? { version } : {});
+      rememberDiagramVersion(cur.activeDocId, resp);
+      setDirty(false);
+      const v = (resp as { data?: { version?: unknown } })?.data?.version;
+      pushToast(typeof v === 'number' ? `Saved (v${v})` : 'Saved');
+      pushLog(`Saved ${docTitleRef.current}${typeof v === 'number' ? ` (v${v})` : ''}`);
+      schedulePersist();
+      return 'saved';
+    } catch (e) {
+      const conflict = conflictFromError(e, version ?? null);
+      if (conflict) {
+        setSaveConflict(conflict);
+        pushLog('Save conflict: server has a newer version — resolve explicitly');
+        // Enrich attempted-vs-current versions without mutating the canvas.
+        api.getDiagram(serverId).then(
+          ({ data }) => {
+            if (typeof data?.version === 'number') {
+              setSaveConflict((prev) => (prev ? { ...prev, serverVersion: data.version } : prev));
+            }
+          },
+          () => { /* current version stays unknown; all actions still work */ },
+        );
+        return 'conflict';
+      }
+      pushToast(`Save failed: ${e instanceof Error ? e.message : e}`);
+      pushLog(`Save failed: ${e instanceof Error ? e.message : e}`);
+      return 'error';
+    }
+  }, [pushToast, pushLog, schedulePersist, activeGraphPatch, rememberDiagramVersion]);
+
+  const forceSaveActiveDoc = useCallback(async (): Promise<'saved' | 'error'> => {
+    const cur = docsRef.current;
+    const active = cur.docs.find((d) => d.id === cur.activeDocId);
+    const serverId = serverDiagramId(cur.activeDocId);
+    if (!active || !serverId) return 'error';
+    const version = typeof active.serverVersion === 'number' ? active.serverVersion : undefined;
+    try {
+      const resp = await api.updateDiagram(
+        serverId,
+        activeGraphPatch(),
+        version !== undefined ? { version, force: true } : { force: true },
+      );
+      rememberDiagramVersion(cur.activeDocId, resp);
+      setSaveConflict(null);
+      setDirty(false);
+      pushToast('Saved your version — the remote state was preserved as a revision');
+      pushLog('Save conflict resolved: kept mine (remote preserved as revision)');
+      schedulePersist();
+      return 'saved';
+    } catch (e) {
+      pushToast(`Force save failed: ${e instanceof Error ? e.message : e}`);
+      pushLog(`Force save failed: ${e instanceof Error ? e.message : e}`);
+      return 'error';
+    }
+  }, [pushToast, pushLog, schedulePersist, activeGraphPatch, rememberDiagramVersion]);
+
+  const reloadActiveDoc = useCallback(async (): Promise<'reloaded' | 'error'> => {
+    const docId = activeDocRef.current;
+    const serverId = serverDiagramId(docId);
+    if (!serverId) return 'error';
+    try {
+      const { data } = await api.getDiagram(serverId);
+      const graph = (data?.graph ?? {}) as Record<string, unknown>;
+      const pick = (k: string): unknown[] => {
+        if (Array.isArray(graph[k])) return graph[k] as unknown[];
+        const top = (data as Record<string, unknown> | null)?.[k];
+        return Array.isArray(top) ? (top as unknown[]) : [];
+      };
+      const ns = pick('nodes').filter(isValidNode) as ArchNode[];
+      const ids = new Set(ns.map((n) => n.id));
+      const es = (pick('edges') as unknown[])
+        .filter((e): e is ArchEdge => isValidEdge(e, ids))
+        .map((e) => ({ ...e, targetCoords: e.targetCoords ? { ...e.targetCoords } : undefined }));
+      snapshot(nodesRef.current, edgesRef.current);
+      setNodesState(reconcileOrphans(cloneNodes(ns), es));
+      setEdgesState(cloneEdges(es));
+      setStrokesState(cloneStrokes((pick('strokes') as unknown[]).filter(isValidStroke)));
+      setTextsState(cloneTexts((pick('texts') as unknown[]).filter(isValidText)));
+      if (typeof data?.title === 'string' && data.title) {
+        setDocTitleState(data.title.slice(0, 80));
+        setDocState((prev) => ({
+          ...prev,
+          docs: prev.docs.map((d) => (d.id === docId ? { ...d, title: String(data.title).slice(0, 80) } : d)),
+        }));
+      }
+      rememberDiagramVersion(docId, { data });
+      setSaveConflict(null);
+      setDirty(false);
+      pushToast('Reloaded the server version — local edits replaced');
+      pushLog('Save conflict resolved: reloaded remote');
+      schedulePersist();
+      return 'reloaded';
+    } catch (e) {
+      pushToast(`Reload failed: ${e instanceof Error ? e.message : e}`);
+      return 'error';
+    }
+  }, [pushToast, pushLog, schedulePersist, snapshot, rememberDiagramVersion]);
+
   // Last failed server-branch request, retained so the UI can offer Retry
   // without losing the local duplicate (REV-R4).
   const failedBranchRef = useRef<{ serverId: string; title: string; branchName: string } | null>(null);
@@ -1957,6 +2121,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setBranchError(null);
       api.createBranch(req.serverId, req.title, req.branchName).then(
         ({ data }) => {
+          // NOTE: the branch response versions the NEW branch diagram, not the
+          // source doc — deliberately not stored as this doc's serverVersion.
           failedBranchRef.current = null;
           pushLog(`Server branch created: ${data?.id ?? req.branchName}`);
         },
@@ -2091,8 +2257,9 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       resumeToasts,
       isOnline,
       lintCount,
+      syncError,
     }),
-    [theme, setTheme, zoom, pan, setPan, tool, setTool, orthogonal, setOrthogonal, snapGrid, setSnapGrid, zoomBy, zoomTo, resetView, freshness, freshnessLabel, driftCount, toasts, pushToast, pauseToasts, resumeToasts, isOnline, lintCount],
+    [theme, setTheme, zoom, pan, setPan, tool, setTool, orthogonal, setOrthogonal, snapGrid, setSnapGrid, zoomBy, zoomTo, resetView, freshness, freshnessLabel, driftCount, toasts, pushToast, pauseToasts, resumeToasts, isOnline, lintCount, syncError],
   );
 
   const docsValue = useMemo<DiagramDocsContextValue>(
@@ -2108,8 +2275,14 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       setDocTags,
       duplicateDoc,
       deleteDoc,
+      serverVersion,
+      saveConflict,
+      saveActiveDoc,
+      forceSaveActiveDoc,
+      reloadActiveDoc,
+      dismissSaveConflict,
     }),
-    [docTitle, setDocTitle, dirty, docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc],
+    [docTitle, setDocTitle, dirty, docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, serverVersion, saveConflict, saveActiveDoc, forceSaveActiveDoc, reloadActiveDoc, dismissSaveConflict],
   );
 
   const collabValue = useMemo<DiagramCollabContextValue>(

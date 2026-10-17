@@ -19,12 +19,16 @@ public class CheckpointService {
   private final CheckpointRepository checkpoints;
   private final DiagramService diagrams;
   private final DiagramRepository diagramRepository;
+  private final RevisionService revisions;
+  private final AuditService audit;
 
   public CheckpointService(CheckpointRepository checkpoints, DiagramService diagrams,
-      DiagramRepository diagramRepository) {
+      DiagramRepository diagramRepository, RevisionService revisions, AuditService audit) {
     this.checkpoints = checkpoints;
     this.diagrams = diagrams;
     this.diagramRepository = diagramRepository;
+    this.revisions = revisions;
+    this.audit = audit;
   }
 
   @Transactional(readOnly = true)
@@ -58,23 +62,31 @@ public class CheckpointService {
     checkpoint.setMeta(meta);
     checkpoint.setBranch(branch);
     checkpoint.setSnapshot(diagram.getGraph());
-    return toJson(checkpoints.saveAndFlush(checkpoint));
+    Map<String, Object> created = toJson(checkpoints.saveAndFlush(checkpoint));
+    audit.record(ownerId, diagram.workspaceId(), "checkpoint.create", "checkpoint",
+        String.valueOf(created.get("id")), "ok");
+    return created;
   }
 
   @Transactional
   public void delete(UUID ownerId, UUID diagramId, UUID checkpointId) {
-    diagrams.requireOwnedForWrite(ownerId, diagramId);
+    Diagram diagram = diagrams.requireOwnedForWrite(ownerId, diagramId);
     Checkpoint checkpoint = checkpoints.findById(checkpointId)
         .orElseThrow(() -> ApiException.notFound("Checkpoint not found: " + checkpointId));
     if (!checkpoint.getDiagram().getId().equals(diagramId)) {
       throw ApiException.validation("Checkpoint does not belong to diagram: " + diagramId);
     }
     checkpoints.delete(checkpoint);
+    audit.record(ownerId, diagram.workspaceId(), "checkpoint.delete", "checkpoint",
+        checkpointId.toString(), "ok");
   }
 
   @Transactional
   public Map<String, Object> restore(UUID ownerId, UUID diagramId, UUID checkpointId) {
-    Diagram diagram = diagrams.requireOwnedForWrite(ownerId, diagramId);
+    // requireOwnedForWrite is read-only; re-attach for the managed write below.
+    diagrams.requireOwnedForWrite(ownerId, diagramId);
+    Diagram diagram = diagramRepository.findById(diagramId)
+        .orElseThrow(() -> ApiException.notFound("Diagram not found: " + diagramId));
     Checkpoint checkpoint = checkpoints.findById(checkpointId)
         .orElseThrow(() -> ApiException.notFound("Checkpoint not found: " + checkpointId));
     if (!checkpoint.getDiagram().getId().equals(diagram.getId())) {
@@ -82,6 +94,12 @@ public class CheckpointService {
     }
     diagram.setGraph(checkpoint.getSnapshot());
     diagramRepository.saveAndFlush(diagram);
+    revisions.recordAndBump(diagram, ownerId, "restore",
+        "Restored from checkpoint " + checkpointId);
+    audit.record(ownerId, diagram.workspaceId(), "checkpoint.restore", "checkpoint",
+        checkpointId.toString(), "ok");
+    audit.record(ownerId, diagram.workspaceId(), "diagram.restore", "diagram",
+        diagramId.toString(), "ok");
     return diagrams.toJson(diagram);
   }
 

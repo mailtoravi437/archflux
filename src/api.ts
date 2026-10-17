@@ -84,8 +84,41 @@ function handleUnauthorized(path: string, status: number) {
   }
 }
 
-async function request<T>(path: string, options: RequestInit = {}, opts: RequestOpts = {}): Promise<T> {
-  const headers: Record<string, string> = {
+/**
+ * Error thrown by {@link request} for non-2xx responses.
+ * Carries the server's stable `code` (e.g. `VERSION_CONFLICT`) and HTTP
+ * status so callers can branch on conflict vs. transient vs. permanent
+ * failures instead of string-matching messages.
+ */
+export class ApiError extends Error {
+  code?: string;
+  status?: number;
+
+  constructor(message: string, opts?: { code?: string; status?: number }) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = opts?.code;
+    this.status = opts?.status;
+  }
+}
+
+/** True when `err` is a stale-write version conflict (HTTP 409 + code). */
+export function isVersionConflictError(err: unknown): boolean {
+  return (
+    err instanceof ApiError &&
+    (err.code === 'VERSION_CONFLICT' || err.status === 409)
+  );
+}
+
+/** True when `err` is a permission denial (HTTP 403). */
+export function isForbiddenError(err: unknown): boolean {
+  return (
+    (err instanceof ApiError && (err.code === 'FORBIDDEN' || err.status === 403)) ||
+    (err instanceof Error && /HTTP 403/.test(err.message))
+  );
+}
+
+async function request<T>(path: string, options: RequestInit = {}, opts: RequestOpts = {}): Promise<T> {  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...((options.headers as Record<string, string>) || {}),
   };
@@ -104,11 +137,14 @@ async function request<T>(path: string, options: RequestInit = {}, opts: Request
   }
   if (!res.ok) {
     let msg = `HTTP ${res.status}`;
+    let code: string | undefined;
     try {
       const err = await res.json();
       msg = err.error?.message || err.message || msg;
+      if (typeof err.error?.code === 'string') code = err.error.code;
+      else if (typeof err.code === 'string') code = err.code;
     } catch { /* ignore */ }
-    throw new Error(msg);
+    throw new ApiError(msg, { code, status: res.status });
   }
   if (res.status === 204) return undefined as T;
   return res.json();
@@ -162,10 +198,20 @@ export const api = {
   getDiagram: (id: string) =>
     request<{ data: any }>(`/v1/diagrams/${id}`),
 
-  updateDiagram: (id: string, patch: any) =>
+  /**
+   * Optimistic-concurrency update. Sends `version` when the caller knows the
+   * last-acknowledged server version; stale versions get a 409 with
+   * `code: VERSION_CONFLICT` (see {@link ApiError}). `force: true` bypasses
+   * the check but still versions history server-side.
+   */
+  updateDiagram: (id: string, patch: any, opts?: { version?: number; force?: boolean }) =>
     request<{ data: any }>(`/v1/diagrams/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(patch),
+      body: JSON.stringify({
+        ...patch,
+        ...(opts?.version !== undefined ? { version: opts.version } : {}),
+        ...(opts?.force ? { force: true } : {}),
+      }),
     }),
 
   deleteDiagram: (id: string) =>
@@ -200,6 +246,24 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ title, branchName }),
     }),
+
+  // Revisions (immutable snapshots with lineage) + entity diff.
+  listRevisions: (diagramId: string) =>
+    request<{ data: Array<{ id: string; diagramId: string; parentRevisionId: string | null; contentHash: string; authorId: string; source: string; message: string; createdAt: string }> }>(
+      `/v1/diagrams/${diagramId}/revisions`),
+
+  getRevision: (diagramId: string, revId: string) =>
+    request<{ data: { id: string; diagramId: string; parentRevisionId: string | null; contentHash: string; authorId: string; source: string; message: string; createdAt: string; snapshot: any } }>(
+      `/v1/diagrams/${diagramId}/revisions/${revId}`),
+
+  diffRevisions: (diagramId: string, from: string, to: string) =>
+    request<{ added: Array<{ id: string; label: string; type: string }>; removed: Array<{ id: string; label: string; type: string }>; changed: Array<{ id: string; fields: string[] }> }>(
+      `/v1/diagrams/${diagramId}/diff?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
+
+  // Admin-only server audit trail. 403 for non-admin workspace roles.
+  listAudit: (workspaceId: string, limit = 50) =>
+    request<{ data: Array<{ id: string; actorId: string; workspaceId: string; action: string; resourceType: string; resourceId: string; outcome: string; correlationId: string; createdAt: string }> }>(
+      `/v1/audit?workspaceId=${encodeURIComponent(workspaceId)}&limit=${limit}`),
 
   // Threads/Replies
   listThreads: (diagramId: string) =>

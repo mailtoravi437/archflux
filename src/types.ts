@@ -164,6 +164,12 @@ export interface DiagramDoc {
   strokes?: FreeStroke[];
   /** Free-standing text labels on this document. */
   texts?: FreeText[];
+  /**
+   * Last server-acknowledged optimistic-concurrency version for server-backed
+   * docs (UUID ids). Absent for local-only docs and tolerated as missing by
+   * the loader — no persistence format bump required.
+   */
+  serverVersion?: number;
 }
 
 export type ThemeName = 'dark' | 'blueprint' | 'light';

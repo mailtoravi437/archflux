@@ -75,6 +75,24 @@ public class WorkspaceService {
   }
 
   /**
+   * Membership role, or null when not a member. Lives here (not in callers)
+   * because RLS-scoped reads MUST run inside a {@code @Transactional} service
+   * method: the identity aspect publishes the GUCs only there. A direct
+   * repository call from a controller runs GUC-less, RLS fail-closes, and the
+   * lookup silently returns empty (live audit-export 403, Phase 2).
+   */
+  @Transactional(readOnly = true)
+  public String roleOf(UUID userId, UUID workspaceId) {
+    readiness.requireReady();
+    if (userId == null || workspaceId == null) {
+      return null;
+    }
+    return memberships.findById_WorkspaceIdAndId_UserId(workspaceId, userId)
+        .map(WorkspaceMembership::getRole)
+        .orElse(null);
+  }
+
+  /**
    * Login-time provisioning (Phase 1): the ONLY writer for login-time user
    * upserts. Auth paths (filter, OAuth success, magic-link verify) run
    * outside {@code @Transactional} service scope with no RequestUser yet, so

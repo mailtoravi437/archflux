@@ -20,6 +20,8 @@ import com.archflux.util.JsonCanonicals;
 import com.archflux.util.LikeEscape;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 import jakarta.persistence.EntityManager;
 
 /**
@@ -37,6 +39,9 @@ public class DiagramService {
   private final UserRepository users;
   private final WorkspaceService workspaceService;
   private final SchemaReadinessService readiness;
+  private final RevisionService revisions;
+  private final AuditService audit;
+  private final MeterRegistry meters;
   private final EntityManager entityManager;
   private final ObjectMapper mapper = JsonCanonicals.baseMapper();
 
@@ -46,11 +51,15 @@ public class DiagramService {
 
   public DiagramService(DiagramRepository diagrams, UserRepository users,
       WorkspaceService workspaceService, SchemaReadinessService readiness,
+      RevisionService revisions, AuditService audit, MeterRegistry meters,
       EntityManager entityManager) {
     this.diagrams = diagrams;
     this.users = users;
     this.workspaceService = workspaceService;
     this.readiness = readiness;
+    this.revisions = revisions;
+    this.audit = audit;
+    this.meters = meters;
     this.entityManager = entityManager;
   }
 
@@ -85,10 +94,18 @@ public class DiagramService {
   @Transactional
   public Map<String, Object> create(UUID ownerId, String title, List<String> tags,
       JsonNode graph, JsonNode nodes, JsonNode edges, JsonNode strokes, JsonNode texts) {
+    return create(ownerId, title, tags, graph, nodes, edges, strokes, texts, "manual");
+  }
+
+  @Transactional
+  public Map<String, Object> create(UUID ownerId, String title, List<String> tags,
+      JsonNode graph, JsonNode nodes, JsonNode edges, JsonNode strokes, JsonNode texts,
+      String source) {
     readiness.requireReady();
     if (title == null || title.isBlank()) {
       throw ApiException.validation("title is required");
     }
+    requireValidGraphTypes(graph, nodes, edges, strokes, texts);
     // Personal workspace first: also provisions the User row for brand-new ids.
     Workspace workspace = workspaceService.resolvePersonalWorkspace(ownerId);
     User owner = users.findById(ownerId).orElseGet(() -> {
@@ -103,6 +120,9 @@ public class DiagramService {
     diagram.setGraph(JsonCanonicals.toCanonicalJson(
         JsonCanonicals.canonicalGraph(graph, nodes, edges, strokes, texts)));
     Diagram saved = diagrams.saveAndFlush(diagram);
+    revisions.recordAndBump(saved, ownerId, source, "Created diagram");
+    audit.record(ownerId, saved.workspaceId(), "diagram.create", "diagram",
+        saved.getId().toString(), "ok");
     return toJson(saved);
   }
 
@@ -121,6 +141,21 @@ public class DiagramService {
   public Map<String, Object> update(UUID ownerId, UUID id, String title, List<String> tags,
       JsonNode graph, JsonNode nodes, JsonNode edges, JsonNode strokes, JsonNode texts,
       boolean graphProvided, boolean tagsProvided) {
+    return update(ownerId, id, title, tags, graph, nodes, edges, strokes, texts,
+        graphProvided, tagsProvided, null, false, "manual");
+  }
+
+  /**
+   * Update with optimistic concurrency: when {@code expectedVersion} is
+   * present and differs from the current version the write is rejected with
+   * 409 VERSION_CONFLICT (never a silent overwrite); {@code force} bypasses
+   * the check but still records a revision (explicit overwrite).
+   */
+  @Transactional
+  public Map<String, Object> update(UUID ownerId, UUID id, String title, List<String> tags,
+      JsonNode graph, JsonNode nodes, JsonNode edges, JsonNode strokes, JsonNode texts,
+      boolean graphProvided, boolean tagsProvided, Long expectedVersion, boolean force,
+      String source) {
     readiness.requireReady();
     Optional<Diagram> any = diagrams.findById(id);
     if (any.isEmpty()) {
@@ -129,6 +164,11 @@ public class DiagramService {
     Diagram diagram = any.get();
     if (!workspaceService.isMember(ownerId, diagram.workspaceId())) {
       throw ApiException.forbidden("Diagram belongs to another workspace: " + id);
+    }
+    if (expectedVersion != null && !force && expectedVersion.longValue() != diagram.getVersion()) {
+      meters.counter("archflux.diagrams.conflicts", Tags.of("outcome", "version_conflict"))
+          .increment();
+      throw ApiException.versionConflict(expectedVersion.longValue(), diagram.getVersion());
     }
     if (title != null) {
       if (title.isBlank()) {
@@ -140,15 +180,50 @@ public class DiagramService {
       diagram.setTags(tags == null ? List.of() : tags);
     }
     if (graphProvided) {
+      requireValidGraphTypes(graph, nodes, edges, strokes, texts);
       JsonNode currentGraph = readGraph(diagram.getGraph());
       Map<String, Object> merged = JsonCanonicals.canonicalGraph(
           graph != null ? graph : currentGraph, nodes, edges, strokes, texts);
       diagram.setGraph(JsonCanonicals.toCanonicalJson(merged));
     }
     Diagram saved = diagrams.saveAndFlush(diagram);
+    revisions.recordAndBump(saved, ownerId, source, force ? "Forced update" : "Updated diagram");
+    audit.record(ownerId, saved.workspaceId(), "diagram.update", "diagram",
+        saved.getId().toString(), "ok");
     // DB trigger sets updated_at — refresh so the response carries the true value.
     entityManager.refresh(saved);
     return toJson(saved);
+  }
+
+  /**
+   * Narrow structural validation: graph content that is present but not an
+   * array/object of the right shape is semantically invalid (422), not a bad
+   * request. Blank titles stay 400; malformed JSON never reaches here (400 at
+   * the message-converter layer).
+   */
+  static void requireValidGraphTypes(JsonNode graph, JsonNode nodes, JsonNode edges,
+      JsonNode strokes, JsonNode texts) {
+    if (graph != null && !graph.isNull() && !graph.isMissingNode() && !graph.isObject()) {
+      throw ApiException.unprocessable("graph must be an object with nodes/edges arrays");
+    }
+    if (graph != null && graph.isObject()) {
+      for (String key : List.of("nodes", "edges", "strokes", "texts")) {
+        JsonNode child = graph.get(key);
+        if (child != null && !child.isMissingNode() && !child.isNull() && !child.isArray()) {
+          throw ApiException.unprocessable(key + " must be an array");
+        }
+      }
+    }
+    requireArrayOrAbsent("nodes", nodes);
+    requireArrayOrAbsent("edges", edges);
+    requireArrayOrAbsent("strokes", strokes);
+    requireArrayOrAbsent("texts", texts);
+  }
+
+  private static void requireArrayOrAbsent(String name, JsonNode value) {
+    if (value != null && !value.isMissingNode() && !value.isNull() && !value.isArray()) {
+      throw ApiException.unprocessable(name + " must be an array");
+    }
   }
 
   @Transactional
@@ -161,7 +236,15 @@ public class DiagramService {
     if (!workspaceService.isMember(ownerId, any.get().workspaceId())) {
       throw ApiException.forbidden("Diagram belongs to another workspace: " + id);
     }
+    UUID workspaceId = any.get().workspaceId();
     diagrams.delete(any.get());
+    // Execute the delete now and detach the session: child rows (revisions,
+    // checkpoints, threads, sync logs) are DB-cascaded, but their managed
+    // entities would otherwise latch onto the removed diagram and poison
+    // every later auto-flush in this transaction (TransientObjectException).
+    entityManager.flush();
+    entityManager.clear();
+    audit.record(ownerId, workspaceId, "diagram.delete", "diagram", id.toString(), "ok");
   }
 
   /** Loads the member-visible diagram or throws 404 (scoped reads) — for nested routes. */
@@ -204,6 +287,9 @@ public class DiagramService {
     branch.setParentDiagram(source);
     branch.setBranchName(branchName);
     Diagram saved = diagrams.saveAndFlush(branch);
+    revisions.recordAndBump(saved, ownerId, "manual", "Branched from " + source.getId());
+    audit.record(ownerId, saved.workspaceId(), "diagram.branch", "diagram",
+        saved.getId().toString(), "ok");
     return toJson(saved);
   }
 
@@ -212,6 +298,7 @@ public class DiagramService {
     out.put("id", diagram.getId().toString());
     out.put("title", diagram.getTitle());
     out.put("tags", diagram.getTags());
+    out.put("version", diagram.getVersion());
     out.put("branchName", diagram.getBranchName());
     UUID parentId = null;
     try {

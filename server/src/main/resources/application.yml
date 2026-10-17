@@ -149,6 +149,30 @@ spring:
       flush-mode: on_save
     timeout: 30d
 
+# Phase 2 observability (PRODUCTIZATION_SPEC §13): minimal actuator
+# surface — health, info, metrics, Prometheus. Everything else stays off.
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  # With endpoints.enabled-by-default=false the metrics-export auto-config
+  # backs off unless the product export is explicitly enabled.
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 app:
   api-token: ${APP_API_TOKEN:${API_TOKEN:}}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}

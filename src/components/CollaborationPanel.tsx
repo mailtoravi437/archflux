@@ -134,8 +134,10 @@ export function CollaborationPanel({ diagramId, embedded }: CollaborationPanelPr
         color: 'var(--text-muted)',
         fontFamily: 'var(--mono-font)',
       }}>
-        <div>Status: {connected ? '🟢 Connected' : '🔴 Disconnected'}</div>
-        <div>Sync: {synced ? '🟢 Synced' : '🟡 Syncing...'}</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <span><strong aria-label="Connection status">Status:</strong> {connected ? '🟢 Connected — live' : '🔴 Disconnected — offline'}</span>
+          <span><strong aria-label="Sync status">Sync:</strong> {synced ? '🟢 Synced — current' : '🟡 Syncing — stale'} {synced ? '' : '(observation may be outdated)'}</span>
+        </div>
       </div>
     </div>
   );

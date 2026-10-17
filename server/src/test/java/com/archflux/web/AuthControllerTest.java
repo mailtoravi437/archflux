@@ -9,6 +9,8 @@ import com.archflux.service.SyncService;
 import com.archflux.auth.JwtService;
 import com.archflux.auth.MagicLinkService;
 import com.archflux.auth.UserSessionService;
+import com.archflux.repo.AuditEventRepository;
+import com.archflux.service.AuditService;
 import com.archflux.service.WorkspaceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,6 +74,9 @@ class AuthControllerTest extends PostgresIT {
     // SECURITY DEFINER provisioning path (user + workspace), not a mock.
     @Autowired
     private WorkspaceService workspaceService;
+
+    @Autowired
+    private AuditEventRepository auditEvents;
 
     @MockitoBean
     private JwtDecoder jwtDecoder;
@@ -334,7 +339,7 @@ class AuthControllerTest extends PostgresIT {
         when(jwtService.getAccessTokenTtlSeconds()).thenReturn(3600L);
         com.archflux.web.AuthController controller = controllerWithDevCookies(
             new com.archflux.web.AuthController(
-                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, authorizedClientService));
+                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, new AuditService(auditEvents), authorizedClientService));
         var httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
         when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
         var httpRes = new org.springframework.mock.web.MockHttpServletResponse();
@@ -361,6 +366,13 @@ class AuthControllerTest extends PostgresIT {
         assertTrue("https://avatars.example.com/u/98765".equals(saved.get().getAvatarUrl()),
             "avatar should be stored, got: " + saved.get().getAvatarUrl());
         verify(jwtService).generateToken(any(User.class), any());
+        // Login is audited with actor + outcome (PROD-009).
+        assertTrue(auditEvents.findByActionOrderByCreatedAtDesc(
+                "auth.login",
+                org.springframework.data.domain.PageRequest.of(0, 10)).stream()
+            .anyMatch(e -> "ok".equals(e.getOutcome())
+                && saved.get().getId().toString().equals(e.getActorId().toString())),
+            "expected an ok auth.login audit event for the OAuth user");
         } finally {
             org.springframework.security.core.context.SecurityContextHolder.clearContext();
         }
@@ -375,7 +387,7 @@ class AuthControllerTest extends PostgresIT {
 
         com.archflux.web.AuthController controller = controllerWithDevCookies(
             new com.archflux.web.AuthController(
-                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, authorizedClientService));
+                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, new AuditService(auditEvents), authorizedClientService));
         var httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
         when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
         var httpRes = new org.springframework.mock.web.MockHttpServletResponse();

@@ -17,6 +17,8 @@ import com.archflux.repo.SyncLogRepository;
 import com.archflux.util.JsonCanonicals;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
 
 /**
  * Idempotent sync staging. The commit SHA is sha256 over the canonical
@@ -36,14 +38,17 @@ public class SyncService {
   private final DiagramRepository diagramRepository;
   private final WorkspaceService workspaceService;
   private final SchemaReadinessService readiness;
+  private final MeterRegistry meters;
   private final ObjectMapper mapper = JsonCanonicals.baseMapper();
 
   public SyncService(SyncLogRepository syncLogRepository, DiagramRepository diagramRepository,
-      WorkspaceService workspaceService, SchemaReadinessService readiness) {
+      WorkspaceService workspaceService, SchemaReadinessService readiness,
+      MeterRegistry meters) {
     this.syncLogRepository = syncLogRepository;
     this.diagramRepository = diagramRepository;
     this.workspaceService = workspaceService;
     this.readiness = readiness;
+    this.meters = meters;
   }
 
   public record SyncOutcome(String status, boolean driftEvaluated, int nodesSynced,
@@ -65,6 +70,7 @@ public class SyncService {
     Optional<SyncLog> existing = syncLogRepository.findFirstByCommitShaOrderByCreatedAtAsc(commitSha);
     if (existing.isPresent()) {
       SyncLog row = existing.get();
+      meters.counter("archflux.sync.runs", Tags.of("status", "noop")).increment();
       log.info("Sync noop for commit {} (actor {})", commitSha, actor);
       return new SyncOutcome("noop", true, 0, 0, commitSha, row.getCreatedAt(), false);
     }
@@ -91,6 +97,7 @@ public class SyncService {
       // Re-read so the returned timestamp matches the persisted row exactly.
       outcome = new SyncOutcome("synced", true, nodesSynced, edgesSynced, commitSha,
           row.getCreatedAt() != null ? row.getCreatedAt() : outcome.timestamp(), true);
+      meters.counter("archflux.sync.runs", Tags.of("status", "synced")).increment();
       log.info("Sync staged commit {} (actor {}, +{}/{} nodes/edges)", commitSha, actor, nodesSynced, edgesSynced);
     } else {
       log.info("Sync computed commit {} without persisting (no resolvable diagram)", commitSha);

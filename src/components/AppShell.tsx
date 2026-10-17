@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import type { ThemeName } from '../types';
 import HonestyBadge from './HonestyBadge';
@@ -6,6 +6,9 @@ import { sourceModeForDoc, sourceModeLabel, sourceModeTooltip } from '../honesty
 import { libraryShapes } from '../mocks';
 import { useDiagram, useDiagramUI } from '../useDiagram';
 import { useFocusTrap } from '../useFocusTrap';
+import { isServerDocId } from '../honesty';
+import type { ConflictAction } from '../conflict';
+import ConflictDialog from './ConflictDialog';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { api, setUnauthorizedHandler } from '../api';
 import { getSession, setSession } from '../session';
@@ -96,9 +99,11 @@ function ToastTray() {
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, displayName } = useDiagram();
+  const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, displayName, serverVersion, saveConflict, saveActiveDoc, forceSaveActiveDoc, reloadActiveDoc, dismissSaveConflict } = useDiagram();
   const isCanvas = location.pathname === '/canvas';
   const [userOpen, setUserOpen] = useState(false);
+  const accountBtnRef = useRef<HTMLButtonElement | null>(null);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   // Token-free account presence: local session mode + a cached /me probe
   // on mount when a non-guest session exists.
   const [signedIn, setSignedIn] = useState(() => {
@@ -155,8 +160,7 @@ export default function AppShell() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [presenting, setPresenting] = useState(false);
-  const [docsOpen, setDocsOpen] = useState(false);
-  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [docsOpen, setDocsOpen] = useState(false);  const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
   const [armDoc, setArmDoc] = useState<string | null>(null);
   // Disarm a pending delete when the Diagrams popover closes.
@@ -167,6 +171,68 @@ export default function AppShell() {
   const shortcutsTrap = useFocusTrap<HTMLDivElement>(shortcutsOpen);
   const docsTrap = useFocusTrap<HTMLDivElement>(docsOpen);
 
+  // Save-conflict dialog hosting (§6.2). A fresh conflict auto-opens the
+  // dialog; Esc/X dismisses it but the "resolve" affordance persists in the
+  // header until one of the three explicit actions runs.
+  const [conflictOpen, setConflictOpen] = useState(false);
+  const [conflictBusy, setConflictBusy] = useState<ConflictAction | null>(null);
+  const prevConflictRef = useRef(saveConflict);
+  useEffect(() => {
+    if (saveConflict && !prevConflictRef.current) setConflictOpen(true);
+    prevConflictRef.current = saveConflict;
+  }, [saveConflict]);
+
+  // Account menu: Esc closes + restores focus to the trigger; arrows move
+  // between items (TOP-R9). Outside click still closes via the overlay.
+  useEffect(() => {
+    if (!userOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setUserOpen(false);
+        accountBtnRef.current?.focus();
+        return;
+      }
+      const menu = accountMenuRef.current;
+      if (!menu) return;
+      const items = Array.from(menu.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+      if (items.length === 0) return;
+      const idx = items.indexOf(document.activeElement as HTMLElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        const next =
+          e.key === 'Home' ? 0
+            : e.key === 'End' ? items.length - 1
+              : e.key === 'ArrowDown' ? (idx + 1) % items.length
+                : (idx - 1 + items.length) % items.length;
+        items[next]?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [userOpen]);
+
+  const onSave = () => {
+    void saveActiveDoc().then((r) => {
+      if (r === 'conflict') setConflictOpen(true);
+    });
+  };
+
+  const runConflictAction = (action: ConflictAction) => {
+    if (action === 'duplicate') {
+      duplicateDoc(activeDocId);
+      dismissSaveConflict();
+      setConflictOpen(false);
+      return;
+    }
+    setConflictBusy(action);
+    const done = action === 'reload' ? reloadActiveDoc() : forceSaveActiveDoc();
+    void done.finally(() => {
+      setConflictBusy(null);
+      setConflictOpen(false);
+    });
+  };
+
   const commands: { id: string; label: string; run: () => void; disabled?: boolean }[] = useMemo(() => [
     { id: 'dashboard', label: 'Go to Document Library', run: () => navigate('/dashboard') },
     { id: 'canvas', label: 'Go to Precision Canvas', run: () => navigate('/canvas') },
@@ -176,6 +242,7 @@ export default function AppShell() {
     { id: 'blueprints', label: 'Go to Blueprints', run: () => navigate('/blueprints') },
     { id: 'settings', label: 'Go to Settings', run: () => navigate('/settings/general') },
     { id: 'export', label: 'Export .arch file', run: () => exportArch() },
+    { id: 'save', label: 'Save diagram to server', run: () => { void saveActiveDoc(); } },
     { id: 'export-png', label: 'Export PNG snapshot', run: () => exportPNG() },
     { id: 'new-doc', label: 'New blank diagram', run: () => { newDoc(); navigate('/canvas'); } },
     { id: 'resync', label: 'Re-sync from upstream', run: () => resync() },
@@ -197,7 +264,7 @@ export default function AppShell() {
     { id: 'theme-dark', label: 'Theme: Obsidian Dark', run: () => setTheme('dark') },
     { id: 'theme-blue', label: 'Theme: Cyber Blueprint', run: () => setTheme('blueprint') },
     { id: 'theme-light', label: 'Theme: Engineering Light', run: () => setTheme('light') },
-  ], [navigate, exportArch, exportPNG, newDoc, resync, healAll, applyLayout, placeShape, openDoc, docs, undo, redo, canUndo, canRedo, resetView, setTheme]);
+  ], [navigate, exportArch, exportPNG, newDoc, resync, healAll, applyLayout, placeShape, openDoc, docs, undo, redo, canUndo, canRedo, resetView, setTheme, saveActiveDoc]);
 
   // Subsequence fuzzy match: every query char appears in order ("expt" → "Export PNG").
   const fuzzyMatch = (label: string, q: string) => {
@@ -319,7 +386,7 @@ export default function AppShell() {
           <div className="brand-logo" onClick={() => navigate('/canvas')} title="Go to canvas" role="button" tabIndex={0} aria-label="Go to canvas" onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/canvas'); } }}>
             <div className="brand-icon-hex">⚡</div>
             <div className="brand-title-wrap">
-              <span className="brand-name" title={dirty ? 'Modified in this session (auto-saved locally)' : 'No unsaved session changes'}>ArchFlux{dirty ? ' •' : ''}</span>
+              <span className="brand-name">ArchFlux</span>
               <span className="brand-tagline">Living System Canvas</span>
             </div>
           </div>
@@ -332,7 +399,7 @@ export default function AppShell() {
             >
               🗂 {docs.length}
             </button>
-            <span>repo/</span>
+            {sourceModeForDoc(activeDocId) !== 'local' && <span>repo/</span>}
             <input
               type="text"
               className="doc-title-input"
@@ -342,7 +409,11 @@ export default function AppShell() {
               maxLength={80}
               style={{ width: 200 }}
             />
-            <span style={{ color: 'var(--text-dim)' }} title={dirty ? 'Modified in this session (auto-saved locally)' : 'No unsaved session changes'}>[git:main]{dirty ? ' ●' : ''}</span>
+            {dirty && <span className="dirty-dot" aria-hidden="true">●</span>}
+            <span className="sr-only" role="status" aria-live="polite">{dirty ? 'Modified in this session (auto-saved locally)' : 'No unsaved session changes'}</span>
+            {sourceModeForDoc(activeDocId) !== 'local' && (
+              <span style={{ color: 'var(--text-dim)' }}>[git:main]</span>
+            )}
           </div>
           {(() => {
             const mode = sourceModeForDoc(activeDocId);
@@ -355,14 +426,21 @@ export default function AppShell() {
               />
             );
           })()}
-          <div className={`freshness-pill ${freshness}`} onClick={() => navigate('/living')} role="button" tabIndex={0} aria-label={`${freshnessLabel} — open Living Sync`} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/living'); } }}>
-            <span className="status-pulse-dot"></span>
-            <span>{freshnessLabel}</span>
-          </div>
+          {sourceModeForDoc(activeDocId) === 'local' ? (
+            <div className="freshness-pill local" onClick={() => navigate('/living')} role="button" tabIndex={0} aria-label="Local — not synced. Open Living Sync" onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/living'); } }}>
+              <span className="status-pulse-dot" aria-hidden="true"></span>
+              <span>Local — not synced</span>
+            </div>
+          ) : (
+            <div className={`freshness-pill ${freshness === 'drift' ? 'warning-stale' : freshness}`} onClick={() => navigate('/living')} role="button" tabIndex={0} aria-label={`${freshnessLabel} — open Living Sync`} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('/living'); } }} style={freshness === 'drift' ? { background: '#FEF3C7', borderColor: '#CA8A04', color: '#CA8A04' } : {}}>
+              <span className="status-pulse-dot" aria-hidden="true" style={freshness === 'drift' ? { background: '#CA8A04', animation: 'pulse 2s infinite' } : {}}></span>
+              <span><strong aria-label={freshness === 'drift' ? 'Stale observation' : 'Current observation'}>{freshness === 'drift' ? 'STALE — ' : 'CURRENT — '}</strong>{freshnessLabel}</span>
+            </div>
+          )}
           <button
             className={`btn linter-chip${lintCount > 0 ? ' pulse' : ''}`}
-            title={`${lintCount} linter issues — open the canvas (linter lives in the right dock)`}
-            aria-label={`${lintCount} linter issues. Open canvas.`}
+            title={lintCount > 0 ? `${lintCount} lint issues — open the canvas (linter lives in the right dock)` : 'No lint issues — open the canvas'}
+            aria-label={lintCount > 0 ? `${lintCount} lint issues. Open canvas.` : 'No lint issues. Open canvas.'}
             onClick={() => navigate('/canvas')}
             style={lintCount > 0 ? { borderColor: 'var(--status-warning, #D97706)', color: 'var(--status-warning, #D97706)' } : { borderColor: 'var(--status-success, #16A34A)', color: 'var(--status-success, #16A34A)' }}
           >
@@ -392,8 +470,8 @@ export default function AppShell() {
           <button className="btn" title="Keyboard shortcuts" aria-label="Show keyboard shortcuts" onClick={() => setShortcutsOpen(true)}>?</button>
           {isCanvas && (
             <>
-              <button className="btn" title={`Undo (${undoDepth} in stack)`} aria-label="Undo" onClick={undo} disabled={!canUndo}>↩</button>
-              <button className="btn" title={`Redo (${redoDepth} in stack)`} aria-label="Redo" onClick={redo} disabled={!canRedo}>↪</button>
+              <button className="btn" title={`Undo (${undoDepth} in stack)`} aria-label="Undo" onClick={undo} disabled={!canUndo} aria-disabled={!canUndo}>↩</button>
+              <button className="btn" title={`Redo (${redoDepth} in stack)`} aria-label="Redo" onClick={redo} disabled={!canRedo} aria-disabled={!canRedo}>↪</button>
             </>
           )}
           <select className="theme-select" value={theme} onChange={(e) => setTheme(e.target.value as ThemeName)} aria-label="Theme">
@@ -401,14 +479,36 @@ export default function AppShell() {
             <option value="blueprint">📐 Cyber Blueprint</option>
             <option value="dark">🌙 Obsidian Dark</option>
           </select>
-          <button className="btn" onClick={startPresenting} title="Hide panels and go fullscreen">
+          <button className="btn" onClick={startPresenting} title="Hide panels and go fullscreen" aria-label="Hide panels and go fullscreen">
             <span>⛶ Focus</span>
           </button>
+          {isServerDocId(activeDocId) && (
+            <button
+              className="btn"
+              onClick={onSave}
+              title={serverVersion !== null ? `Server version v${serverVersion} — save latest edits` : 'Not yet saved to the server'}
+              aria-label={dirty ? 'Save diagram (unsaved changes)' : 'Save diagram'}
+            >
+              <span>💾 Save{serverVersion !== null ? ` v${serverVersion}` : ''}{dirty ? ' •' : ''}</span>
+            </button>
+          )}
+          {saveConflict && !conflictOpen && (
+            <button
+              className="btn"
+              onClick={() => setConflictOpen(true)}
+              title="A newer server version exists — resolve explicitly"
+              aria-label="Resolve save conflict"
+              style={{ borderColor: 'var(--accent-rose)', color: 'var(--accent-rose)' }}
+            >
+              <span>⚠ Conflict — resolve</span>
+            </button>
+          )}
           <button className="btn btn-primary" onClick={exportArch}>
             <span>Export .arch</span>
           </button>
           <div style={{ position: 'relative' }}>
             <button
+              ref={accountBtnRef}
               className="btn"
               aria-label={signedIn ? `Account (${displayName.trim() || 'signed in'})` : 'Account (guest)'}
               aria-haspopup="menu"
@@ -440,11 +540,11 @@ export default function AppShell() {
             {userOpen && (
               <>
                 <div style={{ position: 'fixed', inset: 0, zIndex: 90 }} onClick={() => setUserOpen(false)} aria-hidden="true" />
-                <div role="menu" aria-label="Account" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 91, minWidth: 190, background: 'var(--bg-panel)', border: '1px solid var(--border-panel)', borderRadius: 10, boxShadow: 'var(--panel-shadow)', padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div ref={accountMenuRef} role="menu" aria-label="Account" style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 91, minWidth: 190, background: 'var(--bg-panel)', border: '1px solid var(--border-panel)', borderRadius: 10, boxShadow: 'var(--panel-shadow)', padding: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', padding: '6px 8px', fontFamily: 'var(--mono-font)' }}>
                     {signedIn ? (displayName.trim() || 'Signed in') : 'Guest mode'}
                   </div>
-                  <button className="btn-xs" role="menuitem" style={{ textAlign: 'left' }} onClick={() => { setUserOpen(false); navigate('/settings/team'); }}>
+                  <button autoFocus className="btn-xs" role="menuitem" style={{ textAlign: 'left' }} onClick={() => { setUserOpen(false); navigate('/settings/team'); }}>
                     👥 Profile & Team
                   </button>
                   {signedIn ? (
@@ -648,6 +748,14 @@ export default function AppShell() {
         <div style={{ position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 80, background: 'var(--bg-panel)', border: '1px solid var(--border-panel)', borderRadius: 20, padding: '4px 14px', fontSize: 11, fontFamily: 'var(--mono-font)' }}>
           FOCUS MODE — Esc to exit
         </div>
+      )}
+      {conflictOpen && saveConflict && (
+        <ConflictDialog
+          conflict={saveConflict}
+          busyAction={conflictBusy}
+          onAction={runConflictAction}
+          onClose={() => setConflictOpen(false)}
+        />
       )}
       <ToastTray />
       </>

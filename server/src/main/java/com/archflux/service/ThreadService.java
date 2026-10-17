@@ -20,11 +20,14 @@ public class ThreadService {
   private final ThreadRepository threads;
   private final ReplyRepository replies;
   private final DiagramService diagrams;
+  private final AuditService audit;
 
-  public ThreadService(ThreadRepository threads, ReplyRepository replies, DiagramService diagrams) {
+  public ThreadService(ThreadRepository threads, ReplyRepository replies, DiagramService diagrams,
+      AuditService audit) {
     this.threads = threads;
     this.replies = replies;
     this.diagrams = diagrams;
+    this.audit = audit;
   }
 
   @Transactional(readOnly = true)
@@ -49,7 +52,10 @@ public class ThreadService {
     thread.setPinnedTo(pinnedTo);
     thread.setText(text);
     thread.setResolved(resolved != null && resolved);
-    return threadToJson(threads.saveAndFlush(thread));
+    Map<String, Object> created = threadToJson(threads.saveAndFlush(thread));
+    audit.record(ownerId, diagram.workspaceId(), "thread.create", "thread",
+        String.valueOf(created.get("id")), "ok");
+    return created;
   }
 
   @Transactional(readOnly = true)
@@ -72,7 +78,10 @@ public class ThreadService {
     reply.setThread(thread);
     reply.setAuthor(author);
     reply.setText(text);
-    return replyToJson(replies.saveAndFlush(reply));
+    Map<String, Object> created = replyToJson(replies.saveAndFlush(reply));
+    audit.record(ownerId, thread.getDiagram().workspaceId(), "thread.reply", "thread",
+        threadId.toString(), "ok");
+    return created;
   }
 
   private ReviewThread requireThreadInDiagram(UUID ownerId, UUID diagramId, UUID threadId, boolean write) {

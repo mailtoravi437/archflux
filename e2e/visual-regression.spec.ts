@@ -73,6 +73,13 @@ test.describe('Visual Regression Tests', () => {
     await expect(page.locator('#architectureCanvas')).toHaveScreenshot('canvas-dark-theme.png', shot);
   });
 
+  test('light theme matches snapshot', async ({ page }) => {
+    await page.selectOption('select[aria-label="Theme"]', 'light');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+    await expect(page.locator('#architectureCanvas')).toHaveScreenshot('canvas-light-theme.png', shot);
+  });
+
   test('blueprint theme matches snapshot', async ({ page }) => {
     await page.selectOption('select[aria-label="Theme"]', 'blueprint');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'blueprint');

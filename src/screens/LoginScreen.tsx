@@ -441,6 +441,7 @@ export default function LoginScreen() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={busy}
                   aria-label="Work email"
+                  aria-errormessage={error ? "login-error" : undefined}
                 />
               </label>
               <button
@@ -493,6 +494,7 @@ export default function LoginScreen() {
                 }
                 onPaste={pasteOtp}
                 aria-label="6-digit verification code"
+                aria-errormessage={error ? "login-error" : undefined}
               />
               <button
                 type="submit"
@@ -586,6 +588,7 @@ export default function LoginScreen() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={busy}
                   aria-label="Work email"
+                  aria-errormessage={error ? "login-error" : undefined}
                 />
               </label>
               <button
@@ -645,7 +648,7 @@ export default function LoginScreen() {
                 borderRadius: 6,
                 padding: "8px 10px",
                 color: "var(--accent-rose, #991B1B)",
-              }}>
+              }} id="login-error">
               {error}
             </div>
           )}

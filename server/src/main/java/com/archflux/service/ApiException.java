@@ -32,6 +32,19 @@ public class ApiException extends RuntimeException {
     return new ApiException("VALIDATION_ERROR", 400, message);
   }
 
+  public static ApiException conflict(String code, String message) {
+    return new ApiException(code, 409, message);
+  }
+
+  public static ApiException versionConflict(long expected, long current) {
+    return new ApiException("VERSION_CONFLICT", 409,
+        "Diagram changed since version " + expected + " (current " + current + "). Reload and retry.");
+  }
+
+  public static ApiException unprocessable(String message) {
+    return new ApiException("UNPROCESSABLE_ENTITY", 422, message);
+  }
+
   public static ApiException dbUnavailable() {
     return new ApiException("DB_UNAVAILABLE", 500,
         "Database unavailable — apply db/migrations/V1__init.sql with psql, then retry.");

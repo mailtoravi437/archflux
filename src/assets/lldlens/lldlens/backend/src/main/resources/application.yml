@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: lldlens-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/lldlens}
+    username: ${DB_USERNAME:lldlens}
+    password: ${DB_PASSWORD:lldlens}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+  jpa:
+    hibernate:
+      ddl-auto: validate   # schema is owned by Flyway migrations, never by Hibernate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: never
+
+jwt:
+  secret: ${JWT_SECRET:change-me-in-production-this-must-be-at-least-256-bits-long}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:14}
+
+judge:
+  sandbox-endpoint: ${JUDGE_SANDBOX_URL:http://localhost:9000}
+  timeout-seconds: ${JUDGE_TIMEOUT_SECONDS:10}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    root: INFO
+    com.lldlens: ${LOG_LEVEL:INFO}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
+logging:
+  level:
+    root: WARN
+    com.lldlens: INFO

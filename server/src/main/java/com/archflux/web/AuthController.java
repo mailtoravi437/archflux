@@ -6,6 +6,7 @@ import com.archflux.auth.UserSessionService;
 import com.archflux.domain.User;
 import com.archflux.repo.UserRepository;
 import com.archflux.security.AuthFilter;
+import com.archflux.service.AuditService;
 import com.archflux.service.WorkspaceService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,6 +52,7 @@ public class AuthController {
     private final MagicLinkService magicLinkService;
     private final JwtService jwtService;
     private final WorkspaceService workspaceService;
+    private final AuditService auditService;
     private final OAuth2AuthorizedClientService authorizedClientService;
 
     @Value("${app.frontend-url:http://localhost:5173}")
@@ -67,12 +69,14 @@ public class AuthController {
                           MagicLinkService magicLinkService,
                           JwtService jwtService,
                           WorkspaceService workspaceService,
+                          AuditService auditService,
                           OAuth2AuthorizedClientService authorizedClientService) {
         this.userRepository = userRepository;
         this.sessionService = sessionService;
         this.magicLinkService = magicLinkService;
         this.jwtService = jwtService;
         this.workspaceService = workspaceService;
+        this.auditService = auditService;
         this.authorizedClientService = authorizedClientService;
     }
 
@@ -179,6 +183,8 @@ public class AuthController {
         // Mint JWT, set cookie, redirect with provider only (PROD-011: no token in URL)
         String jwt = jwtService.generateToken(user, sessionId);
         addAuthCookie(response, jwt);
+        auditService.record(user.getId(), null, "auth.login", "user",
+            user.getId().toString(), "ok");
         response.sendRedirect(callbackUrl(provider));
     }
 
@@ -192,6 +198,7 @@ public class AuthController {
             HttpServletResponse response) throws IOException {
         log.warn("OAuth2 failure: {} - {}", error, error_description);
         String code = (error != null && !error.isBlank()) ? error : "oauth_failed";
+        auditService.record(null, null, "auth.login_failed", "auth", code, "error");
         response.sendRedirect(frontendUrl + "/login?error=" +
             java.net.URLEncoder.encode(code, java.nio.charset.StandardCharsets.UTF_8));
     }
@@ -247,6 +254,7 @@ public class AuthController {
         magicLinkService.sendMagicLinkEmail(email, link);
 
         log.info("Magic link sent to {}", email);
+        auditService.record(null, null, "auth.magic_link_requested", "auth", email, "ok");
         return ResponseEntity.ok(Map.of("message", "Magic link sent to " + email));
     }
 
@@ -261,6 +269,7 @@ public class AuthController {
         Optional<String> emailOpt = magicLinkService.verifyToken(token);
 
         if (emailOpt.isEmpty()) {
+            auditService.record(null, null, "auth.login_failed", "auth", "invalid_token", "error");
             response.sendRedirect(frontendUrl + "/login?error=invalid_token");
             return;
         }
@@ -275,6 +284,8 @@ public class AuthController {
         String jwt = jwtService.generateToken(user, sessionId);
 
         addAuthCookie(response, jwt);
+        auditService.record(user.getId(), null, "auth.login", "user",
+            user.getId().toString(), "ok");
         response.sendRedirect(callbackUrl("email"));
     }
 
@@ -311,6 +322,8 @@ public class AuthController {
 
         clearAuthCookie(response);
 
+        auditService.record(actorIdFromCredential(request), null, "auth.logout",
+            "session", sessionId, "ok");
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
@@ -338,6 +351,7 @@ public class AuthController {
 
             String newToken = jwtService.generateToken(userOpt.get(), sessionId);
             addAuthCookie(response, newToken);
+            auditService.record(userId, null, "auth.refresh", "session", sessionId, "ok");
             return ResponseEntity.ok(Map.of("token", newToken));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(Map.of("error", "Invalid token"));
@@ -380,6 +394,19 @@ public class AuthController {
         }
         try {
             return jwtService.getSessionIdFromToken(token);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Best-effort actor resolution for audit trails (null when anonymous/invalid). */
+    private UUID actorIdFromCredential(HttpServletRequest request) {
+        String token = extractCredential(request);
+        if (token == null) {
+            return null;
+        }
+        try {
+            return jwtService.getUserId(token);
         } catch (Exception e) {
             return null;
         }

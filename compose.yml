@@ -57,6 +57,11 @@ services:
       # application.yml currently reads SESSION_COOKIE_SECURE; keep it in sync
       # with APP_COOKIE_SECURE until the server aligns on one name.
       SESSION_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
+      # GitHub webhook HMAC secret. Empty (default) = webhook endpoint
+      # fail-closed ("Webhook secret not configured"). Set a strong random
+      # value to enable push delivery; same secret goes in the GitHub App /
+      # webhook settings. NEVER commit the real value (see .env.example).
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET:-}
     depends_on:
       db:
         condition: service_healthy

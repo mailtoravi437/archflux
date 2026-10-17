@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HonestyBadge from '../components/HonestyBadge';
+import ImportWarnings from '../components/ImportWarnings';
 import { sourceModeForDoc, sourceModeLabel, sourceModeTooltip } from '../honesty';
 import { useDiagram } from '../useDiagram';
 
@@ -31,7 +32,7 @@ export function StorageCard({ docCount, usedKB, onFreeUp, onManage }: {
   onManage: () => void;
 }) {
   const pct = Math.min(100, (docCount / 25) * 100);
-  const bar = pct >= 95 ? 'var(--accent-rose)' : pct >= 80 ? 'var(--accent-amber, #D97706)' : 'var(--accent-cyan, #2563EB)';
+  const bar = pct >= 95 ? 'var(--semantic-error, #DC2626)' : pct >= 80 ? 'var(--semantic-warning, #CA8A04)' : 'var(--semantic-success, #16A34A)';
   return (
     <div className="content-card" style={{ maxWidth: 340 }} aria-label="Storage quota">
       <div className="card-title" style={{ fontSize: 12 }}>
@@ -107,6 +108,9 @@ export default function DashboardScreen() {
   });
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  // Last import's non-fatal warnings (PROD-007). Shown inline; navigation
+  // to canvas still proceeds since the import itself succeeded.
+  const [importWarnings, setImportWarnings] = useState<{ fileName: string; warnings: string[] } | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -235,8 +239,14 @@ export default function DashboardScreen() {
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result));
-        importArch(parsed);
-        pushToast(`Imported ${f.name} — validating schema`);
+        const result = importArch(parsed);
+        if (!result.imported) return; // hard failure: previous graph untouched, toast already shown
+        if (result.warnings.length > 0) {
+          setImportWarnings({ fileName: f.name, warnings: result.warnings });
+        } else {
+          setImportWarnings(null);
+          pushToast(`Imported ${f.name} — validating schema`);
+        }
         navigate('/canvas');
       } catch {
         pushToast('Import failed: invalid .arch JSON');
@@ -380,6 +390,9 @@ export default function DashboardScreen() {
       <div className="screen-view active">
         <div className="screen-content-wrapper" style={{ flexDirection: 'column' }}>
           {toolbar}
+          {importWarnings && (
+            <ImportWarnings fileName={importWarnings.fileName} warnings={importWarnings.warnings} onClose={() => setImportWarnings(null)} />
+          )}
           {docs.length > 0 ? (
             <div className="content-card" style={{ textAlign: 'center', padding: 40 }} role="status">
               <div className="card-title">No diagrams match your filters</div>
@@ -411,6 +424,9 @@ export default function DashboardScreen() {
       <div className="screen-view active">
         <div className="screen-content-wrapper" style={{ flexDirection: 'column' }}>
           {toolbar}
+          {importWarnings && (
+            <ImportWarnings fileName={importWarnings.fileName} warnings={importWarnings.warnings} onClose={() => setImportWarnings(null)} />
+          )}
           <div className="template-card-grid">
             {filtered.map((d) => {
               if (!d) return null;
@@ -430,11 +446,12 @@ export default function DashboardScreen() {
                   </div>
                   <button
                     className="btn-xs"
-                    style={{ position: 'absolute', top: 8, right: 8, color: pinned.has(d.id) ? 'var(--accent-amber)' : 'var(--text-muted)' }}
+                    style={{ position: 'absolute', top: 8, right: 8, color: 'var(--text-muted)' }}
                     title={pinned.has(d.id) ? 'Unpin' : 'Pin to top'}
+                    aria-label={pinned.has(d.id) ? 'Unpin diagram' : 'Pin diagram'}
                     onClick={() => togglePin(d.id)}
                   >
-                    {pinned.has(d.id) ? '📌' : '☆'}
+                    {pinned.has(d.id) ? '📌 Pinned' : '☆ Pin'}
                   </button>
                   <button className="btn-xs" style={{ position: 'absolute', top: 32, right: 8 }} aria-label={`Options for ${d.title}`} onClick={() => setMenuId(menuId === d.id ? null : d.id)}>⋯</button>
                   {menuId === d.id && cardMenu(d.id)}
@@ -453,7 +470,7 @@ export default function DashboardScreen() {
                         style={{ width: '100%', border: '1px solid var(--accent-cyan)', borderRadius: 6, padding: '4px 8px' }}
                       />
                     ) : (
-                      <strong style={{ fontSize: 13 }}>{d.title} {d.id === activeDocId && <span className="badge-count cyan">open</span>}</strong>
+                      <strong style={{ fontSize: 13 }}>{d.title} {d.id === activeDocId && <span className="badge-count" style={{ width: 'fit-content', background: 'var(--bg-panel-subtle)', color: 'var(--text-muted)' }} aria-label="Status: open">open</span>}</strong>
                     )}
                     <div style={{ display: 'flex', gap: 6, fontSize: 10, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)', flexWrap: 'wrap', alignItems: 'center' }}>
                       <span style={{ border: '1px solid var(--border-panel)', borderRadius: 4, padding: '0 4px' }} title="Git tracking branch">[git:main]</span>
@@ -472,7 +489,7 @@ export default function DashboardScreen() {
                         ))}
                       </div>
                     )}
-                    <span className="badge-count" style={{ width: 'fit-content', background: freshness === 'fresh' ? '#DCFCE7' : '#FEF3C7', color: freshness === 'fresh' ? '#16A34A' : '#D97706' }}>
+                    <span className="badge-count" style={{ width: 'fit-content', background: freshness === 'fresh' ? 'var(--accent-emerald-bg)' : 'var(--accent-amber-bg)', color: freshness === 'fresh' ? 'var(--accent-emerald)' : 'var(--accent-amber)' }} aria-label={freshness === 'fresh' ? 'Status: Synced' : 'Status: Drift'}>
                       {freshness === 'fresh' ? '● Synced' : '⚠ Drift'}
                     </span>
                   </div>
@@ -533,10 +550,12 @@ export default function DashboardScreen() {
             )}
           </div>
         </div>
+        {importWarnings && (
+          <ImportWarnings fileName={importWarnings.fileName} warnings={importWarnings.warnings} onClose={() => setImportWarnings(null)} />
+        )}
         {pinnedDocs.length > 0 && (
           <div>
-            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span>📌 Pinned</span>
+            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>              <span>📌 Pinned</span>
               <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>({pinnedDocs.length})</span>
             </div>
             <div className="template-card-grid">
@@ -545,11 +564,11 @@ export default function DashboardScreen() {
                   <div onClick={() => open(d.id)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') open(d.id); }} title={`Open ${d.title}`} style={{ cursor: 'pointer' }}>
                     {thumb(d.nodes)}
                   </div>
-                  <button className="btn-xs" style={{ position: 'absolute', top: 8, right: 8, color: 'var(--accent-amber)' }} title="Unpin" onClick={() => togglePin(d.id)}>📌</button>
+                  <button className="btn-xs" style={{ position: 'absolute', top: 8, right: 8, color: 'var(--text-muted)' }} title="Unpin" aria-label="Unpin diagram" onClick={() => togglePin(d.id)}>📌 Unpin</button>
                   <button className="btn-xs" style={{ position: 'absolute', top: 8, left: 8 }} aria-label={`Options for ${d.title}`} onClick={() => setMenuId(menuId === d.id ? null : d.id)}>⋯</button>
                   {menuId === d.id && cardMenu(d.id)}
                   <div className="blueprint-info">
-                    <strong style={{ fontSize: 13 }}>{d.title} {d.id === activeDocId && <span className="badge-count cyan">open</span>}</strong>
+                    <strong style={{ fontSize: 13 }}>{d.title} {d.id === activeDocId && <span className="badge-count" style={{ width: 'fit-content', background: 'var(--bg-panel-subtle)', color: 'var(--text-muted)' }} aria-label="Status: open">open</span>}</strong>
                     <div style={{ display: 'flex', gap: 6, fontSize: 10, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)', flexWrap: 'wrap', alignItems: 'center' }}>
                       {(() => {
                         const mode = sourceModeForDoc(d.id);
@@ -559,7 +578,7 @@ export default function DashboardScreen() {
                       })()}
                       <span>{d.nodes.length}n</span><span>{d.edges.length}e</span><span>{relTime(d.updatedAt)}</span>
                     </div>
-                    <span className="badge-count" style={{ width: 'fit-content', background: freshness === 'fresh' ? '#DCFCE7' : '#FEF3C7', color: freshness === 'fresh' ? '#16A34A' : '#D97706' }}>
+                    <span className="badge-count" style={{ width: 'fit-content', background: freshness === 'fresh' ? 'var(--accent-emerald-bg)' : 'var(--accent-amber-bg)', color: freshness === 'fresh' ? 'var(--accent-emerald)' : 'var(--accent-amber)' }} aria-label={freshness === 'fresh' ? 'Status: Synced' : 'Status: Drift'}>
                       {freshness === 'fresh' ? '● Synced' : '⚠ Drift'}
                     </span>
                   </div>
@@ -665,7 +684,7 @@ export default function DashboardScreen() {
         <div className="content-card" style={{ maxWidth: 340 }} aria-label="Storage quota">
           <div className="card-title" style={{ fontSize: 12 }}>Storage — {docs.length}/25 Diagrams · {usedKB} KB used</div>
           <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-panel-subtle)', overflow: 'hidden', marginTop: 8 }}>
-            <div style={{ width: `${Math.min(100, (docs.length / 25) * 100)}%`, height: '100%', background: 'var(--accent-cyan, #2563EB)' }} />
+            <div style={{ width: `${Math.min(100, (docs.length / 25) * 100)}%`, height: '100%', background: (docs.length / 25) >= 0.95 ? 'var(--accent-rose)' : (docs.length / 25) >= 0.8 ? 'var(--accent-amber)' : 'var(--accent-emerald)' }} />
           </div>
           <button className="btn-xs" style={{ marginTop: 8 }} onClick={() => navigate('/settings/storage')}>Manage storage →</button>
         </div>

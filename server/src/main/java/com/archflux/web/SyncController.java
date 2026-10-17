@@ -1,6 +1,7 @@
 package com.archflux.web;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,13 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.archflux.security.RequestUser;
-import com.archflux.service.CheckpointService;
+import com.archflux.service.GitHubArchFetcher;
 import com.archflux.service.SyncService;
-import com.archflux.service.DiagramService;
+import com.archflux.service.WebhookEventService;
 import com.archflux.web.dto.SyncRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,10 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -39,34 +37,17 @@ import java.util.UUID;
 public class SyncController {
 
   private final SyncService syncService;
-  private final DiagramService diagramService;
-  private final CheckpointService checkpointService;
-  private final WebClient.Builder webClientBuilder;
-
-  @Value("${github.api-token:}")
-  private String githubToken;
-
-  @Value("${github.api-url:https://api.github.com}")
-  private String githubApiUrl;
+  private final WebhookEventService webhookEvents;
+  private final GitHubArchFetcher fetcher;
 
   @Value("${GITHUB_WEBHOOK_SECRET:}")
   private String webhookSecretProp;
 
-  public SyncController(SyncService syncService, DiagramService diagramService,
-      CheckpointService checkpointService, WebClient.Builder webClientBuilder) {
+  public SyncController(SyncService syncService, WebhookEventService webhookEvents,
+      GitHubArchFetcher fetcher) {
     this.syncService = syncService;
-    this.diagramService = diagramService;
-    this.checkpointService = checkpointService;
-    this.webClientBuilder = webClientBuilder;
-  }
-
-  private WebClient githubClient() {
-    WebClient.Builder builder = webClientBuilder.baseUrl(
-        githubApiUrl != null && !githubApiUrl.isBlank() ? githubApiUrl : "https://api.github.com");
-    if (githubToken != null && !githubToken.isBlank()) {
-      builder = builder.defaultHeader("Authorization", "Bearer " + githubToken);
-    }
-    return builder.defaultHeader("Accept", "application/vnd.github+json").build();
+    this.webhookEvents = webhookEvents;
+    this.fetcher = fetcher;
   }
 
   @Operation(summary = "Sync diagram with upstream", description = "Idempotent sync - computes canonical SHA from diagram+upstream, returns noop if already processed")
@@ -93,19 +74,22 @@ public class SyncController {
   }
 
   /**
-   * Git webhook handler - receives push events from GitHub/GitLab and triggers diagram sync
+   * Git webhook handler — durable inbox (persist-before-ack) with async
+   * processing on the bounded webhook executor. Duplicate delivery IDs answer
+   * success without reprocessing.
    */
-  @Operation(summary = "Git webhook handler", description = "Receives push webhooks from GitHub/GitLab and syncs changed .arch files")
+  @Operation(summary = "Git webhook handler", description = "Receives push webhooks from GitHub and syncs changed .arch files (async)")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Webhook processed"),
+    @ApiResponse(responseCode = "200", description = "Webhook received (async processing) or duplicate"),
     @ApiResponse(responseCode = "401", description = "Invalid signature"),
-    @ApiResponse(responseCode = "400", description = "Invalid payload")
+    @ApiResponse(responseCode = "503", description = "Webhook secret not configured")
   })
   @PostMapping("/webhook/git")
   public ResponseEntity<Map<String, Object>> gitWebhook(
       HttpServletRequest request,
       @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature,
       @RequestHeader(value = "X-GitHub-Event", required = false) String event,
+      @RequestHeader(value = "X-GitHub-Delivery", required = false) String deliveryId,
       @RequestBody(required = false) String payload) {
     if (signature == null || signature.isBlank()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -118,112 +102,52 @@ public class SyncController {
           .body(Map.of("error", "Webhook secret not configured"));
     }
     // Verify GitHub signature (constant-time compare)
-    String expectedSignature = "sha256=" + hmacSha256(payload == null ? "" : payload, secret);
+    String raw = payload == null ? "" : payload;
+    String expectedSignature = "sha256=" + hmacSha256(raw, secret);
     if (!MessageDigest.isEqual(expectedSignature.getBytes(StandardCharsets.UTF_8),
         signature.getBytes(StandardCharsets.UTF_8))) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
           .body(Map.of("error", "Invalid signature"));
     }
 
-    // Only process push events
+    String delivery = (deliveryId == null || deliveryId.isBlank())
+        ? UUID.randomUUID().toString() : deliveryId;
+    WebhookEventService.Receipt receipt =
+        webhookEvents.receive("github", delivery, event, raw);
+    if (receipt.duplicate()) {
+      return ResponseEntity.ok(Map.of("status", "duplicate", "deliveryId", delivery));
+    }
+
+    // Only push events carry .arch changes — mark the rest processed inline.
     if (!"push".equals(event)) {
+      webhookEvents.markProcessed(receipt.event().getId(), "ignored event " + event);
       return ResponseEntity.ok(Map.of("message", "Event ignored: " + event));
     }
 
-    // Parse payload
-    com.fasterxml.jackson.databind.JsonNode json;
-    try {
-      json = diagramService.getMapper().readTree(payload);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(Map.of("error", "Invalid JSON payload"));
-    }
+    // Hand to the bounded async executor; terminal state lands on the event row.
+    webhookEvents.processAsync(receipt.event().getId(), RequestUser.get(request),
+        MDC.get("correlationId"));
+    return ResponseEntity.ok(Map.of("status", "received", "deliveryId", delivery));
+  }
 
-    // Extract repository info and changed files
-    String repoFullName = json.path("repository").path("full_name").asText();
-    String ref = json.path("ref").asText(); // e.g., "refs/heads/main"
-    String branch = ref.startsWith("refs/heads/") ? ref.substring(11) : ref;
-    
-    com.fasterxml.jackson.databind.JsonNode commits = json.path("commits");
-    if (commits == null || !commits.isArray()) {
-      return ResponseEntity.ok(Map.of("message", "No commits in payload"));
-    }
-
-    // Check for .arch file changes (added + modified + removed + head_commit)
-    boolean archFileChanged = false;
-    String archFilePath = null;
-    List<String> changeFields = List.of("added", "modified", "removed");
-    for (var commit : commits) {
-        for (String field : changeFields) {
-            var files = commit.path(field);
-            if (files != null && files.isArray()) {
-                for (var file : files) {
-                    String path = file.asText();
-                    if (path != null && path.endsWith(".arch")) {
-                        archFileChanged = true;
-                        archFilePath = path;
-                        break;
-                    }
-                }
-            }
-            if (archFileChanged) break;
-        }
-        if (archFileChanged) break;
-    }
-    if (!archFileChanged) {
-        var head = json.path("head_commit");
-        for (String field : changeFields) {
-            var files = head.path(field);
-            if (files != null && files.isArray()) {
-                for (var file : files) {
-                    String path = file.asText();
-                    if (path != null && path.endsWith(".arch")) {
-                        archFileChanged = true;
-                        archFilePath = path;
-                        break;
-                    }
-                }
-            }
-            if (archFileChanged) break;
-        }
-    }
-
-    if (!archFileChanged) {
-      return ResponseEntity.ok(Map.of("message", "No .arch files changed"));
-    }
-
-    // Fetch the .arch file content from GitHub API
-    String archContent = fetchArchFileFromGitHub(repoFullName, branch, archFilePath);
-    if (archContent == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body(Map.of("error", "Could not fetch .arch file"));
-    }
-
-    // Parse the .arch file and create/update diagram.
-    // GitHub cannot send our dev-token Bearer, so allow a webhook-mapped user:
-    // prefer the authenticated request user, else GITHUB_WEBHOOK_USER_ID env.
-    UUID userId = RequestUser.get(request);
-    if (userId == null) {
-      String mapped = System.getenv("GITHUB_WEBHOOK_USER_ID");
-      if (mapped != null && !mapped.isBlank()) {
-        try {
-          userId = UUID.fromString(mapped.trim());
-        } catch (Exception ignored) {
-          userId = null;
-        }
-      }
-    }
-    if (userId == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(Map.of("error", "Webhook has no mapped user: send dev-token Bearer or set GITHUB_WEBHOOK_USER_ID"));
-    }
-    createOrUpdateDiagramFromArch(repoFullName, branch, archFilePath, archContent, userId);
-    
-    return ResponseEntity.ok(Map.of(
-        "message", "Diagram synced",
-        "repository", repoFullName,
-        "branch", branch,
-        "file", archFilePath
-    ));
+  /**
+   * Replays a terminally-failed delivery: unknown delivery → 404, non-failed
+   * status → 409.
+   */
+  @Operation(summary = "Replay failed webhook", description = "Re-queues a failed webhook delivery for async processing")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Re-queued"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+    @ApiResponse(responseCode = "404", description = "Unknown delivery"),
+    @ApiResponse(responseCode = "409", description = "Event is not failed")
+  })
+  @PostMapping("/webhook/git/replay")
+  public ResponseEntity<Map<String, Object>> replayWebhook(
+      HttpServletRequest request,
+      @RequestParam String deliveryId) {
+    com.archflux.domain.WebhookEvent event =
+        webhookEvents.replay(deliveryId, RequestUser.get(request), MDC.get("correlationId"));
+    return ResponseEntity.ok(Map.of("status", "received", "deliveryId", event.getDeliveryId()));
   }
 
   static String hmacSha256(String data, String secret) {
@@ -241,97 +165,6 @@ public class SyncController {
     }
   }
 
-  private String fetchArchFileFromGitHub(String repo, String branch, String path) {
-    try {
-      JsonNode envelope = githubClient().get()
-          .uri(uriBuilder -> uriBuilder.path("/repos/{repo}/contents/{path}")
-              .queryParam("ref", branch).build(repo, path))
-          .retrieve()
-          .bodyToMono(JsonNode.class)
-          .blockOptional()
-          .orElse(null);
-      if (envelope == null) return null;
-      if (envelope.isTextual()) return envelope.asText();
-      String encoding = envelope.path("encoding").asText("");
-      String content = envelope.path("content").asText(null);
-      if (content != null && encoding.equalsIgnoreCase("base64")) {
-        String cleaned = content.replaceAll("\\s", "");
-        return new String(Base64.getMimeDecoder().decode(cleaned), StandardCharsets.UTF_8);
-      }
-      if (envelope.has("content")) return envelope.path("content").asText();
-      return envelope.toString();
-    } catch (Exception e) {
-      // Log error but don't fail the webhook
-      return null;
-    }
-  }
-
-  void createOrUpdateDiagramFromArch(String repoFullName, String branch, String archFilePath, String archContent, UUID userId) {
-    org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SyncController.class);
-    try {
-      // Parse the .arch content (supports {nodes,edges,strokes,texts} or {graph:{...}})
-      JsonNode archJson = diagramService.getMapper().readTree(archContent);
-      JsonNode graphNode = archJson.has("graph") ? archJson.path("graph") : archJson;
-      JsonNode nodes = graphNode.path("nodes");
-      JsonNode edges = graphNode.path("edges");
-      JsonNode strokes = graphNode.path("strokes");
-      JsonNode texts = graphNode.path("texts");
-
-      // Generate diagram title from repo and file
-      String diagramTitle = repoFullName + " - " + archFilePath;
-      List<String> tags = Arrays.asList("github", repoFullName, archFilePath, "branch:" + branch);
-
-      // Search for existing diagram with this repo tag
-      String repoTag = "github:" + repoFullName + ":" + archFilePath;
-      var existingResult = diagramService.list(userId, 1, 10, repoTag);
-      UUID diagramId;
-
-      if (!existingResult.items().isEmpty()) {
-        // Update existing diagram — pass through parsed nodes/edges/strokes/texts
-        String existingIdStr = String.valueOf(existingResult.items().get(0).get("id"));
-        diagramId = UUID.fromString(existingIdStr);
-
-        diagramService.update(
-            userId, diagramId,
-            diagramTitle,
-            tags,
-            graphNode.isMissingNode() ? null : graphNode,
-            nodes.isMissingNode() ? null : nodes,
-            edges.isMissingNode() ? null : edges,
-            strokes.isMissingNode() ? null : strokes,
-            texts.isMissingNode() ? null : texts,
-            true, true
-        );
-      } else {
-        // Create new diagram (preserve strokes/texts)
-        com.fasterxml.jackson.databind.node.ObjectNode fullGraph = diagramService.getMapper().createObjectNode();
-        fullGraph.set("nodes", nodes.isMissingNode() ? diagramService.getMapper().createArrayNode() : nodes);
-        fullGraph.set("edges", edges.isMissingNode() ? diagramService.getMapper().createArrayNode() : edges);
-        fullGraph.set("strokes", strokes.isMissingNode() ? diagramService.getMapper().createArrayNode() : strokes);
-        fullGraph.set("texts", texts.isMissingNode() ? diagramService.getMapper().createArrayNode() : texts);
-
-        var created = diagramService.create(
-            userId,
-            diagramTitle,
-            tags,
-            fullGraph, fullGraph.path("nodes"), fullGraph.path("edges"),
-            fullGraph.path("strokes"), fullGraph.path("texts")
-        );
-        diagramId = UUID.fromString(String.valueOf(created.get("id")));
-      }
-
-      try {
-        checkpointService.create(userId, diagramId, "webhook:" + branch + ":" + archFilePath,
-            "repo=" + repoFullName, branch);
-      } catch (Exception e) {
-        log.warn("Webhook checkpoint failed for diagram {}: {}", diagramId, e.getMessage());
-      }
-    } catch (Exception e) {
-      org.slf4j.LoggerFactory.getLogger(SyncController.class)
-          .warn("Failed to create/update diagram from .arch: {}", e.getMessage());
-    }
-  }
-
   /**
    * Health check for GitHub API connectivity
    */
@@ -339,19 +172,11 @@ public class SyncController {
   public ResponseEntity<Map<String, Object>> gitWebhookHealth() {
     try {
       // Test GitHub API connectivity
-      JsonNode result = githubClient().get()
-          .uri(uriBuilder -> uriBuilder.path("/repos/{repo}/contents/{path}")
-              .queryParam("ref", "main").build("github", "docs/README.md"))
-          .retrieve()
-          .bodyToMono(JsonNode.class)
-          .blockOptional()
-          .orElse(null);
-      
-      boolean healthy = result != null && !result.isEmpty();
+      String probed = fetcher.fetch("github", "main", "docs/README.md");
+
+      boolean healthy = probed != null && !probed.isEmpty();
       return ResponseEntity.ok(Map.of(
-          "healthy", healthy,
-          "githubApiUrl", githubApiUrl,
-          "hasToken", githubToken != null && !githubToken.isEmpty()
+          "healthy", healthy
       ));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)

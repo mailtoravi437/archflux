@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import HonestyBadge from '../components/HonestyBadge';
+import RevisionsSection from '../components/RevisionsSection';
 import { SIMULATED } from '../honesty';
 import { useDiagram } from '../useDiagram';
 import { BlueprintThumb } from './BlueprintsScreen';
@@ -306,7 +307,7 @@ export default function ReviewsScreen() {
                   </select>
                 </div>
                 {diffSummary && <div style={{ fontSize: 11, fontFamily: 'var(--mono-font)', marginTop: 6, color: 'var(--accent-cyan)' }}>{diffSummary}</div>}
-                {diffLines.map((l, i) => <div key={i} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: l.startsWith('+') ? '#16A34A' : l.startsWith('-') ? '#DC2626' : 'var(--text-muted)' }}>{l}</div>)}
+                {diffLines.map((l, i) => <div key={i} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: l.startsWith('+') ? '#16A34A' : l.startsWith('-') ? '#DC2626' : '#CA8A04' }} aria-label={l.startsWith('+') ? 'Added' : l.startsWith('-') ? 'Removed' : 'Modified'}><span aria-hidden="true">{l.startsWith('+') ? '●' : l.startsWith('-') ? '●' : '●'}</span> {l}</div>)}
                 {cpA && cpB && cpA.id !== cpB.id && (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginTop: 8 }} role="group" aria-label="Visual checkpoint comparison">
                     {[
@@ -323,13 +324,14 @@ export default function ReviewsScreen() {
                   </div>
                 )}
                 <div style={{ display: 'flex', gap: 12, marginTop: 8, fontSize: 10, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)' }} aria-label="Diff legend">
-                  <span><span style={{ color: '#16A34A' }}>🟩</span> Added in this revision</span>
-                  <span><span style={{ color: '#D97706' }}>🟨</span> Modified label / route</span>
-                  <span><span style={{ color: '#DC2626' }}>🟥</span> Removed component</span>
+                  <span><span style={{ color: '#16A34A' }} aria-hidden="true">●</span> <strong style={{ color: '#16A34A' }}>Added</strong> — new in this revision</span>
+                  <span><span style={{ color: '#CA8A04' }} aria-hidden="true">●</span> <strong style={{ color: '#CA8A04' }}>Modified</strong> — label / route changed</span>
+                  <span><span style={{ color: '#DC2626' }} aria-hidden="true">●</span> <strong style={{ color: '#DC2626' }}>Removed</strong> — component gone</span>
                 </div>
               </div>
             )}
           </div>
+          <RevisionsSection diagramId={activeDocId} />
         </div>
 
         <div className="column-half">

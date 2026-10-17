@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HonestyBadge from '../components/HonestyBadge';
+import ImportWarnings from '../components/ImportWarnings';
 import { DEMO, NOT_CONNECTED, SIMULATED, connectorDisplayStatus } from '../honesty';
 import { mockConnectors, mockDriftLines } from '../mocks';
 import type { Connector } from '../types';
@@ -25,12 +26,13 @@ function loadConnectors(): Connector[] {
 export default function LivingScreen() {
   const navigate = useNavigate();
   const store = useDiagram();
-  const { resync, exportArch, importArch, pushToast, pushLog, syncLog, freshness, nodes, edges, isOnline, panToNode } = store;
+  const { resync, exportArch, importArch, pushToast, pushLog, syncLog, freshness, syncError, nodes, edges, isOnline, panToNode } = store;
 
   const [connectors, setConnectors] = useState<Connector[]>(loadConnectors);
   const [drift, setDrift] = useState(mockDriftLines.map((d, i) => ({ ...d, id: `d${i}`, dismissed: false })));
   const [newName, setNewName] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
+  const [importWarnings, setImportWarnings] = useState<{ fileName: string; warnings: string[] } | null>(null);
   const [armRemove, setArmRemove] = useState<string | null>(null);
   const [preserveLayout, setPreserveLayout] = useState(() => {
     try {
@@ -300,8 +302,17 @@ export default function LivingScreen() {
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result));
-        importArch(parsed);
-        pushToast(`Imported ${f.name} — ${parsed.nodes?.length ?? 0} nodes loaded`);
+        const result = importArch(parsed);
+        if (!result.imported) {
+          setImportError('Import rejected — previous diagram unchanged');
+          return; // hard failure: nothing imported, toast already shown
+        }
+        if (result.warnings.length > 0) {
+          setImportWarnings({ fileName: f.name, warnings: result.warnings });
+        } else {
+          setImportWarnings(null);
+          pushToast(`Imported ${f.name} — ${parsed.nodes?.length ?? 0} nodes loaded`);
+        }
         navigate('/canvas');
       } catch {
         setImportError('Invalid JSON — expected { nodes[], edges[] }');
@@ -339,6 +350,18 @@ export default function LivingScreen() {
           {!isOnline && (
             <div className="callout-block" role="alert" style={{ borderLeftColor: 'var(--accent-rose)' }}>
               <strong>You are offline.</strong> Sync and connector retry are paused until the connection returns — nothing is lost.
+            </div>
+          )}
+          {syncError && (
+            <div className="callout-block" role="alert" aria-label="Sync failed" style={{ borderLeftColor: 'var(--accent-rose)' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <strong>Sync failed.</strong>
+                <span style={{ fontSize: 12 }}>{syncError}</span>
+                <span style={{ flex: 1 }} />
+                <button type="button" className="btn-xs btn-xs-primary" onClick={runResync} disabled={freshness === 'syncing'}>
+                  Retry sync
+                </button>
+              </div>
             </div>
           )}
           <div className="content-card">
@@ -443,8 +466,8 @@ export default function LivingScreen() {
                     ○ {connectorDisplayStatus(c.status)}
                   </span>
                   <HonestyBadge label={DEMO} tone="demo" title="Illustrative connector — no live provider connection exists" />
-                  <button className="btn-xs" onClick={() => retryConnector(c.id)} title="Retry sync">Retry</button>
-                  <button className="btn-xs" onClick={() => removeConnector(c.id)} title="Remove (click twice)">{armRemove === c.id ? 'Sure?' : '✕'}</button>
+                  <button className="btn-xs" onClick={() => retryConnector(c.id)} title="Retry sync" aria-label="Retry connector sync">Retry</button>
+                  <button className="btn-xs" onClick={() => removeConnector(c.id)} title="Remove (click twice)" aria-label="Remove connector">{armRemove === c.id ? 'Sure?' : '✕'}</button>
                 </div>
               </div>
             ))}
@@ -460,7 +483,7 @@ export default function LivingScreen() {
             {syncProgress !== null && (
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
                 <div style={{ flex: 1, height: 6, borderRadius: 3, background: 'var(--bg-panel-subtle)', overflow: 'hidden' }} role="progressbar" aria-valuenow={syncProgress} aria-valuemin={0} aria-valuemax={100} aria-label="Re-sync progress">
-                  <div style={{ width: `${syncProgress}%`, height: '100%', background: 'var(--accent-cyan, #2563EB)', transition: 'width 180ms' }} />
+                  <div style={{ width: `${syncProgress}%`, height: '100%', background: 'var(--accent-cyan, #2563EB)', transition: typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'width 180ms' }} />
                 </div>
                 <button type="button" className="btn-xs" onClick={cancelResync}>Cancel</button>
               </div>
@@ -495,8 +518,8 @@ export default function LivingScreen() {
                 </div>
                 {driftRows.map((row) => (
                   <div key={row.id} role="row" style={{ display: 'grid', gridTemplateColumns: '90px 1fr 1fr 1fr auto', gap: 8, alignItems: 'center', border: '1px solid var(--border-panel)', borderRadius: 6, padding: '6px 8px', fontSize: 11 }}>
-                    <span role="cell" className="badge-count" style={{ width: 'fit-content', background: row.changeType === 'ADDED' ? '#DCFCE7' : row.changeType === 'DELETED' ? '#FEE2E2' : '#FEF3C7', color: row.changeType === 'ADDED' ? '#16A34A' : row.changeType === 'DELETED' ? '#DC2626' : '#D97706' }}>
-                      {row.changeType}
+                    <span role="cell" className="badge-count" style={{ width: 'fit-content', background: row.changeType === 'ADDED' ? '#DCFCE7' : row.changeType === 'DELETED' ? '#FEE2E2' : '#FEF3C7', color: row.changeType === 'ADDED' ? '#16A34A' : row.changeType === 'DELETED' ? '#DC2626' : '#CA8A04', fontWeight: 700 }} aria-label={row.changeType}>
+                      <span aria-hidden="true">{row.changeType === 'ADDED' ? '+ ' : row.changeType === 'DELETED' ? '- ' : '~ '}</span>{row.changeType}
                     </span>
                     <span role="cell" style={{ fontWeight: 700 }}>{row.service}
                       <div style={{ fontWeight: 400, fontSize: 10, color: 'var(--text-muted)' }}>{row.source}</div>
@@ -545,6 +568,9 @@ export default function LivingScreen() {
                 <input type="file" accept=".arch,.json,application/json" style={{ display: 'none' }} onChange={(e) => onImportFile(e.target.files?.[0])} />
               </label>
               {importError && <div role="alert" style={{ color: 'var(--accent-rose)', fontSize: 12 }}>{importError}</div>}
+              {importWarnings && (
+                <ImportWarnings fileName={importWarnings.fileName} warnings={importWarnings.warnings} onClose={() => setImportWarnings(null)} />
+              )}
               <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
                 Connectors sync workspace state locally. Use Download .arch JSON above for
                 versioned backups, and re-sync to apply the pending upstream diff to your canvas.

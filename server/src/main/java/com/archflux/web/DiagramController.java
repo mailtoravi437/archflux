@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.archflux.security.RequestUser;
 import com.archflux.service.CheckpointService;
 import com.archflux.service.DiagramService;
+import com.archflux.service.RevisionService;
 import com.archflux.service.ThreadService;
 import com.archflux.web.dto.BranchCreateRequest;
 import com.archflux.web.dto.CheckpointCreateRequest;
@@ -43,12 +44,14 @@ public class DiagramController {
   private final DiagramService diagrams;
   private final CheckpointService checkpoints;
   private final ThreadService threads;
+  private final RevisionService revisions;
 
   public DiagramController(DiagramService diagrams, CheckpointService checkpoints,
-      ThreadService threads) {
+      ThreadService threads, RevisionService revisions) {
     this.diagrams = diagrams;
     this.checkpoints = checkpoints;
     this.threads = threads;
+    this.revisions = revisions;
   }
 
   @Operation(summary = "List diagrams", description = "Paginated list of diagrams owned by the current user")
@@ -105,12 +108,40 @@ public class DiagramController {
 
   @PutMapping("/{id}")
   public Map<String, Object> update(HttpServletRequest request, @PathVariable UUID id,
-      @RequestBody DiagramUpdateRequest body) {
+      @RequestBody DiagramUpdateRequest body,
+      @RequestParam(required = false) Long version) {
+    Long expected = body.getVersion() != null ? body.getVersion() : version;
     Map<String, Object> updated = diagrams.update(RequestUser.get(request), id,
         body.getTitle(), body.getTags(), body.getGraph(), body.getNodes(),
         body.getEdges(), body.getStrokes(), body.getTexts(),
-        body.isGraphProvided(), body.isTagsPresent());
+        body.isGraphProvided(), body.isTagsPresent(), expected, body.isForce(), "manual");
     return Map.of("data", updated);
+  }
+
+  @GetMapping("/{id}/revisions")
+  public Map<String, Object> listRevisions(HttpServletRequest request, @PathVariable UUID id) {
+    UUID ownerId = RequestUser.get(request);
+    com.archflux.domain.Diagram diagram = diagrams.requireOwnedForRead(ownerId, id);
+    List<Map<String, Object>> items = revisions.list(diagram.getId()).stream()
+        .map(rev -> revisions.toJson(rev, false)).toList();
+    return Map.of("data", items);
+  }
+
+  @GetMapping("/{id}/revisions/{revId}")
+  public Map<String, Object> getRevision(HttpServletRequest request,
+      @PathVariable UUID id, @PathVariable UUID revId) {
+    UUID ownerId = RequestUser.get(request);
+    com.archflux.domain.Diagram diagram = diagrams.requireOwnedForRead(ownerId, id);
+    return Map.of("data", revisions.toJson(revisions.get(diagram.getId(), revId), true));
+  }
+
+  @GetMapping("/{id}/diff")
+  public Map<String, Object> diff(HttpServletRequest request,
+      @PathVariable UUID id,
+      @RequestParam UUID from, @RequestParam UUID to) {
+    UUID ownerId = RequestUser.get(request);
+    com.archflux.domain.Diagram diagram = diagrams.requireOwnedForRead(ownerId, id);
+    return revisions.diff(diagram.getId(), from, to);
   }
 
   @DeleteMapping("/{id}")

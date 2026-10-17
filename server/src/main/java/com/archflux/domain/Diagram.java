@@ -63,6 +63,12 @@ public class Diagram {
   @Column(name = "branch_name", nullable = false)
   private String branchName = "main";
 
+  // Optimistic concurrency counter (NOT NULL since V7). Services bump it
+  // explicitly per mutation; stale writes resolve to 409 — never silent
+  // overwrite (PRODUCTIZATION_SPEC §6.2).
+  @Column(name = "version", nullable = false)
+  private Long version = 1L;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
@@ -93,6 +99,9 @@ public class Diagram {
     }
     if (branchName == null || branchName.isBlank()) {
       branchName = "main";
+    }
+    if (version == null) {
+      version = 1L;
     }
   }
 
@@ -190,6 +199,14 @@ public class Diagram {
 
   public void setBranchName(String branchName) {
     this.branchName = (branchName == null || branchName.isBlank()) ? "main" : branchName;
+  }
+
+  public Long getVersion() {
+    return version;
+  }
+
+  public void setVersion(Long version) {
+    this.version = version;
   }
 
   public Instant getCreatedAt() {

@@ -185,7 +185,32 @@ server boots — GitHub/Google/SSO buttons fail at the provider until real `GITH
 `OIDC_*` credentials are set. Never mount production key material from the repo —
 use the secret manager. Until then, use magic-link or guest login.
 
-## Backup
+## Backup & restore (Phase 2 runbook)
+
+Targets (PRODUCTIZATION_SPEC §12): **RPO ≤ 15 min** for cloud-stored data,
+**RTO ≤ 4 h**. Restore drill **at least quarterly**; automated evidence is
+`BackupRestoreIT` (Testcontainers `pg_dump -Fc` → wipe → `pg_restore` round
+trip), manual drill steps below. Full procedures live in
+[`docs/runbooks.md`](docs/runbooks.md); alert rules in
+[`docs/alerts.md`](docs/alerts.md) (`ArchFluxBackupStale` pages when no
+successful backup lands within 15 min).
+
+```bash
+# Backup (custom format, timestamped; prints location + size):
+scripts/backup.sh
+COMPOSE_PROJECT=archflux-phase1 scripts/backup.sh   # non-default project
+BACKUP_GZIP=1 scripts/backup.sh                   # additionally gzip -9
+
+# Restore into a scratch DB first (requires explicit --yes; refuses
+# non-empty targets without --force), then verify counts + /api/ready:
+COMPOSE_PROJECT=archflux-phase1 scripts/restore.sh --yes \
+  --db archflux_drill ./backups/archflux-<stamp>.dump \
+  --api-base http://localhost:8080
+```
+
+Store backups **outside the primary database failure domain** (object
+storage / separate volume) — a snapshot on the db host's own disk is not a
+backup. Raw one-liners (no verification; prefer the scripts above):
 
 ```bash
 docker compose -f compose.yml exec -T db \
@@ -194,6 +219,24 @@ docker compose -f compose.yml exec -T db \
 
 Restore: `gunzip -c <backup> | docker compose -f compose.yml exec -T db \
 psql -U archflux -d archflux` (schema must exist; see `db/`).
+
+## Security headers (Phase 2)
+
+`nginx/default.conf` ships production headers: HSTS
+(`max-age=31536000; includeSubDomains` — effective where TLS terminates),
+a Vite-SPA-safe Content-Security-Policy
+(`script-src 'self'` — no inline scripts in the bundle;
+`style-src 'self' 'unsafe-inline'`; `img-src 'self' data: blob:`;
+`connect-src 'self' ws: wss:`), plus the existing
+`X-Content-Type-Options` / `X-Frame-Options: DENY` / `Referrer-Policy:
+no-referrer`. Headers are repeated inside the `/` and `/config.json`
+locations because nginx drops server-level `add_header`s for any location
+that sets its own. After changing the file, rebuild `web`, confirm the SPA
+still loads (`e2e/smoke.spec.ts`), and check:
+
+```bash
+curl -sI http://localhost:8080/ | grep -iE 'strict-transport|content-security|x-frame|x-content-type|referrer'
+```
 
 ## Logs
 

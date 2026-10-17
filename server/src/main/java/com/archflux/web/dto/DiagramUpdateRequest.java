@@ -13,6 +13,10 @@ public class DiagramUpdateRequest {
   private JsonNode edges;
   private JsonNode strokes;
   private JsonNode texts;
+  /** Optimistic-concurrency expectation (absent = legacy behavior). */
+  private Long version;
+  /** Explicit overwrite: bypasses the version check, still records history. */
+  private boolean force;
 
   public String getTitle() {
     return title;
@@ -73,6 +77,22 @@ public class DiagramUpdateRequest {
 
   public void setTexts(JsonNode texts) {
     this.texts = texts;
+  }
+
+  public Long getVersion() {
+    return version;
+  }
+
+  public void setVersion(Long version) {
+    this.version = version;
+  }
+
+  public boolean isForce() {
+    return force;
+  }
+
+  public void setForce(boolean force) {
+    this.force = force;
   }
 
   /** True when the client supplied a graph object or any flat array. */

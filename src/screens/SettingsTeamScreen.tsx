@@ -80,7 +80,10 @@ export default function SettingsTeamScreen() {
   };
 
   const exportAudit = () => {
-    const payload = { exportedAt: new Date().toISOString(), members: team, approvalPolicy: s.approvalCount };
+    // Local-only trail: team roster + policy snapshot from this browser.
+    // The server audit export (GET /api/v1/audit, admin workspace role) is
+    // not wired yet — see the note below. Never label this as server data.
+    const payload = { exportedAt: new Date().toISOString(), scope: 'local', members: team, approvalPolicy: s.approvalCount };
     const url = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(payload, null, 2));
     const a = document.createElement('a');
     a.href = url;
@@ -88,7 +91,7 @@ export default function SettingsTeamScreen() {
     document.body.appendChild(a);
     a.click();
     a.remove();
-    pushToast('Audit trail exported');
+    pushToast('Local audit trail exported (this browser only — not server-verified)');
   };
 
   return (
@@ -96,7 +99,11 @@ export default function SettingsTeamScreen() {
       <div className="content-card">
         <div className="card-head">
           <span className="card-title">Team Members ({team.length})</span>
-          <button className="btn-xs" onClick={exportAudit}>Export audit trail</button>
+          <button className="btn-xs" onClick={exportAudit}>Export local audit trail</button>
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
+          Local export only — covers this browser&apos;s roster and policy snapshot. Server-side audit
+          (admin workspace role) is not connected yet.
         </div>
         <label htmlFor="team-invite" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Invite by email</label>
         <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>

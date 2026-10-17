@@ -156,5 +156,46 @@ BEGIN
 END
 $$;
 
+-- ---------------------------------------------------------- 4. V7 Phase 2 integrity grants (mirror of V7__phase2_integrity.sql §6)
+-- Operator-run manual bootstraps: same grants V7 applies when the role exists,
+-- so running roles.sql after V7 converges fresh installs and upgrades alike.
+-- Re-runnable: every block is to_regclass-guarded; GRANTs idempotent. There
+-- are no new functions in V7, so no EXECUTE grants here.
+DO $$
+BEGIN
+  IF to_regclass('public.diagram_revisions') IS NOT NULL
+      AND to_regclass('public.webhook_events') IS NOT NULL
+      AND to_regclass('public.idempotency_keys') IS NOT NULL
+      AND to_regclass('public.audit_events') IS NOT NULL THEN
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.diagram_revisions TO archflux_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.webhook_events TO archflux_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.idempotency_keys TO archflux_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.audit_events TO archflux_app;
+    GRANT ALL PRIVILEGES ON public.diagram_revisions TO archflux_migrator;
+    GRANT ALL PRIVILEGES ON public.webhook_events TO archflux_migrator;
+    GRANT ALL PRIVILEGES ON public.idempotency_keys TO archflux_migrator;
+    GRANT ALL PRIVILEGES ON public.audit_events TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: V7 tables not present yet — apply V7__phase2_integrity.sql first, then re-run roles.sql.';
+  END IF;
+
+  -- bigserial backing sequences: app needs USAGE+SELECT to insert rows;
+  -- nothing else needs sequence UPDATE (no setval in app code).
+  IF to_regclass('public.webhook_events_id_seq') IS NOT NULL THEN
+    GRANT USAGE, SELECT ON SEQUENCE public.webhook_events_id_seq TO archflux_app;
+    GRANT ALL PRIVILEGES ON SEQUENCE public.webhook_events_id_seq TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.webhook_events_id_seq not present yet — apply V7 first, then re-run roles.sql.';
+  END IF;
+
+  IF to_regclass('public.audit_events_id_seq') IS NOT NULL THEN
+    GRANT USAGE, SELECT ON SEQUENCE public.audit_events_id_seq TO archflux_app;
+    GRANT ALL PRIVILEGES ON SEQUENCE public.audit_events_id_seq TO archflux_migrator;
+  ELSE
+    RAISE NOTICE 'roles.sql: public.audit_events_id_seq not present yet — apply V7 first, then re-run roles.sql.';
+  END IF;
+END
+$$;
+
 -- Belt-and-braces: the app role must never hold schema CREATE (DDL).
 REVOKE CREATE ON SCHEMA public FROM archflux_app;

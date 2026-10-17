@@ -96,28 +96,8 @@ export function BlueprintThumb({ nodes, edges, title }: { nodes: ArchNode[]; edg
 }
 
 function badgeStyleFor(category: string): { className: string; style?: CSSProperties } {
-  switch (category) {
-    case 'Cloud Native':
-      return { className: 'badge-count cyan', style: { width: 'fit-content' } };
-    case 'Microservices':
-      return {
-        className: 'badge-count',
-        style: { width: 'fit-content', background: 'var(--accent-emerald-bg)', color: 'var(--accent-emerald)' },
-      };
-    case 'Data & Streaming':
-    case 'AI / RAG':
-      return {
-        className: 'badge-count',
-        style: { width: 'fit-content', background: 'var(--accent-violet-bg)', color: 'var(--accent-violet)' },
-      };
-    case 'Security & Auth':
-      return {
-        className: 'badge-count',
-        style: { width: 'fit-content', background: 'var(--accent-rose-bg)', color: 'var(--accent-rose)' },
-      };
-    default:
-      return { className: 'badge-count warn', style: { width: 'fit-content' } };
-  }
+  // Semantic state: category label preserved; no decorative accent colors.
+  return { className: 'badge-count', style: { width: 'fit-content', background: 'var(--bg-panel-subtle)', color: 'var(--text-muted)' } };
 }
 
 export default function BlueprintsScreen() {
@@ -297,7 +277,7 @@ export default function BlueprintsScreen() {
                   <span className={badge.className} style={badge.style}>{b.category}</span>
                   <strong style={{ fontSize: '14px' }}>{b.title}</strong>
                   <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{b.desc}</p>
-                  <div style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: 'var(--accent-cyan)' }}>{counts?.nodes ?? b.nodeCount}n • {counts?.edges ?? b.edgeCount}e</div>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: 'var(--text-muted)' }}>{counts?.nodes ?? b.nodeCount}n • {counts?.edges ?? b.edgeCount}e</div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
                     <button className="btn-xs" onClick={() => setPreviewId(b.id)}>Preview</button>
                     <button className="btn-xs" onClick={() => insertBlueprint(b.id)} title="Append beside current canvas">Insert</button>

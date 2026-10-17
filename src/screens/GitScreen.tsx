@@ -221,8 +221,8 @@ export default function GitScreen() {
                 {(() => {
                   const failing = pr.checks.some((c) => !c.pass);
                   return (
-                    <span className="badge-count" style={{ background: failing ? '#FEF3C7' : '#DCFCE7', color: failing ? '#D97706' : '#16A34A' }}>
-                      {pr.status}
+                    <span className="badge-count" style={{ background: failing ? '#FEE2E2' : '#DCFCE7', color: failing ? '#DC2626' : '#16A34A', fontWeight: 700 }} aria-label={failing ? 'Checks failed' : 'Checks passed'}>
+                      {pr.status} — {failing ? 'BLOCKED' : 'READY'}
                     </span>
                   );
                 })()}
@@ -235,20 +235,20 @@ export default function GitScreen() {
                 <div style={{ background: 'var(--bg-panel-subtle)', border: '1px solid var(--border-panel)', borderRadius: '6px', padding: '14px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--accent-emerald)', fontFamily: 'var(--mono-font)', marginBottom: '6px' }}>{pr.summary}</div>
                   {pr.diff.map((d, i) => (
-                    <div key={i} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: d.kind === 'add' ? '#16A34A' : d.kind === 'del' ? '#DC2626' : '#D97706' }}>{d.text}</div>
+                    <div key={i} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: d.kind === 'add' ? '#16A34A' : d.kind === 'del' ? '#DC2626' : '#CA8A04' }} aria-label={d.kind === 'add' ? 'Added' : d.kind === 'del' ? 'Removed' : 'Modified'}><span aria-hidden="true">{d.kind === 'add' ? '+ ' : d.kind === 'del' ? '- ' : '~ '}</span>{d.text}</div>
                   ))}
                 </div>
                 <div style={{ marginTop: 10 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 4 }}>PR checks at open time (static snapshot)</div>
                   {pr.checks.map((c) => (
-                    <div key={c.name} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: c.pass ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
-                      {c.pass ? '✓' : '✗'} {c.name}
+                    <div key={c.name} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: c.pass ? '#16A34A' : '#DC2626' }} aria-label={c.pass ? 'Check passed' : 'Check failed'}>
+                      <span aria-hidden="true">{c.pass ? '✓' : '✗'}</span> <strong>{c.pass ? 'PASSED' : 'FAILED'}</strong> — {c.name}
                     </div>
                   ))}
                   <div style={{ fontSize: 11, fontWeight: 700, margin: '8px 0 4px' }}>Automated Gating Checks (live canvas state)</div>
                   {liveChecks.map((c) => (
-                    <div key={c.name} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: c.pass ? 'var(--accent-emerald)' : 'var(--accent-rose)' }}>
-                      {c.pass ? '✓' : '✗'} {c.name} — {c.detail}
+                    <div key={c.name} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: c.pass ? '#16A34A' : '#DC2626' }} aria-label={c.pass ? 'Passed check' : 'Failed check'}>
+                      <span aria-hidden="true">{c.pass ? '✓' : '✗'}</span> <strong>{c.pass ? 'PASSED' : 'FAILED'}</strong> — {c.name} — {c.detail}
                     </div>
                   ))}
                   <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
@@ -314,8 +314,9 @@ export default function GitScreen() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {branchCps.map((cp) => (
-                          <div key={cp.id} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', background: 'var(--bg-panel-subtle)', padding: '4px 8px', borderRadius: 4 }}>
-                            {cp.title}
+                          <div key={cp.id} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', background: 'var(--bg-panel-subtle)', padding: '4px 8px', borderRadius: 4, display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <span style={{ fontWeight: 700 }}>{cp.title}</span>
+                            <span style={{ fontSize: 10, color: '#6D28D9', fontWeight: 700, background: '#EDE9FE', padding: '1px 4px', borderRadius: 3 }} aria-label="Remote branch checkpoint">REMOTE</span>
                             <span style={{ color: 'var(--text-muted)' }}> — {cp.branch ?? branchSel}{cp.meta ? ` • ${cp.meta}` : ''}</span>
                           </div>
                         ))}
@@ -335,7 +336,10 @@ export default function GitScreen() {
               <div className="timeline-stream">
                 {checkpoints.map((cp) => (
                   <div key={cp.id} className={cp.active ? 'timeline-entry active' : 'timeline-entry'}>
-                    <div style={{ fontWeight: 700, fontSize: '13px' }}>{cp.title}</div>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div style={{ fontWeight: 700, fontSize: '13px' }}>{cp.title}</div>
+                      <span className="badge-count" style={{ background: '#EDE9FE', color: '#6D28D9', fontSize: 10, fontWeight: 700 }} aria-label="Local checkpoint">LOCAL</span>
+                    </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--mono-font)' }}>{cp.meta}</div>
                     <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
                       <span className="badge-count cyan">{cp.nodes.length}n/{cp.edges.length}e</span>
