@@ -1,23 +1,243 @@
-name: Deploy to GCP
+name: Deploy ArchFlux to GCP VM
 
 on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+env:
+  VM_APP_DIR: /var/www/archflux-server
+  WWW_ROOT: /var/www/html
+  BACKEND_ENV_FILE: /etc/archflux/backend.env
+
 jobs:
-  deploy:
+  ############################################################################
+  # 1. Frontend build job (Vite SPA -> dist/)
+  ############################################################################
+  build-frontend:
+    name: Build frontend (Vite)
+    runs-on: ubuntu-latest
+    outputs:
+      asset-count: ${{ steps.count.outputs.files }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (oxlint)
+        run: npm run lint
+
+      # --------------------------------------------------------------------
+      # Inject client env from GitHub vars/secrets into .env.production so
+      # Vite bakes it into the bundle at build time.
+      #   - Code reads import.meta.env.VITE_API_URL (default "/api").
+      #   - Prefer a repo VAR (visible), fall back to SECRET (encrypted).
+      #   - Default "/api" works behind Cloudflare -> Nginx /api reverse proxy.
+      # --------------------------------------------------------------------
+      - name: Write frontend env (.env.production)
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_BASE="${{ vars.VITE_API_URL }}"
+          if [ -z "$API_BASE" ]; then API_BASE="${{ secrets.VITE_API_URL }}"; fi
+          if [ -z "$API_BASE" ]; then API_BASE="/api"; fi
+          printf 'VITE_API_URL=%s\n' "$API_BASE" > .env.production
+
+      - name: Build frontend (tsc + vite build)
+        run: npm run build   # produces dist/
+
+      - name: Count built assets
+        id: count
+        shell: bash
+        run: echo "files=$(find dist -type f | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload frontend bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 1
+
+  ############################################################################
+  # 2. VM deployment job (rsync frontend + backend, restart backend)
+  ############################################################################
+  deploy-vm:
+    name: Deploy to GCP VM
+    needs: build-frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+      - name: Checkout repository (backend source)
+        uses: actions/checkout@v4
+
+      - name: Download frontend bundle
+        uses: actions/download-artifact@v4
         with:
-          host: 136.64.40.174
-          username: mailtoravi437
-          key: ${{ secrets.GCP_SSH_KEY }}
-          script: |
-            cd ~/archflux
-            git pull origin main
-            # Skip failing JwtServiceTest during build
-            docker compose -f compose.yml build --build-arg MAVEN_OPTS="-Dtest=!JwtServiceTest"
-            docker compose -f compose.yml up -d
+          name: frontend-dist
+          path: dist/
+
+      # --------------------------------------------------------------------
+      # SSH setup: deploy key + known_hosts (pre-seeded via ssh-keyscan so the
+      # first connect is verified against a known host key, not blindly accepted).
+      # StrictHostKeyChecking=yes fails fast if the VM host key rotates.
+      # --------------------------------------------------------------------
+      - name: Setup SSH key and known_hosts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          umask 077
+          printf '%s\n' "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Pre-seed known_hosts so the first connect is verified against a known
+          # host key rather than blindly accepted. StrictHostKeyChecking=yes then
+          # fails fast if the VM host key ever rotates (rotate known_hosts then).
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          chmod 644 ~/.ssh/known_hosts
+          cat > ~/.ssh/vm-opts <<EOF
+          -o StrictHostKeyChecking=yes
+          -o UserKnownHostsFile=$HOME/.ssh/known_hosts
+          -i $HOME/.ssh/deploy_key
+          -o IdentitiesOnly=yes
+          -o BatchMode=yes
+          -o ServerAliveInterval=30
+          -o ServerAliveCountMax=3
+          EOF
+
+      - name: Resolve SSH options
+        id: sshopts
+        shell: bash
+        run: |
+          opts=$(tr '\n' ' ' < ~/.ssh/vm-opts)
+          echo "opts=${opts}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy frontend bundle to /var/www/html
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          RSYNC_SSH="ssh $SSH_OPTS"
+          rsync -avz --delete -e "$RSYNC_SSH" dist/ "${VM_USER}@${VM_HOST}:${WWW_ROOT}/"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo chown -R www-data:www-data ${WWW_ROOT} && \
+             sudo find ${WWW_ROOT} -type d -exec chmod 755 {} + && \
+             sudo find ${WWW_ROOT} -type f -exec chmod 644 {} + && \
+             sudo chmod 644 ${WWW_ROOT}/index.html"
+
+      # --------------------------------------------------------------------
+      # Backend: rsync server/ (Spring Boot Maven app) to the VM app dir.
+      # --------------------------------------------------------------------
+      - name: Deploy backend source to VM
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" "mkdir -p ${VM_APP_DIR}"
+          RSYNC_SSH="ssh $SSH_OPTS"
+          rsync -avz --delete \
+            --exclude='target/' --exclude='.git/' --exclude='.github/' \
+            -e "$RSYNC_SSH" server/ "${VM_USER}@${VM_HOST}:${VM_APP_DIR}/"
+
+      # --------------------------------------------------------------------
+      # Backend env file on VM (root-only, 600) consumed by systemd via
+      # EnvironmentFile. Values come from GitHub secrets.
+      # --------------------------------------------------------------------
+      - name: Write backend environment file on VM
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo mkdir -p /etc/archflux && sudo chmod 755 /etc/archflux"
+          cat <<'ENVFILE' | ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo tee ${BACKEND_ENV_FILE} >/dev/null && sudo chmod 600 ${BACKEND_ENV_FILE} && sudo chown root:root ${BACKEND_ENV_FILE}"
+SPRING_PROFILES_ACTIVE=prod
+SERVER_PORT=3001
+SPRING_DATASOURCE_URL=${{ secrets.DATABASE_URL }}
+SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
+SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
+APP_API_TOKEN=${{ secrets.API_TOKEN }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+APP_COOKIE_SECURE=true
+REDIS_HOST=127.0.0.1
+GITHUB_WEBHOOK_SECRET=${{ secrets.GITHUB_WEBHOOK_SECRET }}
+ENVFILE
+
+      # --------------------------------------------------------------------
+      # Install Java/Maven on VM (skip if pre-provisioned), build the jar,
+      # and fix ownership so the archflux system user can run it.
+      # NOTE: server/ is Java/Maven, not Node. We use `mvn -q -DskipTests package`
+      # and `java -jar`. If you ever switch the backend to Node, replace these
+      # steps with `npm ci --omit=dev` + PM2 reload.
+      # --------------------------------------------------------------------
+      - name: Install runtime and build backend on VM
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" "
+            set -e
+            sudo apt-get update -y
+            sudo apt-get install -y --no-install-recommends openjdk-21-jre-headless maven curl
+            cd ${VM_APP_DIR}
+            mvn -q -f pom.xml -DskipTests package
+            sudo chown -R archflux:archflux ${VM_APP_DIR} 2>/dev/null || true
+            sudo find ${VM_APP_DIR} -type d -exec chmod 755 {} +
+            sudo find ${VM_APP_DIR} -type f -exec chmod 644 {} +
+          "
+
+      # --------------------------------------------------------------------
+      # Restart via systemd, then poll /api/health.
+      # --------------------------------------------------------------------
+      - name: Restart backend via systemd
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" "sudo systemctl restart archflux-backend"
+
+      - name: Wait for backend health
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          for i in $(seq 1 30); do
+            if ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+               "curl -sf http://127.0.0.1:3001/api/health >/dev/null 2>&1"; then
+              echo "Backend healthy: http://127.0.0.1:3001/api/health"
+              exit 0
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 2
+          done
+          echo "Backend did not become healthy in time" >&2
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo journalctl -u archflux-backend -n 50 --no-pager" >&2 || true
+          exit 1

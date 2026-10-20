@@ -1,0 +1,30 @@
+[Unit]
+Description=ArchFlux Backend API (Spring Boot, Java 21)
+Documentation=https://github.com/archflux/archflux
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=archflux
+Group=archflux
+WorkingDirectory=/var/www/archflux-server
+EnvironmentFile=/etc/archflux/backend.env
+# Safety: fail to start if the jar is missing (prevents a crash loop on empty deploys).
+ExecStartPre=/usr/bin/test -f /var/www/archflux-server/target/app.jar
+ExecStart=/usr/bin/java -jar /var/www/archflux-server/target/app.jar
+Restart=always
+RestartSec=5
+StartLimitBurst=10
+StartLimitIntervalSec=60
+TimeoutStopSec=30
+# Process isolation / hardening.
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/www/archflux-server/target /tmp /var/log/archflux
+PrivateTmp=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

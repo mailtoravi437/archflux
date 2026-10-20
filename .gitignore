@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Vite env files (generated at build time by CI; never commit real values)
+.env
+.env.production
+.env.local
+.env.*.local
+!.env.example
+
 # Java build artifacts
 server/target/
 
