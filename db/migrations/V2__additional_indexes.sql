@@ -29,8 +29,8 @@ $$;
 DO $$
 BEGIN
   IF to_regclass('public.idx_sync_log_commit_sha') IS NULL THEN
-    CREATE INDEX idx_sync_log_commit_sha
-      ON public.sync_log (commit_sha);
+    CREATE UNIQUE INDEX idx_sync_log_commit_sha
+      ON public.sync_log (commit_sha) WHERE commit_sha IS NOT NULL;
   END IF;
 END
 $$;

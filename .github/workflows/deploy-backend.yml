@@ -1,0 +1,139 @@
+name: Deploy ArchFlux Backend
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  VM_APP_DIR: /var/www/archflux-server
+  BACKEND_ENV_FILE: /etc/archflux/backend.env
+
+jobs:
+  ############################################################################
+  # 1. Build server jar and deploy to VM
+  ############################################################################
+  deploy-vm:
+    name: Deploy backend to VM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository (backend source)
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key and known_hosts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          umask 077
+          printf '%s\n' "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          chmod 644 ~/.ssh/known_hosts
+          cat > ~/.ssh/vm-opts <<EOF
+          -o StrictHostKeyChecking=yes
+          -o UserKnownHostsFile=$HOME/.ssh/known_hosts
+          -i $HOME/.ssh/deploy_key
+          -o IdentitiesOnly=yes
+          -o BatchMode=yes
+          -o ServerAliveInterval=30
+          -o ServerAliveCountMax=3
+          EOF
+
+      - name: Resolve SSH options
+        id: sshopts
+        shell: bash
+        run: |
+          opts=$(tr '\n' ' ' < ~/.ssh/vm-opts)
+          echo "opts=${opts}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy backend source to VM
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" "mkdir -p ${VM_APP_DIR}"
+          RSYNC_SSH="ssh $SSH_OPTS"
+          rsync -avz --delete \
+            --exclude='target/' --exclude='.git/' --exclude='.github/' \
+            -e "$RSYNC_SSH" server/ "${VM_USER}@${VM_HOST}:${VM_APP_DIR}/"
+
+      - name: Write backend environment file on VM
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo mkdir -p /etc/archflux && sudo chmod 755 /etc/archflux"
+          cat <<'ENVFILE' | ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo tee ${BACKEND_ENV_FILE} >/dev/null && sudo chmod 600 ${BACKEND_ENV_FILE} && sudo chown root:root ${BACKEND_ENV_FILE}"
+SPRING_PROFILES_ACTIVE=prod
+SERVER_PORT=3001
+SPRING_DATASOURCE_URL=${{ secrets.DATABASE_URL }}
+SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
+SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
+APP_API_TOKEN=${{ secrets.API_TOKEN }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+APP_COOKIE_SECURE=true
+REDIS_HOST=127.0.0.1
+GITHUB_WEBHOOK_SECRET=${{ secrets.GITHUB_WEBHOOK_SECRET }}
+ENVFILE
+
+      - name: Install runtime and build backend on VM
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" "
+            set -e
+            sudo apt-get update -y
+            sudo apt-get install -y --no-install-recommends openjdk-21-jre-headless maven curl
+            cd ${VM_APP_DIR}
+            mvn -q -f pom.xml -DskipTests package
+            sudo chown -R archflux:archflux ${VM_APP_DIR} 2>/dev/null || true
+            sudo find ${VM_APP_DIR} -type d -exec chmod 755 {} +
+            sudo find ${VM_APP_DIR} -type f -exec chmod 644 {} +
+          "
+
+      - name: Restart backend via systemd
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" "sudo systemctl restart archflux-backend"
+
+      - name: Wait for backend health
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          for i in $(seq 1 30); do
+            if ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+               "curl -sf http://127.0.0.1:3001/api/health >/dev/null 2>&1"; then
+              echo "Backend healthy: http://127.0.0.1:3001/api/health"
+              exit 0
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 2
+          done
+          echo "Backend did not become healthy in time" >&2
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo journalctl -u archflux-backend -n 50 --no-pager" >&2 || true
+          exit 1

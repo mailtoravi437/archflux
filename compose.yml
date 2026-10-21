@@ -6,16 +6,16 @@ name: archflux
 
 services:
   db:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-archflux}
       POSTGRES_USER: ${POSTGRES_USER:-archflux}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres-pw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
       # Consumed by docker/db-init/01-roles.sh on FIRST init only (fresh volume).
       # Dev defaults are flagged DEV ONLY — prod must come from the secret manager.
       DB_APP_USER: ${DB_APP_USER:-archflux_app}
-      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-dev-app-only}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}
     volumes:
       - pgdata:/var/lib/postgresql/data
       # Self-provisions the least-privilege app role on fresh volumes.
@@ -44,15 +44,15 @@ services:
       PORT: 3001
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/${POSTGRES_DB:-archflux}}
       SPRING_DATASOURCE_USERNAME: ${DB_APP_USER:-archflux_app}
-      SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:-dev-app-only}
-      APP_API_TOKEN: ${API_TOKEN:-dev-token}
+      SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}
+      APP_API_TOKEN: ${API_TOKEN:-f506189f13b9ff61e04350a8bd983008}
       REDIS_HOST: redis
       # Automated migrations (Phase 1): Flyway runs at server boot AS THE OWNER
       # so pgcrypto/citext extensions can install. Tightening to a dedicated
       # migrator role is a documented follow-up (see DEPLOY.md).
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_USER: ${POSTGRES_USER:-archflux}
-      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-dev-postgres-pw}
+      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
       APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
       # application.yml currently reads SESSION_COOKIE_SECURE; keep it in sync
       # with APP_COOKIE_SECURE until the server aligns on one name.

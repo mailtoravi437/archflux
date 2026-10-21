@@ -1,0 +1,26 @@
+# Production profile overrides — never commit real secrets.
+# Use the secret manager or env vars set by the deployment platform.
+spring:
+  profiles:
+    active: prod
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${DB_APP_USER:archflux_app}
+    password: ${DB_APP_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+app:
+  api-token: ${APP_API_TOKEN}
+  cookie-secure: true
+  frontend-url: ${FRONTEND_URL}
+  email:
+    provider: ${EMAIL_PROVIDER:sendgrid}
+
+logging:
+  level:
+    com.archflux: INFO

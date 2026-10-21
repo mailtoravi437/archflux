@@ -35,11 +35,11 @@
 set -eu
 
 APP_USER="${DB_APP_USER:-archflux_app}"
-APP_PASSWORD="${DB_APP_PASSWORD:-dev-app-only}"
+APP_PASSWORD="${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}"
 OWNER_USER="${POSTGRES_USER:-archflux}"
 DB_NAME="${POSTGRES_DB:-archflux}"
 
-if [ "$APP_PASSWORD" = "dev-app-only" ]; then
+if [ "$APP_PASSWORD" = "K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl" ]; then
   echo "01-roles.sh: WARNING — using default DEV ONLY app password. Set DB_APP_PASSWORD in prod." >&2
 fi
 

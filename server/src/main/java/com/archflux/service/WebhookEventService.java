@@ -261,7 +261,7 @@ public class WebhookEventService {
     String diagramTitle = repoFullName + " - " + archFilePath;
     List<String> tags = Arrays.asList("github", repoFullName, archFilePath, "branch:" + branch);
 
-    String repoTag = "github:" + repoFullName + ":" + archFilePath;
+    String repoTag = repoFullName + " - " + archFilePath;
     DiagramService.PageResult<Map<String, Object>> existingResult =
         diagrams.list(userId, 1, 10, repoTag);
     UUID diagramId;

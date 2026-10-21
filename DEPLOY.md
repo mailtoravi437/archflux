@@ -7,6 +7,17 @@
 | Local dev | `npm run dev` (host Vite, :5173) | host (Spring Boot via IDE/`mvn spring-boot:run`, :3001) or not running | `docker compose up -d db` (:5432 via override) | not required (prod compose only) |
 | Prod compose | `web` (nginx, host :8080 → container :80) | `server` (:3001) | `db` (internal only, no published port) | `redis` (internal only, no published ports; service DNS `redis`) |
 
+## Separate Deployment Mode (new — Agent C)
+
+When frontend and backend are deployed independently (e.g., frontend on CDN/static host, backend on VM/container):
+
+- Use `.env.frontend` / `.env.backend` (split env files).
+- Use `compose.separate.yml` (independent networks, separate service names).
+- Use `deploy/nginx-cross-origin.conf` (no `/api/` proxy; frontend connects to external API URL via `VITE_API_URL`).
+- Separate CI workflows: `.github/workflows/deploy-frontend.yml` + `.github/workflows/deploy-backend.yml`.
+
+This mode is for production architectures where frontend and backend scale/update independently.
+
 Local dev keeps hot-reload on the host; only postgres runs in Docker (the
 `compose.override.yml` publishes it). Prod compose runs all four services;
 `compose.override.yml` must be skipped so the DB stays off the host network.
@@ -138,12 +149,12 @@ Frontend gate coverage for this loop lives in `e2e/auth-session.spec.ts`
 | --- | -------- | ----------------- | ------- |
 | `POSTGRES_DB` | no | `archflux` | DB name |
 | `POSTGRES_USER` | no | `archflux` | owner role (Flyway migrations run as this user) |
-| `POSTGRES_PASSWORD` | yes (prod) | `dev-postgres-pw` (DEV ONLY) | owner password (also `SPRING_FLYWAY_PASSWORD`) |
+| `POSTGRES_PASSWORD` | yes (prod) | `d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56` (DEV ONLY) | owner password (also `SPRING_FLYWAY_PASSWORD`) |
 | `DB_APP_USER` | no | `archflux_app` | least-privilege runtime role (self-provisioned on fresh volumes) |
-| `DB_APP_PASSWORD` | yes (prod) | `dev-app-only` (DEV ONLY) | app role password (runtime datasource + init script) |
+| `DB_APP_PASSWORD` | yes (prod) | `K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl` (DEV ONLY) | app role password (runtime datasource + init script) |
 | `DATABASE_URL` | yes (prod) | assembled from `POSTGRES_*` vs host `db` | API connection string; prod should use `archflux_app` creds |
-| `API_TOKEN` | yes (prod) | `dev-token` (DEV ONLY) | `Authorization: Bearer` token |
-| `JWT_SECRET` | yes (prod) | `dev-secret-change-in-production` (DEV ONLY, server default) | JWT signing secret — no usable default; set a strong value in prod |
+| `API_TOKEN` | yes (prod) | `f506189f13b9ff61e04350a8bd983008` (DEV ONLY) | `Authorization: Bearer` token |
+| `JWT_SECRET` | yes (prod) | `d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56` (DEV ONLY) | JWT signing secret — no usable default; set a strong value in prod |
 | `APP_COOKIE_SECURE` | no | `false` (dev) / **`true`** (prod) | secure flag for session cookies — must be `true` wherever https terminates |
 | `REDIS_*` | no | none needed | no Redis vars required — server uses service DNS (`REDIS_HOST=redis`, port/db defaults); no published ports |
 | `VITE_API_URL` | no | `/api` | frontend API base (build arg + `/config.json`) |
@@ -180,7 +191,7 @@ CN=archflux-dev-only-NOT-FOR-PRODUCTION) so startup never depends on operator SS
 login path is present but CANNOT authenticate against a real identity provider until you provide:
 `SAML_ENTITY_ID`, `SAML_PRIVATE_KEY_LOCATION`, `SAML_CERT_LOCATION`, `SAML_IDP_ENTITY_ID`,
 `SAML_IDP_SSO_URL`, `SAML_IDP_SLO_URL`, `SAML_IDP_CERT_LOCATION` (file paths or secret mounts).
-OAuth2/OIDC registrations ship the same way: placeholder client ids (`changeme-configure-*`) so the
+OAuth2/OIDC registrations ship the same way: placeholder client ids (`generated-placeholder-*`) so the
 server boots — GitHub/Google/SSO buttons fail at the provider until real `GITHUB_*` / `GOOGLE_*` /
 `OIDC_*` credentials are set. Never mount production key material from the repo —
 use the secret manager. Until then, use magic-link or guest login.

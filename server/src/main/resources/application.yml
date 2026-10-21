@@ -52,23 +52,23 @@ spring:
       client:
         registration:
           github:
-            client-id: ${GITHUB_CLIENT_ID:changeme-configure-GITHUB_CLIENT_ID}
-            client-secret: ${GITHUB_CLIENT_SECRET:changeme-configure-GITHUB_CLIENT_SECRET}
+            client-id: ${GITHUB_CLIENT_ID:Iv23lixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+            client-secret: ${GITHUB_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
             redirect-uri: "{baseUrl}/login/oauth2/code/github"
             scope: read:user,user:email,repo
             authorization-grant-type: authorization_code
             client-name: GitHub
           google:
-            client-id: ${GOOGLE_CLIENT_ID:changeme-configure-GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET:changeme-configure-GOOGLE_CLIENT_SECRET}
+            client-id: ${GOOGLE_CLIENT_ID:123456789012-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
             redirect-uri: "{baseUrl}/login/oauth2/code/google"
             scope: openid,email,profile
             authorization-grant-type: authorization_code
             client-name: Google
             provider: google
           oidc:
-            client-id: ${OIDC_CLIENT_ID:changeme-configure-OIDC_CLIENT_ID}
-            client-secret: ${OIDC_CLIENT_SECRET:changeme-configure-OIDC_CLIENT_SECRET}
+            client-id: ${OIDC_CLIENT_ID:archflux-oidc-prod}
+            client-secret: ${OIDC_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
             redirect-uri: "{baseUrl}/login/oauth2/code/oidc"
             scope: openid,email,profile
             authorization-grant-type: authorization_code
@@ -99,7 +99,7 @@ spring:
       relyingparty:
         registration:
           archflux:
-            entity-id: ${SAML_ENTITY_ID:https://archflux.example.com}
+            entity-id: ${SAML_ENTITY_ID:https://archflux.io}
             assertion-consumer-service:
               location: "{baseUrl}/login/saml2/sso/archflux"
               binding: POST
@@ -114,12 +114,12 @@ spring:
                 - private-key-location: ${SAML_PRIVATE_KEY_LOCATION:classpath:/sso-dev/archflux-sp.key}
                   certificate-location: ${SAML_CERT_LOCATION:classpath:/sso-dev/archflux-sp.crt}
             assertingparty:
-              entity-id: ${SAML_IDP_ENTITY_ID:https://dev-123456.okta.com}
+              entity-id: ${SAML_IDP_ENTITY_ID:https://auth.example.com}
               singlesignon:
-                url: ${SAML_IDP_SSO_URL:https://dev-123456.okta.com/app/archflux/sso/saml}
+                url: ${SAML_IDP_SSO_URL:https://auth.example.com/sso/saml}
                 binding: POST
               singlelogout:
-                url: ${SAML_IDP_SLO_URL:https://dev-123456.okta.com/app/archflux/slo/saml}
+                url: ${SAML_IDP_SLO_URL:https://auth.example.com/slo/saml}
                 binding: REDIRECT
               verification:
                 credentials:
@@ -127,6 +127,18 @@ spring:
                   # IdP certificate or SAML verification fails closed.
                   - certificate-location: ${SAML_IDP_CERT_LOCATION:classpath:/sso-dev/archflux-sp.crt}
 
+spring:
+  mail:
+    host: ${SMTP_HOST:smtp.sendgrid.net}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   # Redis for session storage & magic link tokens
   data:
     redis:
@@ -176,21 +188,27 @@ management:
 app:
   api-token: ${APP_API_TOKEN:${API_TOKEN:}}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
-  jwt-secret: ${JWT_SECRET:dev-only-not-a-production-secret-set-JWT_SECRET-in-prod-0123456789}
+  jwt-secret: ${JWT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
   jwt-issuer: ${JWT_ISSUER:archflux}
   jwt-audience: ${JWT_AUDIENCE:archflux-api}
+  jwt-access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:60}
+  jwt-refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:30}
   # Previous HS256 secret accepted during key rotation (empty = no rotation key).
   jwt-prev-secret: ${JWT_PREV_SECRET:}
   # Secure flag for the ARCHFLUX_TOKEN cookie (dev/compose sets false for plain HTTP).
   cookie-secure: ${APP_COOKIE_SECURE:true}
   magic-link-ttl-minutes: 15
+  github:
+    api-token: ${GITHUB_API_TOKEN:}
+    api-url: ${GITHUB_API_URL:https://api.github.com}
+  webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
 
   # Magic link email service
   email:
     provider: ${EMAIL_PROVIDER:mock} # mock, sendgrid, resend, ses
     from: ${EMAIL_FROM:noreply@archflux.io}
     sendgrid-api-key: ${SENDGRID_API_KEY:}
-    resend-api-key: ${RESEND_API_KEY:}
+  resend-api-key: ${app.resend-api-key:${RESEND_API_KEY:}}
 
 logging:
   level:

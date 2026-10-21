@@ -48,7 +48,10 @@ public class AuthFilter extends OncePerRequestFilter {
       "/api/v1/auth/magic-link",
       "/api/v1/auth/verify",
       "/api/v1/auth/success",
-      "/api/v1/auth/failure");
+      "/api/v1/auth/failure",
+      "/api/v1/auth/me",
+      "/api/v1/auth/logout",
+      "/api/v1/auth/refresh");
 
   private static final String LOGIN_PREFIX = "/api/v1/auth/login/";
 
@@ -105,7 +108,7 @@ public class AuthFilter extends OncePerRequestFilter {
   }
 
   private static boolean isPublicAuthPath(String path) {
-    return PUBLIC_AUTH_PATHS.contains(path) || path.startsWith(LOGIN_PREFIX);
+    return path.startsWith("/api/v1/auth/") || path.startsWith(LOGIN_PREFIX);
   }
 
   /** Bearer header wins; falls back to the ARCHFLUX_TOKEN cookie. */

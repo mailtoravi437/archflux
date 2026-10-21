@@ -578,7 +578,7 @@ Docker-DNS `server:3001` proxy (self-healing, 2m bodies so the API's typed 413 w
 from `$API_URL` (default `/api`); build-time `VITE_API_URL` override available.
 
 ### 10.3 Environment & bootstrap
-`POSTGRES_DB/USER/PASSWORD`, `DATABASE_URL` (or `SPRING_DATASOURCE_*`), `API_TOKEN` (prod fail-fast, dev `dev-token`),
+`POSTGRES_DB/USER/PASSWORD`, `DATABASE_URL` (or `SPRING_DATASOURCE_*`), `API_TOKEN` (prod fail-fast, dev `f506189f13b9ff61e04350a8bd983008`),
 `VITE_API_URL`, `WEB_PORT`/`SERVER_PORT`/`POSTGRES_PORT`, `NODE_ENV`, plus OAuth2/SAML/JWT/Redis/mail/webhook vars in
 `application.yml`/`.env.example`. First-deploy: hand-apply V1 (then V2–V5), `roles.sql` with psql-var passwords, dev-only
 seed; `/api/ready` confirms. Backup via `pg_dump`+gzip; logs per service; failure-mode table in DEPLOY (401/429/413/

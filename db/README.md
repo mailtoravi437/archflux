@@ -24,8 +24,8 @@ psql "$BASE" -v ON_ERROR_STOP=1 -f db/migrations/V1__init.sql
 #    Shown values are LOCAL-DEV-ONLY defaults; prod must pass strong unique
 #    passwords per role from a secret manager.
 psql "$BASE" -v ON_ERROR_STOP=1 \
-  -v APP_PASSWORD='dev-app-only' \
-  -v MIGRATOR_PASSWORD='dev-migrator-only' \
+  -v APP_PASSWORD='K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl' \
+  -v MIGRATOR_PASSWORD='f506189f13b9ff61e04350a8bd983008' \
   -f db/roles.sql
 
 # 3. Dev seed (optional, local only; re-runnable — 2nd run inserts 0 rows)

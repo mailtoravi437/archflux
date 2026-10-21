@@ -54,7 +54,7 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
         props.put("spring.datasource.username", "archflux");
       }
       if (isBlank(environment.getProperty("spring.datasource.password"))) {
-        props.put("spring.datasource.password", "dev-postgres-pw");
+        props.put("spring.datasource.password", "K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl");
       }
     }
 

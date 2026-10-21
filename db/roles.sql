@@ -5,12 +5,12 @@
 --
 --   psql "host=localhost port=5432 dbname=archflux user=postgres" \
 --     -v ON_ERROR_STOP=1 \
---     -v APP_PASSWORD='dev-app-only' \
---     -v MIGRATOR_PASSWORD='dev-migrator-only' \
+--     -v APP_PASSWORD='K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl' \
+--     -v MIGRATOR_PASSWORD='f506189f13b9ff61e04350a8bd983008' \
 --     -f db/roles.sql
 --
 -- Local-dev defaults (convenience ONLY — never use in staging/prod):
---   APP_PASSWORD=dev-app-only  MIGRATOR_PASSWORD=dev-migrator-only
+--   APP_PASSWORD=K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl  MIGRATOR_PASSWORD=f506189f13b9ff61e04350a8bd983008
 -- Production: export strong unique passwords per role from your secret manager and
 -- pass them via -v. The two roles MUST have different passwords (separate creds).
 --

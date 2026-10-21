@@ -42,6 +42,12 @@ public class Checkpoint {
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
+  @Column(name = "deleted_at")
+  private Instant deletedAt;
+
+  @Column(name = "active", nullable = false)
+  private Boolean active = false;
+
   public Checkpoint() {
   }
 
@@ -111,5 +117,21 @@ public class Checkpoint {
 
   public Instant getCreatedAt() {
     return createdAt;
+  }
+
+  public Instant getDeletedAt() {
+    return deletedAt;
+  }
+
+  public void setDeletedAt(Instant deletedAt) {
+    this.deletedAt = deletedAt;
+  }
+
+  public Boolean getActive() {
+    return active;
+  }
+
+  public void setActive(Boolean active) {
+    this.active = active;
   }
 }

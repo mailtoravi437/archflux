@@ -15,12 +15,12 @@ ALTER TABLE public.sync_log ENABLE ROW LEVEL SECURITY;
 -- Helper functions for role checks (must exist before policies reference them)
 CREATE OR REPLACE FUNCTION public.current_user_id() RETURNS uuid
 LANGUAGE sql STABLE AS $$
-  SELECT current_setting('app.current_user_id', true)::uuid
+  SELECT NULLIF(current_setting('app.current_user_id', true), '')::uuid
 $$;
 
 CREATE OR REPLACE FUNCTION public.current_user_has_role(role text) RETURNS boolean
 LANGUAGE sql STABLE AS $$
-  SELECT current_setting('app.current_user_role', true) = role
+  SELECT COALESCE(NULLIF(current_setting('app.current_user_role', true), ''), 'member') = role
 $$;
 
 -- RLS Policies for users: users can read all, only admins can modify
@@ -30,6 +30,10 @@ CREATE POLICY users_select_all ON public.users FOR SELECT USING (true);
 CREATE POLICY users_modify_admin ON public.users FOR ALL
   USING (public.current_user_has_role('admin'))
   WITH CHECK (public.current_user_has_role('admin'));
+DROP POLICY IF EXISTS users_modify_self ON public.users;
+CREATE POLICY users_modify_self ON public.users FOR UPDATE
+  USING (id = public.current_user_id())
+  WITH CHECK (id = public.current_user_id());
 
 -- RLS Policies for diagrams: users see own diagrams + public/shared ones
 DROP POLICY IF EXISTS diagrams_owner ON public.diagrams;
@@ -42,6 +46,7 @@ CREATE POLICY diagrams_shared_read ON public.diagrams FOR SELECT
   USING (tags && ARRAY['public'] OR owner_id = public.current_user_id());
 
 -- RLS Policies for checkpoints: tied to diagram ownership
+DROP POLICY IF EXISTS checkpoints_owner ON public.checkpoints;
 DROP POLICY IF EXISTS checkpoints_owner ON public.checkpoints;
 CREATE POLICY checkpoints_owner ON public.checkpoints FOR ALL
   USING (EXISTS (
@@ -57,6 +62,7 @@ CREATE POLICY checkpoints_owner ON public.checkpoints FOR ALL
 
 -- RLS Policies for threads: tied to diagram ownership
 DROP POLICY IF EXISTS threads_owner ON public.threads;
+DROP POLICY IF EXISTS threads_owner ON public.threads;
 CREATE POLICY threads_owner ON public.threads FOR ALL
   USING (EXISTS (
     SELECT 1 FROM public.diagrams d 
@@ -70,6 +76,7 @@ CREATE POLICY threads_owner ON public.threads FOR ALL
   ));
 
 -- RLS Policies for replies: tied to thread -> diagram ownership
+DROP POLICY IF EXISTS replies_owner ON public.replies;
 DROP POLICY IF EXISTS replies_owner ON public.replies;
 CREATE POLICY replies_owner ON public.replies FOR ALL
   USING (EXISTS (
@@ -86,6 +93,7 @@ CREATE POLICY replies_owner ON public.replies FOR ALL
   ));
 
 -- RLS Policies for sync_log: tied to diagram ownership
+DROP POLICY IF EXISTS sync_log_owner ON public.sync_log;
 DROP POLICY IF EXISTS sync_log_owner ON public.sync_log;
 CREATE POLICY sync_log_owner ON public.sync_log FOR ALL
   USING (EXISTS (
@@ -115,10 +123,19 @@ CREATE TABLE IF NOT EXISTS public.audit_log (
 CREATE INDEX IF NOT EXISTS idx_audit_log_table_pk ON public.audit_log (table_name, (new_row->>'id'));
 CREATE INDEX IF NOT EXISTS idx_audit_log_changed_at ON public.audit_log (changed_at DESC);
 
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_audit_log_operation') THEN
+    ALTER TABLE public.audit_log ADD CONSTRAINT chk_audit_log_operation CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE'));
+  END IF;
+END $$;
+
 -- Generic audit trigger function
 CREATE OR REPLACE FUNCTION public.audit_trigger_fn()
 RETURNS trigger
 LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
 AS $func$
 DECLARE
   v_old jsonb;
@@ -186,10 +203,7 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'checkpoints_title_len') THEN
     ALTER TABLE public.checkpoints ADD CONSTRAINT checkpoints_title_len CHECK (char_length(title) <= 200);
   END IF;
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'checkpoints' AND column_name = 'badge')
-     AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'checkpoints_badge_len') THEN
-    ALTER TABLE public.checkpoints ADD CONSTRAINT checkpoints_badge_len CHECK (badge IS NULL OR char_length(badge) <= 100);
-  END IF;
+  -- badge column does not exist (dead constraint removed).
 END
 $$;
 
@@ -351,8 +365,14 @@ BEGIN
 END
 $func$;
 
--- Grant execute on cleanup function to application role
--- GRANT EXECUTE ON FUNCTION public.archive_old_sync_logs(interval) TO archflux_app;
+-- Grant execute on cleanup function and audit log access to application role
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'archflux_app') THEN
+    EXECUTE 'GRANT EXECUTE ON FUNCTION public.archive_old_sync_logs(interval) TO archflux_app';
+    EXECUTE 'GRANT INSERT, SELECT ON public.audit_log TO archflux_app';
+  END IF;
+END $$;
 
 -- ---------------------------------------------------------------- 9. Performance: Set fillfactor for high-update tables
 -- diagrams gets frequent updated_at updates

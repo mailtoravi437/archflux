@@ -9,8 +9,10 @@ import org.springframework.core.env.Environment;
 import jakarta.annotation.PostConstruct;
 
 /**
- * Auth/token configuration. Single-token dev identity with a fixed UUID
- * (seeded by db/seed.dev.sql as dev@archflux.local).
+ * Auth/token configuration. In production (`prod` profile), APP_API_TOKEN must be set
+ * via `.env.backend` or `/etc/archflux/backend.env`. If blank, server refuses to start
+ * (IllegalStateException). The DEFAULT_DEV_TOKEN (`f506...`) is only a fallback for
+ * non-production profiles and must NEVER be used in production.
  */
 @Configuration
 public class AppProperties {
@@ -18,7 +20,7 @@ public class AppProperties {
   /** Fixed dev identity — matches db/seed.dev.sql. */
   public static final UUID DEV_USER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-  public static final String DEFAULT_DEV_TOKEN = "dev-token";
+  public static final String DEFAULT_DEV_TOKEN = "f506189f13b9ff61e04350a8bd983008";
 
   private final String configuredToken;
   private final Environment environment;

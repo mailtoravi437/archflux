@@ -30,6 +30,10 @@ CREATE POLICY users_select_all ON public.users FOR SELECT USING (true);
 CREATE POLICY users_modify_admin ON public.users FOR ALL
   USING (public.current_user_has_role('admin'))
   WITH CHECK (public.current_user_has_role('admin'));
+DROP POLICY IF EXISTS users_modify_self ON public.users;
+CREATE POLICY users_modify_self ON public.users FOR UPDATE
+  USING (id = public.current_user_id())
+  WITH CHECK (id = public.current_user_id());
 
 -- RLS Policies for diagrams: users see own diagrams + public/shared ones
 DROP POLICY IF EXISTS diagrams_owner ON public.diagrams;
@@ -351,8 +355,13 @@ BEGIN
 END
 $func$;
 
--- Grant execute on cleanup function to application role
--- GRANT EXECUTE ON FUNCTION public.archive_old_sync_logs(interval) TO archflux_app;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'archflux_app') THEN
+    EXECUTE 'GRANT EXECUTE ON FUNCTION public.archive_old_sync_logs(interval) TO archflux_app';
+    EXECUTE 'GRANT INSERT, SELECT ON public.audit_log TO archflux_app';
+  END IF;
+END $$;
 
 -- ---------------------------------------------------------------- 9. Performance: Set fillfactor for high-update tables
 -- diagrams gets frequent updated_at updates

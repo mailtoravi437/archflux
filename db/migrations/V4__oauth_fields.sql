@@ -78,6 +78,6 @@ BEGIN
   ) THEN
     ALTER TABLE public.users 
     ADD CONSTRAINT chk_users_provider 
-    CHECK (provider IN ('github', 'google', 'email', 'sso', 'mock'));
+    CHECK (provider IS NULL OR provider IN ('github', 'google', 'email', 'sso', 'oidc', 'saml', 'mock'));
   END IF;
 END $$;

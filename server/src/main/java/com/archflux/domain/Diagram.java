@@ -76,6 +76,9 @@ public class Diagram {
   @Column(name = "updated_at", nullable = false)
   private Instant updatedAt;
 
+  @Column(name = "deleted_at")
+  private Instant deletedAt;
+
   public Diagram() {
   }
 
@@ -219,5 +222,13 @@ public class Diagram {
 
   public void setUpdatedAt(Instant updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public Instant getDeletedAt() {
+    return deletedAt;
+  }
+
+  public void setDeletedAt(Instant deletedAt) {
+    this.deletedAt = deletedAt;
   }
 }
