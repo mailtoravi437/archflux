@@ -73,19 +73,19 @@ jobs:
           SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
           ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
             "sudo mkdir -p /etc/archflux && sudo chmod 755 /etc/archflux"
-          cat <<-'ENVFILE' | ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
-            "sudo tee ${BACKEND_ENV_FILE} >/dev/null && sudo chmod 600 ${BACKEND_ENV_FILE} && sudo chown root:root ${BACKEND_ENV_FILE}"
-	SPRING_PROFILES_ACTIVE=prod
-	SERVER_PORT=3001
-	SPRING_DATASOURCE_URL=${{ secrets.DATABASE_URL }}
-	SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
-	SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
-	APP_API_TOKEN=${{ secrets.API_TOKEN }}
-	JWT_SECRET=${{ secrets.JWT_SECRET }}
-	APP_COOKIE_SECURE=true
-	REDIS_HOST=127.0.0.1
-	GITHUB_WEBHOOK_SECRET=${{ secrets.GITHUB_WEBHOOK_SECRET }}
-	ENVFILE
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "cat << 'ENV_EOF' | sudo tee ${BACKEND_ENV_FILE} > /dev/null && sudo chmod 600 ${BACKEND_ENV_FILE} && sudo chown root:root ${BACKEND_ENV_FILE}
+SPRING_PROFILES_ACTIVE=prod
+SERVER_PORT=3001
+SPRING_DATASOURCE_URL=${{ secrets.DATABASE_URL }}
+SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }}
+SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
+APP_API_TOKEN=${{ secrets.API_TOKEN }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+APP_COOKIE_SECURE=true
+REDIS_HOST=127.0.0.1
+GITHUB_WEBHOOK_SECRET=${{ secrets.GITHUB_WEBHOOK_SECRET }}
+ENV_EOF"
 
       - name: Install runtime and build backend on VM
         shell: bash
