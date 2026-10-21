@@ -41,6 +41,17 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: true
+  mail:
+    host: ${SMTP_HOST:smtp.sendgrid.net}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
   # OAuth2 / OIDC / SAML2 (single security key — YAML last-wins would drop oauth2 otherwise)
   # Client ids/secrets default to non-functional placeholders so Boot's
@@ -127,18 +138,6 @@ spring:
                   # IdP certificate or SAML verification fails closed.
                   - certificate-location: ${SAML_IDP_CERT_LOCATION:classpath:/sso-dev/archflux-sp.crt}
 
-spring:
-  mail:
-    host: ${SMTP_HOST:smtp.sendgrid.net}
-    port: ${SMTP_PORT:587}
-    username: ${SMTP_USERNAME:}
-    password: ${SMTP_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   # Redis for session storage & magic link tokens
   data:
     redis:
@@ -208,7 +207,7 @@ app:
     provider: ${EMAIL_PROVIDER:mock} # mock, sendgrid, resend, ses
     from: ${EMAIL_FROM:noreply@archflux.io}
     sendgrid-api-key: ${SENDGRID_API_KEY:}
-  resend-api-key: ${app.resend-api-key:${RESEND_API_KEY:}}
+    resend-api-key: ${app.resend-api-key:${RESEND_API_KEY:}}
 
 logging:
   level:
