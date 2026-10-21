@@ -1,0 +1,117 @@
+name: Deploy ArchFlux Frontend
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  WWW_ROOT: /var/www/html
+
+jobs:
+  ############################################################################
+  # 1. Frontend build job (Vite SPA -> dist/)
+  ############################################################################
+  build-frontend:
+    name: Build frontend (Vite)
+    runs-on: ubuntu-latest
+    outputs:
+      asset-count: ${{ steps.count.outputs.files }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (oxlint)
+        run: npm run lint
+
+      - name: Write frontend env (.env.production)
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_BASE="${{ vars.VITE_API_URL }}"
+          if [ -z "$API_BASE" ]; then API_BASE="${{ secrets.VITE_API_URL }}"; fi
+          if [ -z "$API_BASE" ]; then API_BASE="/api"; fi
+          printf 'VITE_API_URL=%s\n' "$API_BASE" > .env.production
+
+      - name: Build frontend (tsc + vite build)
+        run: npm run build
+
+      - name: Count built assets
+        id: count
+        shell: bash
+        run: echo "files=$(find dist -type f | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload frontend bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 1
+
+  ############################################################################
+  # 2. Deploy static files to VM (no server interaction)
+  ############################################################################
+  deploy-vm:
+    name: Deploy frontend to VM
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download frontend bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+
+      - name: Setup SSH key and known_hosts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          umask 077
+          printf '%s\n' "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+          chmod 644 ~/.ssh/known_hosts
+          cat > ~/.ssh/vm-opts <<EOF
+          -o StrictHostKeyChecking=yes
+          -o UserKnownHostsFile=$HOME/.ssh/known_hosts
+          -i $HOME/.ssh/deploy_key
+          -o IdentitiesOnly=yes
+          -o BatchMode=yes
+          -o ServerAliveInterval=30
+          -o ServerAliveCountMax=3
+          EOF
+
+      - name: Resolve SSH options
+        id: sshopts
+        shell: bash
+        run: |
+          opts=$(tr '\n' ' ' < ~/.ssh/vm-opts)
+          echo "opts=${opts}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy frontend bundle to /var/www/html
+        shell: bash
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+          VM_USER: ${{ secrets.VM_USER }}
+        run: |
+          set -euo pipefail
+          SSH_OPTS="${{ steps.sshopts.outputs.opts }}"
+          RSYNC_SSH="ssh $SSH_OPTS"
+          rsync -avz --delete -e "$RSYNC_SSH" dist/ "${VM_USER}@${VM_HOST}:${WWW_ROOT}/"
+          ssh $SSH_OPTS "${VM_USER}@${VM_HOST}" \
+            "sudo chown -R www-data:www-data ${WWW_ROOT} && \
+             sudo find ${WWW_ROOT} -type d -exec chmod 755 {} + && \
+             sudo find ${WWW_ROOT} -type f -exec chmod 644 {} + && \
+             sudo chmod 644 ${WWW_ROOT}/index.html"
