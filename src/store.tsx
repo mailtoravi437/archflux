@@ -1741,33 +1741,36 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     pushToast(`Exported ${base}.arch (local)`);
   }, [pushToast]);
 
-  const exportPNG = useCallback(() => {
+  // LucidChart-parity vector/CSV export: full document, tightly cropped, from
+  // live store state (assets inlined so files are self-contained).
+  const composeExportDoc = useCallback((): DiagramDoc => ({
+    id: activeDocRef.current ?? 'local',
+    title: docTitleRef.current,
+    nodes: nodesRef.current,
+    edges: edgesRef.current,
+    strokes: strokesRef.current,
+    texts: textsRef.current,
+    createdAt: 0,
+    updatedAt: Date.now(),
+  }), []);
+
+  /** Legacy viewport-screenshot PNG (fallback when SVG rasterization fails). */
+  const exportPNGFromCanvas = useCallback(() => {
     const canvas = document.getElementById('architectureCanvas') as HTMLCanvasElement | null;
     if (!canvas || canvas.width === 0) {
-      pushToast('Canvas not ready — open Precision Canvas first');
+      pushToast('PNG export unsupported — canvas not ready if you are not on the Precision Canvas screen');
       return;
     }
-    const settings = (() => {
-      try {
-        return JSON.parse(localStorage.getItem('archflux:settings:v1') ?? '{}') as { exportResolution?: string };
-      } catch {
-        return {} as { exportResolution?: string };
-      }
-    })();
-    const scale = settings.exportResolution === '4x' ? 4 : settings.exportResolution === '1x' ? 1 : 2;
+    const base = archBaseName();
     const out = document.createElement('canvas');
-    out.width = canvas.width * scale;
-    out.height = canvas.height * scale;
+    out.width = canvas.width;
+    out.height = canvas.height;
     const ctx = out.getContext('2d');
     if (!ctx) {
       pushToast('PNG export unsupported here');
       return;
     }
-    ctx.scale(scale, scale);
-    ctx.fillStyle = themeRef.current === 'dark' ? '#1F2937' : '#FFFFFF';
-    ctx.fillRect(0, 0, out.width, out.height);
     ctx.drawImage(canvas, 0, 0);
-    const base = archBaseName();
     out.toBlob((blob) => {
       if (!blob) {
         pushToast('PNG export failed');
@@ -1781,22 +1784,37 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       a.click();
       a.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 2000);
-      pushToast(`Exported ${base}.png`);
+      pushToast(`Exported ${base}.png (snapshot)`);
     }, 'image/png');
   }, [pushToast]);
 
-  // LucidChart-parity vector/CSV export: full document, tightly cropped, from
-  // live store state (assets inlined so files are self-contained).
-  const composeExportDoc = useCallback((): DiagramDoc => ({
-    id: activeDocRef.current ?? 'local',
-    title: docTitleRef.current,
-    nodes: nodesRef.current,
-    edges: edgesRef.current,
-    strokes: strokesRef.current,
-    texts: textsRef.current,
-    createdAt: 0,
-    updatedAt: Date.now(),
-  }), []);
+  const exportPNG = useCallback(() => {
+    // LucidChart-parity raster export: tightly cropped full-document render
+    // (not a viewport screenshot), honoring the export-resolution setting.
+    const settings = (() => {
+      try {
+        return JSON.parse(localStorage.getItem('archflux:settings:v1') ?? '{}') as { exportResolution?: string };
+      } catch {
+        return {} as { exportResolution?: string };
+      }
+    })();
+    const scale = settings.exportResolution === '4x' ? 4 : settings.exportResolution === '1x' ? 1 : 2;
+    void exportDocument(composeExportDoc(), {
+      format: 'png',
+      scale,
+      background: themeRef.current === 'dark' ? 'dark' : 'white',
+    })
+      .then((result) => {
+        if (!result.blob) {
+          pushToast('PNG export failed — falling back to canvas snapshot');
+          exportPNGFromCanvas();
+          return;
+        }
+        downloadExport(result);
+        pushToast(`Exported ${result.fileName} (${result.summary})`);
+      })
+      .catch(() => exportPNGFromCanvas());
+  }, [pushToast]);
 
   const exportSVG = useCallback(() => {
     void exportDocument(composeExportDoc(), {
