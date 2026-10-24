@@ -203,7 +203,7 @@ export default function DashboardScreen() {
     } catch {
       return '—';
     }
-  }, [docs]);
+  }, []);
 
   const open = (id: string) => {
     openDoc(id);

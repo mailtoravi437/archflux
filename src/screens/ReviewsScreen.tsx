@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import HonestyBadge from '../components/HonestyBadge';
 import RevisionsSection from '../components/RevisionsSection';
@@ -59,17 +59,12 @@ export default function ReviewsScreen() {
   const navigate = useNavigate();
   const location = useLocation();
   // Merge & Automation (ex-#/git) lives here as a sub-tab; deep links and
-  // the ⌘G shortcut arrive via location.state.
-  const getInitialTab = (): SubTab => {
+  // the ⌘G shortcut arrive via location.state. Derive directly during render
+  // instead of using state + effect (avoids setState-in-effect lint warning).
+  const subTab: SubTab = (() => {
     const tab = (location.state as { tab?: SubTab } | null)?.tab;
     return (tab === 'merge' || tab === 'discuss') ? tab : 'discuss';
-  };
-  const [subTab, setSubTab] = useState<SubTab>(getInitialTab);
-  // Deep links (e.g. #/git, ⌘G) can arrive while already mounted — sync them.
-  useEffect(() => {
-    const tab = (location.state as { tab?: SubTab } | null)?.tab;
-    if (tab === 'merge' || tab === 'discuss') setSubTab(tab);
-  }, [location]);
+  })();
   const [filter, setFilter] = useState<'all' | 'open' | 'resolved'>('all');
   const [newText, setNewText] = useState('');
   const [newPin, setNewPin] = useState(nodes[0]?.id ?? '');
@@ -207,8 +202,8 @@ export default function ReviewsScreen() {
           {decision && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, display: 'flex', gap: 6, alignItems: 'center' }} role="status"><span>Decision recorded: {decision === 'approved' ? 'Approved ✓' : 'Changes requested'}</span><HonestyBadge label={SIMULATED} tone="demo" title="Local-only decision — no server call occurs" /></div>}
         </div>
         <nav style={{ display: 'flex', gap: 6 }} aria-label="Reviews sections">
-          <button className={`btn-xs${subTab === 'discuss' ? ' btn-xs-primary' : ''}`} aria-pressed={subTab === 'discuss'} onClick={() => setSubTab('discuss')}>💬 Discussion & Diff</button>
-          <button className={`btn-xs${subTab === 'merge' ? ' btn-xs-primary' : ''}`} aria-pressed={subTab === 'merge'} onClick={() => setSubTab('merge')}>🐙 Merge & Automation</button>
+          <button className={`btn-xs${subTab === 'discuss' ? ' btn-xs-primary' : ''}`} aria-pressed={subTab === 'discuss'} onClick={() => navigate('/reviews', { state: { tab: 'discuss' } })}>💬 Discussion & Diff</button>
+          <button className={`btn-xs${subTab === 'merge' ? ' btn-xs-primary' : ''}`} aria-pressed={subTab === 'merge'} onClick={() => navigate('/reviews', { state: { tab: 'merge' } })}>🐙 Merge & Automation</button>
         </nav>
       {subTab === 'discuss' ? (
       <div className="screen-content-wrapper">
