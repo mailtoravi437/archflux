@@ -40,23 +40,30 @@ const localStorageMock = (() => {
 
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock,
+  writable: true,
+  configurable: true,
 });
 
 globalThis.localStorage = localStorageMock;
 
 // Mock window.matchMedia
-globalThis.matchMedia = globalThis.matchMedia || function (query) {
-  return {
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  };
-};
+// NOTE: must be vi.fn, not jest.fn — a ReferenceError here aborts this whole
+// setup file silently and every later mock (ResizeObserver, FontFace, rAF)
+// disappears with it.
+const matchMediaMock = (query: string): MediaQueryList => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(), // deprecated
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+} as unknown as MediaQueryList);
+globalThis.matchMedia = globalThis.matchMedia || matchMediaMock;
+globalThis.window.matchMedia = globalThis.window.matchMedia
+  ? globalThis.window.matchMedia
+  : matchMediaMock;
 
 // Mock ResizeObserver
 globalThis.ResizeObserver = globalThis.ResizeObserver || function () {

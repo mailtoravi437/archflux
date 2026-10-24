@@ -99,7 +99,7 @@ function ToastTray() {
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, displayName, serverVersion, saveConflict, saveActiveDoc, forceSaveActiveDoc, reloadActiveDoc, dismissSaveConflict } = useDiagram();
+  const { theme, setTheme, freshness, freshnessLabel, driftCount, pushToast, exportArch, exportPNG, exportSVG, exportCSV, docTitle, setDocTitle, dirty, undo, redo, canUndo, canRedo, undoDepth, redoDepth, resetView, healAll, resync, threads, docs, activeDocId, openDoc, newDoc, renameDoc, duplicateDoc, deleteDoc, placeShape, applyLayout, displayName, serverVersion, saveConflict, saveActiveDoc, forceSaveActiveDoc, reloadActiveDoc, dismissSaveConflict } = useDiagram();
   const isCanvas = location.pathname === '/canvas';
   const [userOpen, setUserOpen] = useState(false);
   const accountBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -242,6 +242,8 @@ export default function AppShell() {
     { id: 'blueprints', label: 'Go to Blueprints', run: () => navigate('/blueprints') },
     { id: 'settings', label: 'Go to Settings', run: () => navigate('/settings/general') },
     { id: 'export', label: 'Export .arch file', run: () => exportArch() },
+    { id: 'export-svg', label: 'Export SVG (vector)', run: () => exportSVG() },
+    { id: 'export-csv', label: 'Export CSV (shape data)', run: () => exportCSV() },
     { id: 'save', label: 'Save diagram to server', run: () => { void saveActiveDoc(); } },
     { id: 'export-png', label: 'Export PNG snapshot', run: () => exportPNG() },
     { id: 'new-doc', label: 'New blank diagram', run: () => { newDoc(); navigate('/canvas'); } },
@@ -264,7 +266,7 @@ export default function AppShell() {
     { id: 'theme-dark', label: 'Theme: Obsidian Dark', run: () => setTheme('dark') },
     { id: 'theme-blue', label: 'Theme: Cyber Blueprint', run: () => setTheme('blueprint') },
     { id: 'theme-light', label: 'Theme: Engineering Light', run: () => setTheme('light') },
-  ], [navigate, exportArch, exportPNG, newDoc, resync, healAll, applyLayout, placeShape, openDoc, docs, undo, redo, canUndo, canRedo, resetView, setTheme, saveActiveDoc]);
+  ], [navigate, exportArch, exportPNG, exportSVG, exportCSV, newDoc, resync, healAll, applyLayout, placeShape, openDoc, docs, undo, redo, canUndo, canRedo, resetView, setTheme, saveActiveDoc]);
 
   // Subsequence fuzzy match: every query char appears in order ("expt" → "Export PNG").
   const fuzzyMatch = (label: string, q: string) => {

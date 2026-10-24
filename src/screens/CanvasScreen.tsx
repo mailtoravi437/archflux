@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDiagram } from '../useDiagram';
 import type { CanvasTool } from '../useDiagram';
-import type { ArchEdge, ArchNode, LibraryShape, ShapeCategory } from '../types';
+import type { ArchNode, LibraryShape, ShapeCategory } from '../types';
 import { libraryShapes } from '../mocks';
 import { useFocusTrap } from '../useFocusTrap';
 import { sourceModeForDoc } from '../honesty';
 import {
   clampNodeSize,
+  distToSegment,
+  edgePoints,
   hitResizeHandle,
   minimapTransform,
   miniToWorld,
@@ -20,6 +22,14 @@ import {
 import { ToolPalette } from '../components/ToolPalette';
 import { CollaborationPanel } from '../components/CollaborationPanel';
 import { useCollaboration } from '../hooks/useCollaboration';
+import {
+  drawEdgePass,
+  drawFreeTextPass,
+  drawInkPass,
+  drawNodePass,
+  drawThreadPinPass,
+  type NodeIconSource,
+} from '../canvas/render';
 
 export const TOOLS: { id: CanvasTool; icon: string; label: string; title: string }[] = [
   { id: 'select', icon: '/icons/tools/select.svg', label: 'Select', title: 'Select & Move (V)' },
@@ -146,89 +156,7 @@ function Swatches(props: { values: (string | null)[]; current: string | undefine
   );
 }
 
-interface Pt {
-  x: number;
-  y: number;
-}
-
 /** Shared edge geometry: polyline points used by both draw and hit-testing. */
-function edgePoints(edge: ArchEdge, nodes: ArchNode[], orthogonal: boolean, curve: 'orthogonal' | 'straight' | 'bezier' = 'orthogonal'): Pt[] | null {
-  const fromNode = nodes.find((n) => n.id === edge.from);
-  if (!fromNode) return null;
-  let startX = fromNode.x + fromNode.w;
-  let startY = fromNode.y + fromNode.h / 2;
-  let endX = 0;
-  let endY = 0;
-  if (edge.to) {
-    const toNode = nodes.find((n) => n.id === edge.to);
-    if (!toNode) return null;
-    if (toNode.x > fromNode.x + fromNode.w) {
-      startX = fromNode.x + fromNode.w;
-      startY = fromNode.y + fromNode.h / 2;
-      endX = toNode.x;
-      endY = toNode.y + toNode.h / 2;
-    } else if (toNode.y > fromNode.y + fromNode.h) {
-      startX = fromNode.x + fromNode.w / 2;
-      startY = fromNode.y + fromNode.h;
-      endX = toNode.x + toNode.w / 2;
-      endY = toNode.y;
-    } else {
-      startX = fromNode.x;
-      startY = fromNode.y + fromNode.h / 2;
-      endX = toNode.x + toNode.w;
-      endY = toNode.y + toNode.h / 2;
-    }
-  } else if (edge.targetCoords) {
-    startX = fromNode.x + fromNode.w / 2;
-    startY = fromNode.y + fromNode.h;
-    endX = edge.targetCoords?.x ?? 0;
-    endY = edge.targetCoords?.y ?? 0;
-  } else {
-    return null;
-  }
-  if (curve === 'bezier') {
-    const dx = endX - startX;
-    const c1x = startX + (dx ?? 0) * 0.4;
-    const c1y = startY;
-    const c2x = endX - (dx ?? 0) * 0.4;
-    const c2y = endY;
-    const steps = 16;
-    const pts: Pt[] = [];
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps;
-      const mt = 1 - t;
-      const bx = mt * mt * mt * startX + 3 * mt * mt * t * c1x + 3 * mt * t * t * c2x + t * t * t * endX;
-      const by = mt * mt * mt * startY + 3 * mt * mt * t * c1y + 3 * mt * t * t * c2y + t * t * t * endY;
-      pts.push({
-        x: isFinite(bx) ? bx : startX,
-        y: isFinite(by) ? by : startY,
-      });
-    }
-    return pts;
-  }
-  if (orthogonal && !edge.isDangling) {
-    const midX = (startX + endX) / 2;
-    return [
-      { x: startX, y: startY },
-      { x: isFinite(midX) ? midX : startX, y: startY },
-      { x: isFinite(midX) ? midX : startX, y: isFinite(endY) ? endY : startY },
-      { x: isFinite(endX) ? endX : 0, y: isFinite(endY) ? endY : 0 },
-    ];
-  }
-  return [
-    { x: isFinite(startX) ? startX : 0, y: isFinite(startY) ? startY : 0 },
-    { x: isFinite(endX) ? endX : 0, y: isFinite(endY) ? endY : 0 },
-  ];
-}
-
-function distToSegment(px: number, py: number, a: Pt, b: Pt): number {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const lenSq = dx * dx + dy * dy;
-  if (lenSq === 0) return Math.hypot(px - a.x, py - a.y);
-  const t = Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / lenSq));
-  return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
-}
 
 export default function CanvasScreen() {
   const navigate = useNavigate();
@@ -354,6 +282,21 @@ export default function CanvasScreen() {
   const draftCommitted = useRef(false);
   // Bumps when a vendor icon finishes loading so the canvas repaints it.
   const [, setIconTick] = useState(0);
+  // Shared render-pass vendor-icon bridge: pass calls get() before painting
+  // (only complete images draw) and ensure() registers in-flight loads; the
+  // drain counter resumes visual tests waiting for stable pixels.
+  const iconsAdapter: NodeIconSource = {
+    get: (src) => iconImgCache.get(src) ?? null,
+    ensure: (src) => {
+      if (iconImgCache.has(src)) return;
+      const img = new Image();
+      trackIconLoad();
+      img.onload = () => { setIconTick((t) => t + 1); noteIconSettled(); };
+      img.onerror = () => { iconImgCache.delete(src); noteIconSettled(); };
+      iconImgCache.set(src, img);
+      img.src = src;
+    },
+  };
 
   // Preload all vendor icons at startup so they're cached before rendering
   useEffect(() => {
@@ -830,383 +773,27 @@ export default function CanvasScreen() {
         x <= vx1 && x + bw >= vx0 && y <= vy1 && y + bh >= vy0;
 
       s.edges.forEach((edge) => {
+        // Cull on the pre-pass polyline (exact points match the shared helper).
         const pts = edgePoints(edge, s.nodes ?? [], s.orthogonal, s.connectorCurve);
         if (!pts) return;
         if (pts.every((p) => p.x < vx0 || p.x > vx1 || p.y < vy0 || p.y > vy1)) return;
-        const startX = pts[0].x;
-        const startY = pts[0].y;
-        const endX = pts[pts.length - 1].x;
-        const endY = pts[pts.length - 1].y;
-        const isEdgeSelected = s.selectedEdgeId === edge.id;
-
-        ctx.save();
-        ctx.strokeStyle = isEdgeSelected ? (isDark ? '#8B83FF' : '#635BFF') : (isDark ? '#4B5363' : '#C7CDD7');
-        ctx.lineWidth = isEdgeSelected ? 3 : 2;
-        if (isEdgeSelected) {
-          ctx.shadowColor = '#635BFF';
-          ctx.shadowBlur = 8;
-        }
-        const lineStyle = edge.lineStyle ?? (edge.dashed ? 'dashed' : 'solid');
-        if (edge.isDangling || lineStyle === 'dashed') ctx.setLineDash([4, 4]);
-        else if (lineStyle === 'dotted') ctx.setLineDash([2, 4]);
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-        ctx.setLineDash([]);
-        const headlen = 8;
-        const arrowMode = edge.arrow ?? 'end';
-        const drawHead = (hx: number, hy: number, angle: number) => {
-          ctx.beginPath();
-          ctx.moveTo(hx, hy);
-          ctx.lineTo(hx - headlen * Math.cos(angle - Math.PI / 6), hy - headlen * Math.sin(angle - Math.PI / 6));
-          ctx.lineTo(hx - headlen * Math.cos(angle + Math.PI / 6), hy - headlen * Math.sin(angle + Math.PI / 6));
-          ctx.closePath();
-          ctx.fill();
-        };
-        const prev = pts[pts.length - 2] ?? pts[0];
-        const angle = Math.atan2(endY - prev.y, endX - prev.x);
-        ctx.fillStyle = isEdgeSelected ? '#635BFF' : (isDark ? '#9CA3AF' : '#6B7280');
-        if (arrowMode !== 'none') drawHead(endX, endY, angle);
-        if (arrowMode === 'both') {
-          const first = pts[1] ?? pts[0];
-          drawHead(startX, startY, Math.atan2(startY - first.y, startX - first.x));
-        }
-        if (edge.label) {
-          ctx.font = "600 13px 'Caveat', cursive";
-          ctx.fillStyle = isEdgeSelected ? (isDark ? '#93C5FD' : '#1D4ED8') : isDark ? '#D1D5DB' : '#6B7280';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'alphabetic';
-          ctx.fillText(edge.label, (startX + endX) / 2 - 15, (startY + endY) / 2 - 8);
-        }
-        ctx.restore();
+        drawEdgePass(ctx, edge, s.nodes ?? [], {
+          isDark,
+          selected: s.selectedEdgeId === edge.id,
+          orthogonal: s.orthogonal,
+          curve: s.connectorCurve,
+        });
       });
 
-      /** Draw a single node with support for different shapes. */
+      /** Draw a single node — delegates to the shared render pass. */
       const drawNode = (node: ArchNode) => {
         if (!onScreen(node.x, node.y, node.w, node.h)) return;
-        const isSelected = s.selectedId === node.id || s.multiSel.includes(node.id);
-        const isPending = s.pendingFrom === node.id;
-        const shape = node.shape ?? 'rectangle';
-        const hasIcon = node.icon || node.iconSrc;
-
-        ctx.save();
-        const nodeBg = node.fill ?? (isDark ? '#191D25' : '#FFFFFF');
-        const strokeColor = isPending ? (isDark ? '#F0B86E' : '#98600A') : isSelected ? (isDark ? '#8B83FF' : '#635BFF') : (node.stroke ?? (isDark ? '#4B5363' : '#C7CDD7'));
-        const lineWidth = node.strokeWidth ?? (isSelected || isPending ? 2 : 1);
-        const shadowColor = isPending ? '#F0B86E' : isSelected ? '#635BFF' : 'transparent';
-        const shadowBlur = (isSelected || isPending) ? 8 : 0;
-
-        if (shape === 'logo') {
-          // Logo-only mode: render just the icon, no box
-          ctx.shadowColor = shadowColor;
-          ctx.shadowBlur = shadowBlur;
-          if (node.iconSrc) {
-            let img = iconImgCache.get(node.iconSrc);
-            if (!img) {
-              img = new Image();
-              trackIconLoad();
-              img.onload = () => { setIconTick((t) => t + 1); noteIconSettled(); };
-              img.onerror = () => { iconImgCache.delete(node.iconSrc!); noteIconSettled(); };
-              iconImgCache.set(node.iconSrc, img);
-              img.src = node.iconSrc;
-            }
-            // Only draw if image is already loaded (cached)
-            if (img.complete && img.naturalWidth > 0) {
-              const size = Math.min(node.w, node.h);
-              ctx.drawImage(img, node.x, node.y, size, size);
-            }
-          } else if (node.icon) {
-            ctx.font = `${Math.min(node.w, node.h) * 0.7}px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(node.icon, node.x + node.w / 2, node.y + node.h / 2);
-          // Details centered below the icon
-          const detailsLines = (node.details ?? "").split("\n").slice(0, 3);
-
-          ctx.font = '10px "Inter", -apple-system, sans-serif';
-          ctx.fillStyle = isDark ? "#9CA3AF" : "#6B7280";
-          detailsLines.slice(0, 3).forEach((line, i) => {
-            const truncated = line.length > 26 ? line.slice(0, 26) + "…" : line;
-            const textWidth = ctx.measureText(truncated).width;
-            ctx.fillText(truncated, node.x + node.w / 2 - textWidth / 2, node.y + node.h + 12 + i * 14);
-          });
-          }
-          // Selection indicator
-          if (isSelected) {
-            ctx.strokeStyle = (isDark ? '#8B83FF' : '#635BFF');
-            ctx.lineWidth = 2;
-            ctx.setLineDash([4, 4]);
-            ctx.strokeRect(node.x - 4, node.y - 4, node.w + 8, node.h + 8);
-            ctx.setLineDash([]);
-          }
-} else if (shape === 'cylinder') {
-          // Cylinder shape for databases
-          const cx = node.x + node.w / 2;
-          const rx = node.w / 2;
-          const ry = node.h * 0.15;
-          const h = node.h * 0.7;
-          const topY = node.y + ry;
-          const bottomY = topY + h;
-
-          ctx.shadowColor = shadowColor;
-          ctx.shadowBlur = shadowBlur;
-
-          // Top ellipse
-          ctx.beginPath();
-          ctx.ellipse(cx, topY, rx, ry, 0, 0, Math.PI * 2);
-          ctx.fillStyle = nodeBg;
-          ctx.fill();
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = lineWidth;
-          ctx.stroke();
-
-          // Body
-          ctx.beginPath();
-          ctx.moveTo(node.x, topY);
-          ctx.lineTo(node.x, bottomY);
-          ctx.ellipse(cx, bottomY, rx, ry, 0, Math.PI, 0);
-          ctx.lineTo(node.x + node.w, node.y + ry);
-          ctx.ellipse(cx, node.y + ry, rx, ry, 0, 0, Math.PI);
-          ctx.closePath();
-          ctx.fillStyle = nodeBg;
-          ctx.fill();
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = lineWidth;
-          ctx.stroke();
-
-          // Bottom ellipse (stroke only)
-          ctx.beginPath();
-          ctx.ellipse(cx, bottomY, rx, ry, 0, 0, Math.PI * 2);
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = lineWidth;
-          ctx.stroke();
-
-          // Icon/label
-          ctx.shadowColor = 'transparent';
-          ctx.shadowBlur = 0;
-          if (hasIcon) {
-            if (node.iconSrc) {
-              let img = iconImgCache.get(node.iconSrc);
-              if (!img) {
-                img = new Image();
-                trackIconLoad();
-                img.onload = () => { setIconTick((t) => t + 1); noteIconSettled(); };
-                img.onerror = () => {
-                  iconImgCache.delete(node.iconSrc!);
-                  noteIconSettled();
-                };
-                iconImgCache.set(node.iconSrc, img);
-                img.src = node.iconSrc;
-              }
-              // Only draw if image is already loaded (cached)
-              if (img.complete && img.naturalWidth > 0) {
-                ctx.drawImage(img, node.x + 8, node.y + 8, 24, 24);
-              }
-            } else if (node.icon) {
-              ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'middle';
-              ctx.fillText(node.icon, node.x + 10, node.y + 22);
-            }
-          }
-          ctx.font = "600 13px 'Inter', -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? '#F9FAFB' : '#1F2937';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          const label = node.label.length > 20 ? node.label.slice(0, 19) + '…' : node.label;
-          const textX = node.x + (hasIcon ? 42 : 12);
-          ctx.fillText(label, textX, node.y + 20);
-          ctx.font = "11px 'Inter', -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? '#9CA3AF' : '#6B7280';
-          const tag = node.tag.length > 22 ? node.tag.slice(0, 21) + '…' : node.tag;
-          ctx.fillText(tag, textX, node.y + 40);
-
-          // Details (below tag; only lines that fit inside the node)
-          if (node.details?.trim()) {
-            ctx.font = "10px 'Inter', -apple-system, sans-serif";
-            ctx.fillStyle = isDark ? '#9CA3AF' : '#6B7280';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            const maxChars = Math.max(8, Math.floor((node.w - (textX - node.x) - 8) / 6));
-            const maxLines = Math.max(0, Math.floor((node.y + node.h - 6 - (node.y + 56)) / 13));
-            node.details.split('\n').slice(0, Math.min(3, maxLines)).forEach((line, i) => {
-              const truncated = line.length > maxChars ? line.slice(0, maxChars) + '…' : line;
-              ctx.fillText(truncated, textX, node.y + 56 + i * 13);
-            });
-          }
-
-        } else if (shape === 'rounded') {
-          // Rounded rectangle (modern card style)
-          const radius = 10;
-          ctx.shadowColor = shadowColor;
-          ctx.shadowBlur = shadowBlur;
-          ctx.beginPath();
-          ctx.roundRect(node.x, node.y, node.w, node.h, radius);
-          ctx.fillStyle = nodeBg;
-          ctx.fill();
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = lineWidth;
-          ctx.stroke();
-
-          // Icon/label
-          ctx.shadowColor = 'transparent';
-          ctx.shadowBlur = 0;
-          if (hasIcon) {
-            if (node.iconSrc) {
-              let img = iconImgCache.get(node.iconSrc);
-              if (!img) {
-                img = new Image();
-                img.onload = () => setIconTick((t) => t + 1);
-                img.onerror = () => iconImgCache.delete(node.iconSrc!);
-                iconImgCache.set(node.iconSrc, img);
-                img.src = node.iconSrc;
-              }
-              // Only draw if image is already loaded (cached)
-              if (img.complete && img.naturalWidth > 0) {
-                ctx.drawImage(img, node.x + 10, node.y + 10, 24, 24);
-              }
-            } else if (node.icon) {
-              ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'middle';
-              ctx.fillText(node.icon, node.x + 12, node.y + 22);
-            }
-          }
-          ctx.font = "600 13px 'Inter', -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? '#F9FAFB' : '#1F2937';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          const label = node.label.length > 20 ? node.label.slice(0, 19) + '…' : node.label;
-          const textX = node.x + (hasIcon ? 42 : 14);
-          ctx.fillText(label, textX, node.y + 20);
-          ctx.font = "11px 'Inter', -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? '#9CA3AF' : '#6B7280';
-          const tag = node.tag.length > 22 ? node.tag.slice(0, 21) + '…' : node.tag;
-          ctx.fillText(tag, textX, node.y + 40);
-
-          // Details (below tag; only lines that fit inside the node)
-          if (node.details?.trim()) {
-            ctx.font = "10px 'Inter', -apple-system, sans-serif";
-            ctx.fillStyle = isDark ? '#9CA3AF' : '#6B7280';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            const maxChars = Math.max(8, Math.floor((node.w - (textX - node.x) - 8) / 6));
-            const maxLines = Math.max(0, Math.floor((node.y + node.h - 6 - (node.y + 56)) / 13));
-            node.details.split('\n').slice(0, Math.min(3, maxLines)).forEach((line, i) => {
-              const truncated = line.length > maxChars ? line.slice(0, maxChars) + '…' : line;
-              ctx.fillText(truncated, textX, node.y + 56 + i * 13);
-            });
-          }
-
-        } else {
-          // Default: clean rectangle with subtle header
-          ctx.shadowColor = shadowColor;
-          ctx.shadowBlur = shadowBlur;
-          ctx.beginPath();
-          ctx.roundRect(node.x, node.y, node.w, node.h, 6);
-          ctx.fillStyle = nodeBg;
-          ctx.fill();
-          ctx.strokeStyle = strokeColor;
-          ctx.lineWidth = lineWidth;
-          ctx.stroke();
-
-          // Header bar
-          ctx.shadowColor = 'transparent';
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = isDark ? '#2D2D2D' : '#F8F9FA';
-          ctx.beginPath();
-          ctx.roundRect(node.x, node.y, node.w, 32, [6, 6, 0, 0]);
-          ctx.fill();
-          ctx.strokeStyle = isDark ? '#3D3D3D' : '#E5E7EB';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(node.x, node.y + 32);
-          ctx.lineTo(node.x + node.w, node.y + 32);
-          ctx.stroke();
-
-          // Icon
-          if (hasIcon) {
-            if (node.iconSrc) {
-              let img = iconImgCache.get(node.iconSrc);
-              if (!img) {
-                img = new Image();
-                img.onload = () => setIconTick((t) => t + 1);
-                img.onerror = () => iconImgCache.delete(node.iconSrc!);
-                iconImgCache.set(node.iconSrc, img);
-                img.src = node.iconSrc;
-              }
-              // Only draw if image is already loaded (cached)
-              if (img.complete && img.naturalWidth > 0) {
-                ctx.drawImage(img, node.x + 8, node.y + 4, 24, 24);
-              }
-            } else if (node.icon) {
-              ctx.font = "18px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'middle';
-              ctx.fillText(node.icon, node.x + 10, node.y + 16);
-            }
-          }
-
-          // Label
-          ctx.font = "600 13px 'Inter', -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? '#F9FAFB' : '#1F2937';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          const label = node.label.length > 20 ? node.label.slice(0, 19) + '…' : node.label;
-          const textX = node.x + (hasIcon ? 40 : 12);
-          ctx.fillText(label, textX, node.y + 16);
-
-          // Tag
-          ctx.font = "11px 'Inter', -apple-system, sans-serif";
-          ctx.fillStyle = isDark ? '#9CA3AF' : '#6B7280';
-          const tag = node.tag.length > 22 ? node.tag.slice(0, 21) + '…' : node.tag;
-          ctx.fillText(tag, textX, node.y + 34);
-
-          // Details (below tag; only lines that fit inside the node)
-          if (node.details?.trim()) {
-            ctx.font = "10px 'Inter', -apple-system, sans-serif";
-            ctx.fillStyle = isDark ? '#9CA3AF' : '#6B7280';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            const maxChars = Math.max(8, Math.floor((node.w - (textX - node.x) - 8) / 6));
-            const maxLines = Math.max(0, Math.floor((node.y + node.h - 6 - (node.y + 50)) / 13));
-            node.details.split('\n').slice(0, Math.min(3, maxLines)).forEach((line, i) => {
-              const truncated = line.length > maxChars ? line.slice(0, maxChars) + '…' : line;
-              ctx.fillText(truncated, textX, node.y + 50 + i * 13);
-            });
-          }
-        }
-
-        // Connector ports (only for non-logo shapes)
-        if (shape !== 'logo' && s.tool === 'connector') {
-          const ports = [
-            { x: node.x + node.w / 2, y: node.y },
-            { x: node.x + node.w / 2, y: node.y + node.h },
-            { x: node.x, y: node.y + node.h / 2 },
-            { x: node.x + node.w, y: node.y + node.h / 2 },
-          ];
-          ports.forEach((p) => {
-            if (isPending) {
-              ctx.save();
-              ctx.shadowColor = '#6366F1';
-              ctx.shadowBlur = 12;
-              ctx.fillStyle = '#6366F1';
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.restore();
-            } else {
-              ctx.fillStyle = '#6366F1';
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-              ctx.fill();
-            }
-          });
-        }
-
-        ctx.restore();
+        drawNodePass(ctx, node, iconsAdapter, {
+          isDark,
+          selected: s.selectedId === node.id || s.multiSel.includes(node.id),
+          pending: s.pendingFrom === node.id,
+          showPorts: s.tool === 'connector',
+        });
       };
 
       s.nodes.forEach(drawNode);
@@ -1254,98 +841,22 @@ export default function CanvasScreen() {
           maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
         });
         if (maxX < vx0 || minX > vx1 || maxY < vy0 || minY > vy1) return;
-        ctx.save();
-        ctx.strokeStyle = selected ? '#635BFF' : color;
-        ctx.fillStyle = selected ? '#635BFF' : color;
-        ctx.lineWidth = width;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        if (selected) {
-          ctx.shadowColor = '#635BFF';
-          ctx.shadowBlur = 8;
-        }
-        if (pts.length === 1) {
-          ctx.beginPath();
-          ctx.arc(pts[0].x, pts[0].y, width / 2, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          ctx.beginPath();
-          ctx.moveTo(pts[0].x, pts[0].y);
-          for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
-          ctx.stroke();
-        }
-        ctx.restore();
+        drawInkPass(ctx, pts, color, width, selected);
       };
       s.strokes.forEach((st) => inkPass(st.pts, st.color, st.width, s.selectedStrokeId === st.id));
       if (ink && ink.length > 0) {
         inkPass(ink, isDark ? '#E5E7EB' : '#1F2937', 3, false);
       }
       // Free-standing text labels (Excalidraw-style).
-      const textFont = (t: { fontFamily?: string; bold?: boolean; italic?: boolean; fontSize: number }) => {
-        const fam = t.fontFamily ?? 'Caveat';
-        const generic = fam === 'Fira Code' ? 'monospace' : fam === 'Plus Jakarta Sans' ? 'sans-serif' : 'cursive';
-        return `${t.italic ? 'italic ' : ''}${t.bold ? '700' : '600'} ${t.fontSize}px '${fam}', ${generic}`;
-      };
       s.texts.forEach((t) => {
-        const isSel = s.selectedTextId === t.id;
-        const lines = t.text.split('\n');
-        const lh = t.fontSize * 1.3;
-        ctx.save();
-        ctx.font = textFont(t);
-        // Background pill behind the whole block.
-        if (t.fill && t.fill !== 'transparent') {
-          let maxW = 0;
-          lines.forEach((line) => { maxW = Math.max(maxW, ctx.measureText(line).width); });
-          const pad = 8;
-          const bw = maxW + pad * 2;
-          const bh = lines.length * lh + pad;
-          const bx = t.x - pad;
-          const by = t.y - t.fontSize - pad / 2;
-          ctx.fillStyle = t.fill;
-          ctx.beginPath();
-          const rr = ctx as CanvasRenderingContext2D & { roundRect?: (x: number, y: number, w: number, h: number, r: number) => void };
-          if (typeof rr.roundRect === 'function') rr.roundRect(bx, by, bw, bh, 8);
-          else ctx.rect(bx, by, bw, bh);
-          ctx.fill();
-          if (t.border) {
-            ctx.strokeStyle = isSel ? '#635BFF' : t.color;
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-          }
-        }
-        ctx.fillStyle = isSel ? '#635BFF' : t.color;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'alphabetic';
-        if (isSel) {
-          ctx.shadowColor = '#635BFF';
-          ctx.shadowBlur = 8;
-        }
-        lines.forEach((line, i) => {
-          ctx.fillText(line, t.x, t.y + i * lh);
-        });
-        ctx.restore();
+        drawFreeTextPass(ctx, t, s.selectedTextId === t.id, isDark);
       });
       // Note pins — visual markers for review threads on the canvas.
       s.threads.forEach((t) => {
         if (t.pinnedTo === '__canvas') return;
         const n = s.nodes.find((node) => node.id === t.pinnedTo);
         if (!n) return;
-        const cx = n.x + n.w + 6;
-        const cy = n.y - 6;
-        ctx.save();
-        ctx.fillStyle = t.resolved ? '#16A34A' : '#F59E0B';
-        ctx.strokeStyle = isDark ? '#1F2937' : '#FFFFFF';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = "bold 10px 'Patrick Hand', cursive";
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(t.resolved ? '✓' : '!', cx, cy + 0.5);
-        ctx.restore();
+        drawThreadPinPass(ctx, n, { resolved: t.resolved, isDark });
       });
       ctx.restore();
     };

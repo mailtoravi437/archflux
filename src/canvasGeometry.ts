@@ -148,3 +148,112 @@ export function worldToMini(x: number, y: number, t: MinimapTransform): { x: num
 export function miniToWorld(x: number, y: number, t: MinimapTransform): { x: number; y: number } {
   return { x: (x - t.ox) / t.s, y: (y - t.oy) / t.s };
 }
+
+// ==================== EDGE GEOMETRY (shared draw + hit-test + export) ========
+
+export interface Pt {
+  x: number;
+  y: number;
+}
+
+/** Curve style for connector routing (also a settings key). */
+export type ConnectorCurve = 'orthogonal' | 'straight' | 'bezier';
+
+/**
+ * Shared connector geometry: polyline points used by the canvas draw pass,
+ * hit-testing, minimap, and export. Sides are chosen by relative node
+ * position: right→left, bottom→top, fallback left→right. Dangling edges use
+ * targetCoords. Bezier sampling is numerically guarded (falls back to the
+ * anchor when a control point overflows).
+ */
+export function edgePoints(
+  edge: EdgeGeometryInput,
+  nodes: { id: string; x: number; y: number; w: number; h: number }[],
+  orthogonal: boolean,
+  curve: ConnectorCurve = 'orthogonal',
+): Pt[] | null {
+  const fromNode = nodes.find((n) => n.id === edge.from);
+  if (!fromNode) return null;
+  let startX = fromNode.x + fromNode.w;
+  let startY = fromNode.y + fromNode.h / 2;
+  let endX: number;
+  let endY: number;
+  if (edge.to) {
+    const toNode = nodes.find((n) => n.id === edge.to);
+    if (!toNode) return null;
+    if (toNode.x > fromNode.x + fromNode.w) {
+      startX = fromNode.x + fromNode.w;
+      startY = fromNode.y + fromNode.h / 2;
+      endX = toNode.x;
+      endY = toNode.y + toNode.h / 2;
+    } else if (toNode.y > fromNode.y + fromNode.h) {
+      startX = fromNode.x + fromNode.w / 2;
+      startY = fromNode.y + fromNode.h;
+      endX = toNode.x + toNode.w / 2;
+      endY = toNode.y;
+    } else {
+      startX = fromNode.x;
+      startY = fromNode.y + fromNode.h / 2;
+      endX = toNode.x + toNode.w;
+      endY = toNode.y + toNode.h / 2;
+    }
+  } else if (edge.targetCoords) {
+    startX = fromNode.x + fromNode.w / 2;
+    startY = fromNode.y + fromNode.h;
+    endX = edge.targetCoords.x ?? 0;
+    endY = edge.targetCoords.y ?? 0;
+  } else {
+    return null;
+  }
+  if (curve === 'bezier') {
+    const dx = endX - startX;
+    const c1x = startX + (dx ?? 0) * 0.4;
+    const c1y = startY;
+    const c2x = endX - (dx ?? 0) * 0.4;
+    const c2y = endY;
+    const steps = 16;
+    const pts: Pt[] = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const mt = 1 - t;
+      const bx = mt * mt * mt * startX + 3 * mt * mt * t * c1x + 3 * mt * t * t * c2x + t * t * t * endX;
+      const by = mt * mt * mt * startY + 3 * mt * mt * t * c1y + 3 * mt * t * t * c2y + t * t * t * endY;
+      pts.push({
+        x: isFinite(bx) ? bx : startX,
+        y: isFinite(by) ? by : startY,
+      });
+    }
+    return pts;
+  }
+  if (orthogonal && !edge.isDangling) {
+    const midX = (startX + endX) / 2;
+    return [
+      { x: startX, y: startY },
+      { x: isFinite(midX) ? midX : startX, y: startY },
+      { x: isFinite(midX) ? midX : startX, y: isFinite(endY) ? endY : startY },
+      { x: isFinite(endX) ? endX : 0, y: isFinite(endY) ? endY : 0 },
+    ];
+  }
+  return [
+    { x: isFinite(startX) ? startX : 0, y: isFinite(startY) ? startY : 0 },
+    { x: isFinite(endX) ? endX : 0, y: isFinite(endY) ? endY : 0 },
+  ];
+}
+
+/** Only the geometry fields of ArchEdge that edgePoints reads. */
+export interface EdgeGeometryInput {
+  from: string;
+  to?: string | null;
+  targetCoords?: { x: number; y: number };
+  isDangling?: boolean;
+}
+
+/** Distance from a point to a segment (classic rule, lenSq degenerate case). */
+export function distToSegment(px: number, py: number, a: Pt, b: Pt): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) return Math.hypot(px - a.x, py - a.y);
+  const t = Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / lenSq));
+  return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
+}

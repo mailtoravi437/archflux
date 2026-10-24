@@ -9,6 +9,7 @@ import type {
   PRPreview,
   ReviewComment,
 } from './types';
+import { getShapeRegistry, toLibraryShape } from './canvas/ShapeRegistry';
 
 export const mockNodes: ArchNode[] = [
   { id: 'client', type: 'service', label: 'Client Gateway', tag: 'Web / Mobile', health: '99.98%', x: 80, y: 160, w: 160, h: 70, stroke: '#2563EB', iconSrc: '/icons/aws/apigw.svg' },
@@ -311,53 +312,32 @@ export const mockPRs: PRItem[] = [
 ];
 
 /** Shape library organized by functional category (Excalidraw-style). */
-export const libraryShapes: LibraryShape[] = [
-  // General / Abstract
-  { id: 'gen-service', provider: 'General', kind: 'service', label: 'Microservice', tag: 'Node.js / REST', icon: '📦', iconSrc: '/icons/general/service.svg', stroke: '#2563EB', category: 'general' },
-  { id: 'gen-gateway', provider: 'General', kind: 'gateway', label: 'API Gateway', tag: 'Ingress', icon: '🚪', iconSrc: '/icons/general/gateway.svg', stroke: '#7C3AED', category: 'general' },
-  { id: 'gen-db', provider: 'General', kind: 'db', label: 'Database', tag: 'SQL / NoSQL', icon: '🗄️', iconSrc: '/icons/general/database.svg', stroke: '#2563EB', category: 'general' },
-  { id: 'gen-stream', provider: 'General', kind: 'stream', label: 'Event Stream', tag: 'Pub / Sub', icon: '🌊', iconSrc: '/icons/general/stream.svg', stroke: '#7C3AED', category: 'general' },
-  // Compute
-  { id: 'aws-ec2', provider: 'AWS', kind: 'service', label: 'EC2 Instance', tag: 'EC2 · t3.medium', icon: '🖥️', iconSrc: '/icons/aws/ec2.svg', stroke: '#FF9900', category: 'compute' },
-  { id: 'aws-lambda', provider: 'AWS', kind: 'service', label: 'Lambda', tag: 'Lambda · Node.js 20', icon: 'λ', iconSrc: '/icons/aws/lambda.svg', stroke: '#FF9900', category: 'compute' },
-  { id: 'aws-ecs', provider: 'AWS', kind: 'service', label: 'ECS Service', tag: 'ECS · Fargate', icon: '🐳', iconSrc: '/icons/aws/ecs.svg', stroke: '#FF9900', category: 'compute' },
-  { id: 'gcp-gce', provider: 'GCP', kind: 'service', label: 'Compute Engine', tag: 'GCE · e2-medium', icon: '🖥️', iconSrc: '/icons/gcp/compute.svg', stroke: '#4285F4', category: 'compute' },
-  { id: 'gcp-run', provider: 'GCP', kind: 'service', label: 'Cloud Run', tag: 'Cloud Run · gen2', icon: '🏃', iconSrc: '/icons/gcp/cloudrun.svg', stroke: '#4285F4', category: 'compute' },
-  { id: 'gcp-gke', provider: 'GCP', kind: 'service', label: 'GKE Cluster', tag: 'GKE · Autopilot', icon: '☸️', iconSrc: '/icons/gcp/gke.svg', stroke: '#4285F4', category: 'compute' },
-  { id: 'az-vm', provider: 'Azure', kind: 'service', label: 'Virtual Machine', tag: 'VM · D2s v5', icon: '🖥️', iconSrc: '/icons/azure/vm.svg', stroke: '#0078D4', category: 'compute' },
-  { id: 'az-func', provider: 'Azure', kind: 'service', label: 'Functions', tag: 'Functions · Flex', icon: 'λ', iconSrc: '/icons/azure/func.svg', stroke: '#0078D4', category: 'compute' },
-  { id: 'az-aks', provider: 'Azure', kind: 'service', label: 'AKS Cluster', tag: 'AKS · managed', icon: '☸️', iconSrc: '/icons/azure/aks.svg', stroke: '#0078D4', category: 'compute' },
-  // Storage
-  { id: 'aws-s3', provider: 'AWS', kind: 'db', label: 'S3 Bucket', tag: 'S3 · Standard', icon: '🪣', iconSrc: '/icons/aws/s3.svg', stroke: '#FF9900', category: 'storage' },
-  { id: 'gcp-gcs', provider: 'GCP', kind: 'db', label: 'Cloud Storage', tag: 'GCS · multi-region', icon: '🪣', iconSrc: '/icons/gcp/storage.svg', stroke: '#4285F4', category: 'storage' },
-  { id: 'az-blob', provider: 'Azure', kind: 'db', label: 'Blob Storage', tag: 'Blob · Hot tier', icon: '🪣', iconSrc: '/icons/azure/sql.svg', stroke: '#0078D4', category: 'storage' },
-  // Database
-  { id: 'aws-rds', provider: 'AWS', kind: 'db', label: 'RDS Database', tag: 'RDS · Postgres 15', icon: '🐘', iconSrc: '/icons/aws/rds.svg', stroke: '#FF9900', category: 'database' },
-  { id: 'aws-dynamo', provider: 'AWS', kind: 'db', label: 'DynamoDB', tag: 'DynamoDB · on-demand', icon: '🗃️', iconSrc: '/icons/aws/dynamo.svg', stroke: '#FF9900', category: 'database' },
-  { id: 'gcp-sql', provider: 'GCP', kind: 'db', label: 'Cloud SQL', tag: 'Cloud SQL · Postgres', icon: '🐘', iconSrc: '/icons/gcp/sql.svg', stroke: '#4285F4', category: 'database' },
-  { id: 'gcp-bq', provider: 'GCP', kind: 'db', label: 'BigQuery', tag: 'BigQuery · slots', icon: '📊', iconSrc: '/icons/gcp/bigquery.svg', stroke: '#4285F4', category: 'database' },
-  { id: 'az-sql', provider: 'Azure', kind: 'db', label: 'SQL Database', tag: 'SQL DB · Hyperscale', icon: '🗄️', iconSrc: '/icons/azure/sql.svg', stroke: '#0078D4', category: 'database' },
-  { id: 'az-cosmos', provider: 'Azure', kind: 'db', label: 'Cosmos DB', tag: 'Cosmos · SQL API', icon: '🌍', iconSrc: '/icons/azure/cosmos.svg', stroke: '#0078D4', category: 'database' },
-  { id: 'data-redis', provider: 'Data', kind: 'db', label: 'Redis', tag: 'Redis 7 · Cluster', icon: '🔴', iconSrc: '/icons/data/redis.svg', stroke: '#DC2626', category: 'database' },
-  { id: 'data-pg', provider: 'Data', kind: 'db', label: 'PostgreSQL', tag: 'Postgres 15', icon: '🐘', iconSrc: '/icons/data/postgres.svg', stroke: '#336791', category: 'database' },
-  { id: 'data-mongo', provider: 'Data', kind: 'db', label: 'MongoDB', tag: 'Mongo 7 · Atlas', icon: '🍃', iconSrc: '/icons/data/mongo.svg', stroke: '#47A248', category: 'database' },
-  { id: 'data-es', provider: 'Data', kind: 'db', label: 'Elasticsearch', tag: 'Elastic 8', icon: '🔍', iconSrc: '/icons/data/elastic.svg', stroke: '#D97706', category: 'database' },
-  // Network
-  { id: 'aws-apigw', provider: 'AWS', kind: 'gateway', label: 'API Gateway', tag: 'API GW · REST', icon: '🚪', iconSrc: '/icons/aws/apigw.svg', stroke: '#FF9900', category: 'network' },
-  { id: 'aws-alb', provider: 'AWS', kind: 'gateway', label: 'Load Balancer', tag: 'ALB · L7', icon: '⚖️', iconSrc: '/icons/aws/alb.svg', stroke: '#FF9900', category: 'network' },
-  { id: 'aws-cfront', provider: 'AWS', kind: 'gateway', label: 'CloudFront', tag: 'CloudFront · CDN', icon: '🌐', iconSrc: '/icons/aws/cfront.svg', stroke: '#FF9900', category: 'network' },
-  { id: 'gcp-lb', provider: 'GCP', kind: 'gateway', label: 'Load Balancing', tag: 'GLB · anycast', icon: '⚖️', iconSrc: '/icons/gcp/lb.svg', stroke: '#4285F4', category: 'network' },
-  { id: 'az-fd', provider: 'Azure', kind: 'gateway', label: 'Front Door', tag: 'Front Door · WAF', icon: '🌐', iconSrc: '/icons/azure/fd.svg', stroke: '#0078D4', category: 'network' },
-  // Messaging
-  { id: 'aws-sqs', provider: 'AWS', kind: 'stream', label: 'SQS Queue', tag: 'SQS · FIFO', icon: '📨', iconSrc: '/icons/aws/sqs.svg', stroke: '#FF9900', category: 'messaging' },
-  { id: 'aws-sns', provider: 'AWS', kind: 'stream', label: 'SNS Topic', tag: 'SNS · fan-out', icon: '📢', iconSrc: '/icons/aws/sns.svg', stroke: '#FF9900', category: 'messaging' },
-  { id: 'gcp-pubsub', provider: 'GCP', kind: 'stream', label: 'Pub/Sub', tag: 'Pub/Sub · ordered', icon: '📬', iconSrc: '/icons/gcp/pubsub.svg', stroke: '#4285F4', category: 'messaging' },
-  { id: 'az-sb', provider: 'Azure', kind: 'stream', label: 'Service Bus', tag: 'Service Bus · sessions', icon: '📨', iconSrc: '/icons/azure/fd.svg', stroke: '#0078D4', category: 'messaging' },
-  { id: 'data-kafka', provider: 'Data', kind: 'stream', label: 'Kafka', tag: 'Kafka 3.6', icon: '🌊', iconSrc: '/icons/data/kafka.svg', stroke: '#7C3AED', category: 'messaging' },
-  { id: 'data-rabbit', provider: 'Data', kind: 'stream', label: 'RabbitMQ', tag: 'RabbitMQ · quorum', icon: '🐇', iconSrc: '/icons/data/rabbit.svg', stroke: '#FF6600', category: 'messaging' },
-  // Observability
-  { id: 'aws-cw', provider: 'AWS', kind: 'service', label: 'CloudWatch', tag: 'CloudWatch · alarms', icon: '📈', iconSrc: '/icons/aws/cw.svg', stroke: '#FF9900', category: 'observability' },
-];
+/**
+ * The shape catalog derives from the ShapeRegistry (src/canvas/ShapeRegistry)
+ * in pack order — the registry is the single source of truth. Registering a
+ * new pack there makes it appear here, in the CanvasScreen drawer, and in the
+ * command palette with zero further changes.
+ */
+/**
+ * Shape library — derived from the ShapeRegistry (single source of truth).
+ * Registering a new pack there automatically appears in the CanvasScreen
+ * drawer, the command palette, and mock-shape placement.
+ *
+ * Order preserves the historical catalog: category-major, provider-minor —
+ * so the drawer visual order is stable across the registry migration.
+ */
+export const libraryShapes: LibraryShape[] = (
+  () => {
+    const reg = getShapeRegistry();
+    const packOrder = ['general', 'aws', 'gcp', 'azure', 'data'];
+    const categoryOrder = ['general', 'compute', 'storage', 'database', 'network', 'messaging', 'observability'];
+    return categoryOrder.flatMap((cat) =>
+      packOrder.flatMap((packId) =>
+        (reg.getPack(packId)?.shapes ?? []).filter((s) => s.category === cat),
+      ),
+    ).map(toLibraryShape);
+  }
+)();
 
 /** Deterministic blueprint graph payloads — used by Load-to-Canvas. */
 export function blueprintGraph(id: string): { nodes: ArchNode[]; edges: ArchEdge[] } {

@@ -7,6 +7,7 @@ import { api } from './api';
 import { buildArchExport, validateArchImport } from './archFormat';
 import { conflictFromError, type ConflictInfo } from './conflict';
 import { offlineSyncFailure } from './syncState';
+import { exportDocument, downloadExport } from './canvas/export/ExportPipeline';
 
 export interface Toast {
   id: number;
@@ -181,6 +182,8 @@ export interface DiagramCollabContextValue {
   healAll: () => void;
   exportArch: () => void;
   exportPNG: () => void;
+  exportSVG: () => void;
+  exportCSV: () => void;
   importArch: (data: { nodes: ArchNode[]; edges: ArchEdge[] }) => { imported: boolean; warnings: string[] };
 }
 
@@ -1782,8 +1785,49 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
     }, 'image/png');
   }, [pushToast]);
 
-  const importArch = useCallback(
-    (data: any) => {
+  // LucidChart-parity vector/CSV export: full document, tightly cropped, from
+  // live store state (assets inlined so files are self-contained).
+  const composeExportDoc = useCallback((): DiagramDoc => ({
+    id: activeDocRef.current ?? 'local',
+    title: docTitleRef.current,
+    nodes: nodesRef.current,
+    edges: edgesRef.current,
+    strokes: strokesRef.current,
+    texts: textsRef.current,
+    createdAt: 0,
+    updatedAt: Date.now(),
+  }), []);
+
+  const exportSVG = useCallback(() => {
+    void exportDocument(composeExportDoc(), {
+      format: 'svg',
+      background: themeRef.current === 'dark' ? 'dark' : 'white',
+    })
+      .then((result) => {
+        if (!result.blob) {
+          pushToast('SVG export failed — canvas data unavailable');
+          return;
+        }
+        downloadExport(result);
+        pushToast(`Exported ${result.fileName} (${result.summary})`);
+      })
+      .catch(() => pushToast('SVG export failed'));
+  }, [composeExportDoc, pushToast]);
+
+  const exportCSV = useCallback(() => {
+    void exportDocument(composeExportDoc(), { format: 'csv' })
+      .then((result) => {
+        if (!result.blob) {
+          pushToast('CSV export failed');
+          return;
+        }
+        downloadExport(result);
+        pushToast(`Exported ${result.fileName} (${result.summary})`);
+      })
+      .catch(() => pushToast('CSV export failed'));
+  }, [composeExportDoc, pushToast]);
+
+  const importArch = useCallback((data: any) => {
       // Validate fully BEFORE mutation: hard failure leaves the previous
       // graph unchanged (PROD-006). Soft issues return as warnings.
       const result = validateArchImport(data);
@@ -2309,9 +2353,11 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       healAll,
       exportArch,
       exportPNG,
+      exportSVG,
+      exportCSV,
       importArch,
     }),
-    [threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, syncLog, pushLog, resync, healOrphan, pruneWire, healAll, exportArch, exportPNG, importArch],
+    [threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, syncLog, pushLog, resync, healOrphan, pruneWire, healAll, exportArch, exportPNG, exportSVG, exportCSV, importArch],
   );
 
   return (
