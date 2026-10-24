@@ -22,6 +22,7 @@ import {
 import { ToolPalette } from '../components/ToolPalette';
 import { CollaborationPanel } from '../components/CollaborationPanel';
 import { useCollaboration } from '../hooks/useCollaboration';
+import { CanvasEngine } from '../canvas/CanvasEngine';
 import {
   drawEdgePass,
   drawFreeTextPass,
@@ -489,6 +490,89 @@ export default function CanvasScreen() {
   useEffect(() => {
     stateRef.current = { nodes, edges, strokes, texts, threads, selectedId, selectedEdgeId, selectedStrokeId, selectedTextId, textDraft, multiSel, theme, zoom, pan, orthogonal, pendingFrom, tool, lockedTool, sketchy, gridStyle, snapThreshold, connectorCurve };
   });
+
+  // ==================== LIVE REMOTE CURSORS (LucidChart parity) ==============
+  // Own pointer → awareness (world coords, throttled); remote peers → engine
+  // decorations layer, a screen-space canvas stacked above the content canvas.
+  const lastCursorPub = useRef(0);
+  const cursorsEngineRef = useRef<CanvasEngine | null>(null);
+  const publishCursor = useCallback((clientX: number, clientY: number) => {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const now = performance.now();
+    if (now - lastCursorPub.current < 50) return;
+    lastCursorPub.current = now;
+    const s = stateRef.current;
+    const rect = cv.getBoundingClientRect();
+    collab.updateAwareness({
+      cursor: {
+        x: Math.round((clientX - rect.left - s.pan.x) / s.zoom),
+        y: Math.round((clientY - rect.top - s.pan.y) / s.zoom),
+      },
+    });
+  }, [collab.updateAwareness]);
+  const clearOwnCursor = useCallback(() => {
+    collab.updateAwareness({ cursor: null });
+  }, [collab.updateAwareness]);
+
+  // Mount the decorations layer once (appended after the content canvas → on top).
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const engine = new CanvasEngine({
+      viewport: { x: 0, y: 0, zoom: 1 },
+      isDark: false,
+      gridStyle: 'none',
+      connectorCurve: 'orthogonal',
+      orthogonal: true,
+      devicePixelRatio: window.devicePixelRatio || 1,
+    });
+    engine.mount(viewport, ['decorations']);
+    const onResize = () => {
+      engine.resize(viewport.clientWidth, viewport.clientHeight);
+    };
+    window.addEventListener('resize', onResize);
+    window.setTimeout(onResize, 40);
+    cursorsEngineRef.current = engine;
+    return () => {
+      window.removeEventListener('resize', onResize);
+      engine.destroy();
+      cursorsEngineRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Repaint remote cursors when presence or the view transform changes.
+  useEffect(() => {
+    const engine = cursorsEngineRef.current;
+    if (!engine) return;
+    let selfId = '';
+    try {
+      const awareness = collab.awareness;
+      if (awareness && typeof awareness.clientID === 'number') selfId = String(awareness.clientID);
+    } catch {
+      /* awareness not ready */
+    }
+    const cursors = collab.users
+      .filter((u) => String(u.id) !== selfId && u.cursor)
+      .map((u) => ({ userId: u.id, userName: u.name, userColor: u.color, x: u.cursor!.x, y: u.cursor!.y }));
+    engine.setConfig({ isDark: theme === 'dark', devicePixelRatio: window.devicePixelRatio || 1 });
+    engine.setViewport({ x: pan.x, y: pan.y, zoom });
+    engine.render({
+      nodes: [],
+      edges: [],
+      strokes: [],
+      texts: [],
+      selectedIds: [],
+      selectedEdgeId: null,
+      pendingFrom: null,
+      showPorts: false,
+      pendingInk: null,
+      cursors,
+      alignGuides: [],
+    });
+  }, [collab.users, collab.awareness, pan.x, pan.y, zoom, theme]);
+
   // A typed draft is never lost: rescued on unmount (route switch), stashed on
   // reload/close (beforeunload), restored on mount. Empty drafts are ignored.
   useEffect(() => {
@@ -1104,6 +1188,8 @@ const n = cur.nodes.find((node) => node.id === hit);
       }
     };
     const onPointerMove = (e: PointerEvent) => {
+      // Live presence: publish own cursor for remote collaborators (throttled).
+      if (e.target === cv) publishCursor(e.clientX, e.clientY);
       // Live ink capture while the pencil is down (independent of drag state).
       if (inkRef.current) {
         const rect = cv.getBoundingClientRect();
@@ -1236,14 +1322,16 @@ const n = cur.nodes.find((node) => node.id === hit);
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
+    cv.addEventListener('pointerleave', clearOwnCursor);
     return () => {
       window.removeEventListener('resize', onResize);
       cv.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
+      cv.removeEventListener('pointerleave', clearOwnCursor);
     };
-  }, [setPan, setSelectedId, addNode, connectNodes, setTool, pushToast, moveNode, moveStroke, moveText, addStroke, addText, updateText, deleteText, checkpoint, finishTextDraft]);
+  }, [setPan, setSelectedId, addNode, connectNodes, setTool, pushToast, moveNode, moveStroke, moveText, addStroke, addText, updateText, deleteText, checkpoint, finishTextDraft, publishCursor, clearOwnCursor]);
 
   // Live repaint: the canvas paints on mount/resize only, so re-invoke draw
   // whenever visual state changes (drag frames, selection, theme, pan/zoom…).

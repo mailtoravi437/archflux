@@ -126,10 +126,11 @@ export function useCollaboration(diagramId: string | null) {
     const awareness = session.provider.awareness;
     awarenessRef.current = awareness;
 
-    // Set local user info
+    // Set local user info — identity is the awareness clientID so remote
+    // peers can render live cursors per-client (and we can filter ourselves).
     awareness.setLocalState({
       user: {
-        id: 'current-user',
+        id: String(awareness.clientID),
         name: 'Current User',
         color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'),
       },
@@ -224,7 +225,7 @@ export function useCollaboration(diagramId: string | null) {
   }, []);
 
   // Update awareness (cursor position, selection)
-  const updateAwareness = useCallback((awareness: Partial<{ cursor: { x: number; y: number }; selection: any }>) => {
+  const updateAwareness = useCallback((awareness: Partial<{ cursor: { x: number; y: number } | null; selection: any }>) => {
     if (awarenessRef.current) {
       awarenessRef.current.setLocalStateField('user', {
         ...awarenessRef.current.getLocalState()?.user,

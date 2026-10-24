@@ -101,16 +101,50 @@ export class CanvasEngine {
   /** Issued when an async icon finishes loading so the host can repaint. */
   onIconsSettled: (() => void) | null = null;
 
+  /** Last-rendered input keys per layer (layers repaint only when these change). */
+  private layerKeys = new Map<LayerName, string>();
+
+  /**
+   * Stable serialization of a layer's render inputs. Cursors are compared by
+   * reference; everything else by value so equal frames skip work entirely.
+   */
+  private layerInputKey(name: LayerName, scene: CanvasScene): string {
+    const { viewport, isDark, gridStyle } = this.config;
+    switch (name) {
+      case 'grid':
+        return `${viewport.x}|${viewport.y}|${viewport.zoom}|${gridStyle}|${isDark}|${this.width}x${this.height}`;
+      case 'selection':
+        return `${viewport.x}|${viewport.y}|${viewport.zoom}|${isDark}|${scene.selectedIds.join(',')}|${scene.pendingFrom ?? ''}|${scene.alignGuides.map((g) => `${g.vertical ? 'v' : 'h'}${g.at}`).join(',')}`;
+      case 'content': {
+        // Graph changes are detected by reference identity (the store replaces
+        // arrays/objects immutably); settings by value.
+        const refs = [scene.nodes, scene.edges, scene.strokes, scene.texts, scene.pendingInk, scene.selectedEdgeId, scene.pendingFrom, scene.showPorts];
+        let refDiff = '';
+        for (let i = 0; i < refs.length; i++) {
+          if (refs[i] !== this.lastContentRefs[i]) refDiff += `${i};`;
+        }
+        this.lastContentRefs = refs;
+        return `${refDiff}|${viewport.x}|${viewport.y}|${viewport.zoom}|${isDark}|${this.config.orthogonal}|${this.config.connectorCurve}`;
+      }
+      case 'decorations':
+        return `${viewport.x}|${viewport.y}|${viewport.zoom}|${scene.cursors.map((c) => `${c.userId}:${c.x}:${c.y}`).join('|')}`;
+    }
+  }
+
+  /** Previous content references (identity comparison for graph changes). */
+  private lastContentRefs: unknown[] = [];
+
   constructor(config: EngineConfig) {
     this.config = config;
   }
 
   // ==================== LIFECYCLE ====================
 
-  /** Attach four stacked canvases to a positioned container. */
-  mount(container: HTMLElement): void {
+  /** Attach stacked canvases to a positioned container. Mount a subset (e.g. everything except 'content') when the host owns a content canvas. */
+  mount(container: HTMLElement, layers: LayerName[] = LAYER_ORDER): void {
     this.unmount();
     for (const name of LAYER_ORDER) {
+      if (!layers.includes(name)) continue;
       const canvas = document.createElement('canvas');
       canvas.className = 'af-canvas-layer';
       canvas.dataset.layer = name;
@@ -136,6 +170,7 @@ export class CanvasEngine {
     this.width = width;
     this.height = height;
     const dpr = this.config.devicePixelRatio;
+    this.layerKeys.clear();
     for (const layer of this.layers.values()) {
       layer.canvas.width = Math.max(1, Math.round(width * dpr));
       layer.canvas.height = Math.max(1, Math.round(height * dpr));
@@ -166,8 +201,8 @@ export class CanvasEngine {
     const prev = this.config.viewport;
     this.config.viewport = { ...this.config.viewport, ...viewport };
     if (prev.zoom !== this.config.viewport.zoom || prev.x !== this.config.viewport.x || prev.y !== this.config.viewport.y) {
-      this.layers.get('grid')!.dirty = true;
-      this.layers.get('content')!.dirty = true;
+      if (this.layers.has('grid')) this.layers.get('grid')!.dirty = true;
+      if (this.layers.has('content')) this.layers.get('content')!.dirty = true;
     }
   }
 
@@ -177,8 +212,8 @@ export class CanvasEngine {
     const paletteTouched = updates.isDark !== undefined && updates.isDark !== this.config.isDark;
     const routeTouched = updates.orthogonal !== undefined && updates.orthogonal !== this.config.orthogonal;
     this.config = { ...this.config, ...updates };
-    if (gridTouched) this.layers.get('grid')!.dirty = true;
-    if (gridTouched || curveTouched || paletteTouched || routeTouched) {
+    if (gridTouched && this.layers.has('grid')) this.layers.get('grid')!.dirty = true;
+    if ((gridTouched || curveTouched || paletteTouched || routeTouched) && this.layers.has('content')) {
       this.layers.get('content')!.dirty = true;
     }
   }
@@ -204,14 +239,32 @@ export class CanvasEngine {
 
   // ==================== RENDER ====================
 
-  /** Full render pass; layers redraw only when dirty (cursors each frame). */
+  /** Full render pass; layers redraw only when their render inputs changed. */
   render(scene: CanvasScene): void {
     if (!this.layers.size) return;
+    for (const name of this.layers.keys()) {
+      const key = this.layerInputKey(name, scene);
+      const prev = this.layerKeys.get(name);
+      if (prev !== key) {
+        this.layers.get(name)!.dirty = true;
+        this.layerKeys.set(name, key);
+      }
+    }
     this.ensureIcons(scene.nodes);
     this.applyLayer('grid', () => this.drawGrid());
     this.applyLayer('content', () => this.drawContent(scene));
     this.applyLayer('selection', () => this.drawSelection(scene));
-    this.drawCursors(scene);
+    this.applyLayer('decorations', () => this.drawCursors(scene));
+  }
+
+  /** Force a layer to repaint on the next render() (host-driven invalidation). */
+  invalidate(...names: LayerName[]): void {
+    for (const name of names) {
+      if (this.layers.has(name)) {
+        this.layers.get(name)!.dirty = true;
+        this.layerKeys.delete(name);
+      }
+    }
   }
 
   /** Composite all layers into one canvas covering `worldRect` (export path). */
@@ -237,8 +290,8 @@ export class CanvasEngine {
   }
 
   private applyLayer(name: LayerName, draw: () => void): void {
-    const layer = this.layers.get(name)!;
-    if (!layer.dirty) return;
+    const layer = this.layers.get(name);
+    if (!layer || !layer.dirty) return;
     draw();
     layer.dirty = false;
   }
@@ -440,7 +493,11 @@ export class CanvasEngine {
     ensure: (src) => {
       if (this.iconCache.has(src)) return;
       const img = new Image();
-      img.onload = () => { this.iconCache.set(src, img); this.onIconsSettled?.(); };
+      img.onload = () => {
+        this.iconCache.set(src, img);
+        this.layerKeys.delete('content');
+        this.onIconsSettled?.();
+      };
       img.onerror = () => this.onIconsSettled?.();
       img.src = src;
     },
@@ -457,6 +514,7 @@ export class CanvasEngine {
       const img = new Image();
       img.onload = () => {
         this.iconCache.set(src, img);
+        this.layerKeys.delete('content');
         this.onIconsSettled?.();
       };
       img.onerror = () => {
@@ -464,6 +522,9 @@ export class CanvasEngine {
       };
       img.src = src;
     }
-    if (started) this.layers.get('content')!.dirty = true;
+    if (started) {
+      this.layers.get('content') && (this.layers.get('content')!.dirty = true);
+      this.layerKeys.delete('content');
+    }
   }
 }
