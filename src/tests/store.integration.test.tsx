@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, act, fireEvent, screen } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { DiagramProvider } from '../store';
 import CanvasScreen from '../screens/CanvasScreen';

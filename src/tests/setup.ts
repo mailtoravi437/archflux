@@ -1,4 +1,4 @@
-import { expect, vi } from 'vitest';
+import { vi } from 'vitest';
 
 // Suppress console.errors during tests (they're often expected)
 const originalError = console.error;
@@ -67,7 +67,6 @@ globalThis.window.matchMedia = globalThis.window.matchMedia
 
 // Mock ResizeObserver
 globalThis.ResizeObserver = globalThis.ResizeObserver || function () {
-  const callbacks = [];
   return {
     observe: () => {},
     unobserve: () => {},

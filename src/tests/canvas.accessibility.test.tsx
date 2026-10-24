@@ -1,10 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, act, screen } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { DiagramProvider } from '../store';
 import CanvasScreen from '../screens/CanvasScreen';
-import { useDiagram, useDiagramUI } from '../useDiagram';
 
 // Mock canvas 2D context
 const mockCanvasContext = {
@@ -68,21 +67,21 @@ describe('CanvasScreen accessibility', () => {
   });
 
   it('has accessible canvas with aria-label', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     expect(canvas).toHaveAttribute('aria-label');
     expect(canvas.getAttribute('aria-label')).toContain('Architecture diagram');
   });
 
   it.skip('has screen-reader only node list for traversal', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const srNav = container.querySelector('.sr-only[aria-label="Diagram nodes and routes"]');
     expect(srNav).toBeInTheDocument();
     expect(srNav).toHaveAttribute('role', 'navigation');
   });
 
   it('tool rail buttons have aria-labels', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const toolButtons = container.querySelectorAll('.vertical-tool-rail .rail-btn');
     toolButtons.forEach(btn => {
       expect(btn).toHaveAttribute('aria-label');
@@ -90,7 +89,7 @@ describe('CanvasScreen accessibility', () => {
   });
 
   it.skip('command palette has proper ARIA attributes', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     // Open command palette via Cmd+K
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { metaKey: true, key: 'k' }));
@@ -106,13 +105,13 @@ describe('CanvasScreen accessibility', () => {
   });
 
   it('library drawer has proper ARIA roles', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const libButton = container.querySelector('[aria-label="Open shape library"]');
     expect(libButton).toBeInTheDocument();
   });
 
   it.skip('focus trap works on modals', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     // Open command palette
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { metaKey: true, key: 'k' }));
@@ -133,7 +132,7 @@ describe('CanvasScreen keyboard navigation', () => {
   });
 
   it.skip('opens command palette with Cmd+K', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { metaKey: true, key: 'k' }));
@@ -144,7 +143,7 @@ describe('CanvasScreen keyboard navigation', () => {
   });
 
   it.skip('closes modals with Escape', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { metaKey: true, key: 'k' }));
@@ -162,7 +161,7 @@ describe('CanvasScreen keyboard navigation', () => {
   });
 
   it.skip('switches tools with single-key shortcuts', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     
     // Press 'v' for select tool
     act(() => {
@@ -182,7 +181,7 @@ describe('CanvasScreen keyboard navigation', () => {
   });
 
   it.skip('navigates screens with Cmd+shortcuts', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     
     // Cmd+O for dashboard
     act(() => {
@@ -200,7 +199,7 @@ describe('CanvasScreen touch/mobile support', () => {
   });
 
   it.skip('handles touchstart for node selection', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     act(() => {
@@ -215,7 +214,7 @@ describe('CanvasScreen touch/mobile support', () => {
   });
 
   it.skip('handles touchmove for panning', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     act(() => {
@@ -237,7 +236,7 @@ describe('CanvasScreen touch/mobile support', () => {
   });
 
   it.skip('handles touchend for node release', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     act(() => {
@@ -258,7 +257,7 @@ describe('CanvasScreen touch/mobile support', () => {
   });
 
   it.skip('handles pinch zoom gesture', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     // Simulate pinch with two touches
@@ -300,7 +299,7 @@ describe('CanvasScreen drag logic', () => {
   });
 
   it('drags node without creating edge', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     // Start drag on node
@@ -323,7 +322,7 @@ describe('CanvasScreen drag logic', () => {
   });
 
   it('connects nodes on click-click without drag', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     const click = (x: number, y: number) => {
@@ -343,7 +342,7 @@ describe('CanvasScreen drag logic', () => {
   });
 
   it('multi-selects with Shift+click', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     // First click
@@ -373,7 +372,7 @@ describe('CanvasScreen text tool', () => {
   });
 
   it('creates text on canvas click with text tool', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     // Select text tool
@@ -391,7 +390,7 @@ describe('CanvasScreen text tool', () => {
   });
 
   it('edits existing text on double-click', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     // Double-click on text area
@@ -410,7 +409,7 @@ describe('CanvasScreen freehand drawing', () => {
   });
 
   it('draws freehand stroke with pencil tool', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     const canvas = container.querySelector('#architectureCanvas') as HTMLCanvasElement;
     
     // Select draw tool
@@ -445,7 +444,7 @@ describe('CanvasScreen auto-layout', () => {
   });
 
   it('applies DAG layout via command palette', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     
     // Open command palette and run layout
     act(() => {
@@ -457,7 +456,7 @@ describe('CanvasScreen auto-layout', () => {
   });
 
   it('fits content to view with F key', () => {
-    const { container } = setupCanvas();
+    setupCanvas();
     
     act(() => {
       window.dispatchEvent(new KeyboardEvent('keydown', { key: 'f' }));

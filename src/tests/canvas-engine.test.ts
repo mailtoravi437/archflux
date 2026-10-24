@@ -3,9 +3,8 @@
  * coordinate math, and compositeWorld. jsdom has no 2D context, so a small
  * explicit stub is registered for the duration of these tests.
  */
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { CanvasEngine, type CanvasScene } from '../canvas/CanvasEngine';
-import type { ArchNode } from '../types';
 
 const emptyScene = (): CanvasScene => ({
   nodes: [],

@@ -337,7 +337,7 @@ function loadQueue(): QueuedMutation[] {
 
 function saveQueue(queue: QueuedMutation[]) {
   try {
-    const serializable = queue.map(({ resolve, reject, ...rest }) => rest);
+    const serializable = queue.map(({ resolve: _resolve, reject: _reject, ...rest }) => rest);
     localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(serializable));
   } catch {
     /* quota ignore */
