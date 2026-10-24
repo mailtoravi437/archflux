@@ -26,7 +26,7 @@ function loadConnectors(): Connector[] {
 export default function LivingScreen() {
   const navigate = useNavigate();
   const store = useDiagram();
-  const { resync, exportArch, importArch, pushToast, pushLog, syncLog, freshness, syncError, nodes, edges, isOnline, panToNode } = store;
+  const { resync, exportArch, exportSVG, exportCSV, importArch, pushToast, pushLog, syncLog, freshness, syncError, nodes, edges, isOnline, panToNode } = store;
 
   const [connectors, setConnectors] = useState<Connector[]>(loadConnectors);
   const [drift, setDrift] = useState(mockDriftLines.map((d, i) => ({ ...d, id: `d${i}`, dismissed: false })));
@@ -555,10 +555,20 @@ export default function LivingScreen() {
                   <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Deterministic file for Git versioning and backup</div>
                 </div>
               </button>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Tip: PNG snapshots live on the canvas — open Precision Canvas and use the 🖼
-                button in the bottom bar, or ⌘K → Export PNG snapshot.
-              </div>
+              <button type="button" className="dock-action-btn" style={{ padding: '12px' }} onClick={() => exportSVG()}>
+                <span style={{ fontSize: '20px' }}>🧬</span>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700 }}>Download SVG (vector)</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Self-contained vector — icons inlined, tight document crop</div>
+                </div>
+              </button>
+              <button type="button" className="dock-action-btn" style={{ padding: '12px' }} onClick={() => exportCSV()}>
+                <span style={{ fontSize: '20px' }}>📊</span>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 700 }}>Download CSV (shape data)</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Nodes + edges table for spreadsheets and audits</div>
+                </div>
+              </button>
               <label className="dock-action-btn" style={{ padding: '12px', cursor: 'pointer' }}>
                 <span style={{ fontSize: '20px' }}>📥</span>
                 <div style={{ textAlign: 'left' }}>

@@ -184,6 +184,7 @@ export interface DiagramCollabContextValue {
   exportPNG: () => void;
   exportSVG: () => void;
   exportCSV: () => void;
+  exportPrint: () => void;
   importArch: (data: { nodes: ArchNode[]; edges: ArchEdge[] }) => { imported: boolean; warnings: string[] };
 }
 
@@ -1814,7 +1815,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         pushToast(`Exported ${result.fileName} (${result.summary})`);
       })
       .catch(() => exportPNGFromCanvas());
-  }, [pushToast]);
+  }, [composeExportDoc, exportPNGFromCanvas, pushToast]);
 
   const exportSVG = useCallback(() => {
     void exportDocument(composeExportDoc(), {
@@ -1843,6 +1844,13 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         pushToast(`Exported ${result.fileName} (${result.summary})`);
       })
       .catch(() => pushToast('CSV export failed'));
+  }, [composeExportDoc, pushToast]);
+
+  // LucidChart `ucbHr` parity: PDF via the browser print dialog (no PDF dep).
+  const exportPrint = useCallback(() => {
+    void exportDocument(composeExportDoc(), { format: 'print', background: 'white' })
+      .then(() => pushToast('Print view opened — choose "Save as PDF" in the dialog'))
+      .catch(() => pushToast('Print export failed'));
   }, [composeExportDoc, pushToast]);
 
   const importArch = useCallback((data: any) => {
@@ -2373,9 +2381,10 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       exportPNG,
       exportSVG,
       exportCSV,
+      exportPrint,
       importArch,
     }),
-    [threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, syncLog, pushLog, resync, healOrphan, pruneWire, healAll, exportArch, exportPNG, exportSVG, exportCSV, importArch],
+    [threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, syncLog, pushLog, resync, healOrphan, pruneWire, healAll, exportArch, exportPNG, exportSVG, exportCSV, exportPrint, importArch],
   );
 
   return (
