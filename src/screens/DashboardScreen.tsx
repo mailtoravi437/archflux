@@ -71,7 +71,7 @@ function relTime(ts: number): string {
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
-  const { docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, exportArch, exportPNG, importArch, pushToast, freshness } = useDiagram();
+  const { docs, activeDocId, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, exportArch, exportPNG, exportSVG, exportCSV, importArch, pushToast, freshness } = useDiagram();
   const [query, setQuery] = useState('');
   const [sort, setSortState] = useState<SortKey>(() => loadDashView().sort);
   const [view, setViewState] = useState<View>(() => loadDashView().view);
@@ -264,6 +264,8 @@ export default function DashboardScreen() {
           { label: 'Rename', fn: () => { setRenameText(doc?.title ?? ''); setRenamingId(id); } },
                   { label: 'Export .arch', fn: () => { openDoc(id); window.setTimeout(exportArch, 50); } },
                   { label: 'Export PNG', fn: () => exportPngFor(id) },
+                  { label: 'Export SVG (vector)', fn: () => { openDoc(id); window.setTimeout(exportSVG, 50); } },
+                  { label: 'Export CSV (shape data)', fn: () => { openDoc(id); window.setTimeout(exportCSV, 50); } },
         ].map((a) => (
           <button key={a.label} role="menuitem" className="dock-action-btn" style={{ width: '100%', justifyContent: 'flex-start', padding: '6px 10px' }} onClick={() => { a.fn(); setMenuId(null); }}>
             {a.label}
