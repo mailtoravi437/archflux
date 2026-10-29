@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Policies and rule builder</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 28px 32px; overflow: hidden">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <p style="margin: 0 0 4px; font-size: 12px; color: #5B6474">Workspace settings › Policies</p>
+          <h1 style="margin: 0; font-size: 22px; font-weight: 700">Policies</h1>
+          <p style="margin: 4px 0 0; color: #5B6474">Checked on every save, every review and in CI. Blocking rules stop a merge.</p>
+        </div>
+        <label style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF"><input type="checkbox" checked>CI gate on pull requests</label>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+        <section style="grid-column: span 2; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden">
+          <div style="padding: 14px 16px; border-bottom: 1px solid #EEF0F3; display: flex; align-items: center"><h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Rules · 14 active</h2><button style="height: 30px; padding: 0 10px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 600">New rule</button></div>
+          <sc-for list="{{rules}}" as="r" hint-placeholder-count="7">
+            <div style="{{r.style}}">
+              <span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #5B6474">{{r.pack}} · {{r.hits}}</span></span>
+              <span style="padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: {{r.sevBg}}; color: {{r.sevFg}}">{{r.sev}}</span>
+            </div>
+          </sc-for>
+        </section>
+
+        <section aria-label="Rule builder" style="grid-column: span 3; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <input aria-label="Rule name" value="Card data stays in the PCI zone" style="flex-grow: 1; height: 36px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 15px; font-weight: 600">
+            <select aria-label="Severity" style="height: 36px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>Block merge</option><option>Warn</option><option>Info</option></select>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; background: #F6F7F9; border-radius: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: #5B6474">WHEN an element</span>
+            <div style="display: flex; gap: 8px; align-items: center"><select aria-label="Field" style="height: 34px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>data class</option></select><select aria-label="Operator" style="height: 34px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>is</option></select><select aria-label="Value" style="height: 34px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>PCI</option></select></div>
+            <span style="font-size: 12px; font-weight: 600; color: #5B6474">AND it has a relationship to an element that</span>
+            <div style="display: flex; gap: 8px; align-items: center"><select aria-label="Field" style="height: 34px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>is inside container</option></select><select aria-label="Operator" style="height: 34px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>is not</option></select><select aria-label="Value" style="height: 34px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>PCI zone</option></select></div>
+            <button style="width: fit-content; height: 28px; padding: 0 10px; border: 1px dashed #C3C8D1; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Add condition</button>
+            <span style="font-size: 12px; font-weight: 600; color: #5B6474">THEN</span>
+            <input aria-label="Message" value="Card data flows out of the PCI zone — route it through the tokenizer." style="height: 34px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF">
+          </div>
+          <div style="padding: 12px; border: 1px solid #F5C2C2; background: #FEF2F2; border-radius: 8px; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-weight: 600; color: #B91C1C">Preview: 2 matches in 41 diagrams</span>
+            <span>payments-saga.arch — Payment Service → Analytics Warehouse</span>
+            <span>checkout-mesh.arch — Card Vault → Fraud Scorer</span>
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end"><button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Cancel</button><button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Save rule</button></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const row = (sel) => 'display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #F1F2F5; ' + (sel ? 'background: #F7F7FF; box-shadow: inset 2px 0 0 #4F46E5' : '');
+    const block = { sev: 'Block', sevBg: '#FDE8E8', sevFg: '#B91C1C' };
+    const warn = { sev: 'Warn', sevBg: '#FEF3C7', sevFg: '#92400E' };
+    const info = { sev: 'Info', sevBg: '#F1F2F5', sevFg: '#3D4553' };
+    return {
+      no: false,
+      rules: [
+        { name: 'Card data stays in the PCI zone', pack: 'Custom', hits: '2 violations', style: row(true), ...block },
+        { name: 'No public database', pack: 'Security pack', hits: '0 violations', style: row(false), ...block },
+        { name: 'Every service has an owner', pack: 'Ownership pack', hits: '5 violations', style: row(false), ...warn },
+        { name: 'No single point of failure on tier-1', pack: 'Reliability pack', hits: '1 violation', style: row(false), ...warn },
+        { name: 'Routes declare a protocol', pack: 'Built-in', hits: '3 violations', style: row(false), ...warn },
+        { name: 'No isolated services', pack: 'Built-in', hits: '1 violation', style: row(false), ...info },
+        { name: 'No dangling routes', pack: 'Built-in', hits: '0 violations', style: row(false), ...info }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

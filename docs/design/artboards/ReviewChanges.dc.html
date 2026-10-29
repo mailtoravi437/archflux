@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Review changes tab</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Review" status="Proposal #14" status-dot="#4F46E5" hint-size="1440px,48px"></dc-import>
+
+  <!-- Review header -->
+  <div style="background: #FFFFFF; border-bottom: 1px solid #E3E6EB; padding: 14px 24px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="padding: 2px 10px; border-radius: 999px; background: #DCF3E6; color: #047857; font-size: 12px; font-weight: 600">Open</span>
+      <h1 style="margin: 0; font-size: 18px; font-weight: 700">#14 Introduce saga orchestration for payments</h1>
+      <span style="color: #5B6474"><strong style="color: #1B1F27">[Engineer]</strong> wants to merge 4 versions into <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 1px 6px; background: #F1F2F5; border-radius: 4px">main</span> from base v11</span>
+      <span style="flex-grow: 1"></span>
+      <span style="font-size: 12px; color: #92400E; font-weight: 500">main is 2 versions ahead</span>
+      <button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 500">Update from main</button>
+    </div>
+    <div role="tablist" aria-label="Review sections" style="display: flex; gap: 20px">
+      <a href="Review.dc.html" role="tab" aria-selected="false" style="height: 36px; display: flex; align-items: center; border-bottom: 2px solid transparent; color: #5B6474; text-decoration: none">Overview</a>
+      <span role="tab" aria-selected="true" style="height: 36px; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid #4F46E5; font-weight: 600">Changes <span style="padding: 0 6px; border-radius: 999px; background: #F1F2F5; font-size: 11px">9</span></span>
+      <span role="tab" aria-selected="false" style="height: 36px; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: #5B6474">Checks <span style="padding: 0 6px; border-radius: 999px; background: #FEF3C7; color: #92400E; font-size: 11px">1 warn</span></span>
+      <span role="tab" aria-selected="false" style="height: 36px; display: flex; align-items: center; border-bottom: 2px solid transparent; color: #5B6474">Activity</span>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <!-- Change list -->
+    <aside aria-label="Changes" style="width: 300px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #E3E6EB; display: flex; flex-direction: column">
+      <div style="padding: 12px 14px; border-bottom: 1px solid #EEF0F3; display: flex; flex-direction: column; gap: 6px">
+        <span style="display: flex; align-items: center"><span style="font-weight: 600; flex-grow: 1">6 of 9 viewed</span><span style="font-size: 12px; color: #5B6474">Hide viewed</span></span>
+        <span style="height: 6px; border-radius: 3px; background: #EEF0F3; overflow: hidden"><span style="display: block; width: 66%; height: 100%; background: #4F46E5"></span></span>
+      </div>
+      <div style="padding: 8px; display: flex; flex-direction: column; gap: 2px; overflow: hidden">
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="5">
+          <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em; padding: 10px 8px 4px">{{g.title}}</span>
+          <sc-for list="{{g.items}}" as="c" hint-placeholder-count="2">
+            <label style="{{c.style}}"><input type="checkbox" checked="{{c.viewed}}" aria-label="Viewed {{c.name}}" style="width: 14px; height: 14px"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{c.dot}}; flex-shrink: 0"></span><span style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{c.name}}</span><span style="font-size: 11px; color: #5B6474">{{c.note}}</span></label>
+          </sc-for>
+        </sc-for>
+      </div>
+    </aside>
+
+    <!-- Diff canvas -->
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+      <div style="position: absolute; left: 16px; top: 14px; display: flex; gap: 8px; z-index: 2">
+        <div role="radiogroup" aria-label="Diff view" style="display: flex; padding: 2px; background: #F1F2F5; border-radius: 8px"><button role="radio" aria-checked="true" style="height: 28px; padding: 0 10px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-size: 12px; font-weight: 600">Overlay</button><button role="radio" aria-checked="false" style="height: 28px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px">Side by side</button></div>
+        <label style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 8px; font-size: 12px"><input type="checkbox">Show layout changes (14)</label>
+      </div>
+
+      <div style="position: absolute; left: 60px; top: 150px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #C3C8D1; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 2px; color: #3D4553"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px">unchanged</span></div>
+      <span style="position: absolute; left: 250px; top: 182px; width: 110px; border-top: 2px dashed #15803D"></span>
+      <div style="position: absolute; left: 360px; top: 150px; width: 200px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #15803D; border-radius: 8px; background: #DCF3E6; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Saga Orchestrator</span><span style="font-size: 11px; color: #047857">Added · Temporal</span></div>
+      <span style="position: absolute; left: 542px; top: 138px; width: 22px; height: 22px; border-radius: 11px 11px 11px 2px; background: #4F46E5; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">1</span>
+      <span style="position: absolute; left: 460px; top: 214px; height: 90px; border-left: 2px solid #15803D"></span>
+      <div style="position: absolute; left: 360px; top: 304px; width: 200px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #D97706; border-radius: 8px; background: #FEF3C7; box-shadow: 0 0 0 3px rgba(79,70,229,.3); display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Payment Service</span><span style="font-size: 11px; color: #92400E">Changed · 2 properties</span></div>
+
+      <!-- Inline review comment with suggestion -->
+      <section aria-label="New review comment on Payment Service" style="position: absolute; left: 590px; top: 250px; width: 380px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; box-shadow: 0 16px 40px rgba(16,24,40,.16); padding: 14px; display: flex; flex-direction: column; gap: 10px; z-index: 3">
+        <span style="display: flex; gap: 6px; align-items: center"><span style="padding: 1px 8px; border-radius: 999px; background: #F1F2F5; font-size: 11px; font-weight: 600">Payment Service · technology</span><span style="font-size: 11px; color: #5B6474">on v15</span></span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px">
+          <span style="padding: 6px 8px; background: #FEF2F2; color: #B91C1C; border-radius: 6px">− Go 1.21</span>
+          <span style="padding: 6px 8px; background: #ECFDF3; color: #047857; border-radius: 6px">+ Go 1.22</span>
+        </div>
+        <textarea aria-label="Comment" style="height: 60px; padding: 8px 10px; border: 1px solid #4F46E5; border-radius: 8px; font: inherit; resize: none">Can we also mark this tier-1? @Payments-oncall</textarea>
+        <div style="padding: 10px; border: 1px dashed #A5B4FC; border-radius: 8px; background: #F7F7FF; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 12px; font-weight: 600; color: #4338CA">Suggested change</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px">tier: 2 → <strong>1</strong></span>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end">
+          <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Add single comment</button>
+          <button style="height: 32px; padding: 0 12px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Add to review</button>
+        </div>
+      </section>
+
+      <!-- Submit review popover -->
+      <section aria-label="Submit review" style="position: absolute; right: 16px; top: 14px; width: 330px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; box-shadow: 0 16px 40px rgba(16,24,40,.16); padding: 14px; display: flex; flex-direction: column; gap: 10px; z-index: 4">
+        <span style="display: flex; align-items: center"><span style="font-weight: 600; flex-grow: 1">Finish your review</span><span style="padding: 1px 8px; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-size: 11px; font-weight: 600">3 pending</span></span>
+        <textarea aria-label="Review summary" placeholder="Summary (optional)" style="height: 56px; padding: 8px 10px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit; resize: none"></textarea>
+        <label style="display: flex; gap: 8px; align-items: flex-start"><input type="radio" name="decision"><span><strong>Comment</strong><br><span style="font-size: 12px; color: #5B6474">Feedback without approval</span></span></label>
+        <label style="display: flex; gap: 8px; align-items: flex-start"><input type="radio" name="decision" checked><span><strong>Approve</strong><br><span style="font-size: 12px; color: #5B6474">Counts toward the 2 required approvals</span></span></label>
+        <label style="display: flex; gap: 8px; align-items: flex-start"><input type="radio" name="decision"><span><strong>Request changes</strong><br><span style="font-size: 12px; color: #5B6474">Blocks merge until you approve</span></span></label>
+        <button style="height: 36px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Submit review</button>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = (sel) => 'display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 8px; border-radius: 6px; cursor: pointer; ' + (sel ? 'background: #EEF0FF; font-weight: 600' : '');
+    const c = (name, note, dot, viewed, sel) => ({ name, note, dot, viewed, style: st(sel) });
+    const g = '#15803D', r = '#B91C1C', a = '#D97706', n = '#8A93A3';
+    return {
+      groups: [
+        { title: 'Added · 3', items: [c('Saga Orchestrator', '1 comment', g, true), c('Saga Ledger', '', g, true), c('Order → Saga', 'route', g, true)] },
+        { title: 'Removed · 1', items: [c('Payment Lock (Redis)', '', r, true)] },
+        { title: 'Changed · 3', items: [c('Payment Service', '2 props', a, false, true), c('Order Service', 'owner', a, true), c('API Gateway → Order', 'protocol', a, true)] },
+        { title: 'Views · 1', items: [c('Page "Failure handling"', 'added', a, false)] },
+        { title: 'Layout · 14 (hidden)', items: [c('Show layout changes', '', n, false)] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

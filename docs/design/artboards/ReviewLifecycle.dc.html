@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Review lifecycle and version model</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <h1 style="position: absolute; left: 48px; top: 32px; margin: 0; font-size: 22px; font-weight: 700">Review lifecycle &amp; version model</h1>
+
+  <!-- Lifecycle -->
+  <span style="position: absolute; left: 48px; top: 90px; font-size: 15px; font-weight: 600">Proposal states</span>
+  <div style="position: absolute; left: 48px; top: 140px; width: 150px; height: 60px; border: 1.5px solid #8A93A3; border-radius: 10px; background: #F6F7F9; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-weight: 600">Draft</span><span style="font-size: 11px; color: #5B6474">not notifying</span></div>
+  <div style="position: absolute; left: 330px; top: 140px; width: 150px; height: 60px; border: 1.5px solid #15803D; border-radius: 10px; background: #F0FDF4; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-weight: 600">Open</span><span style="font-size: 11px; color: #5B6474">reviewers notified</span></div>
+  <div style="position: absolute; left: 640px; top: 140px; width: 170px; height: 60px; border: 1.5px solid #4F46E5; border-radius: 10px; background: #EEF0FF; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-weight: 600">Mergeable</span><span style="font-size: 11px; color: #5B6474">all gates green</span></div>
+  <div style="position: absolute; left: 960px; top: 140px; width: 150px; height: 60px; border: 1.5px solid #6D28D9; border-radius: 10px; background: #F5F3FF; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-weight: 600">Merged</span><span style="font-size: 11px; color: #5B6474">merge version on main</span></div>
+  <div style="position: absolute; left: 330px; top: 300px; width: 150px; height: 60px; border: 1.5px dashed #B91C1C; border-radius: 10px; background: #FEF2F2; display: flex; flex-direction: column; align-items: center; justify-content: center"><span style="font-weight: 600">Closed</span><span style="font-size: 11px; color: #5B6474">reopenable 90 d</span></div>
+
+  <span style="position: absolute; left: 198px; top: 170px; width: 132px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 205px; top: 150px; font-size: 11px; color: #3D4553">Ready for review</span>
+  <span style="position: absolute; left: 480px; top: 162px; width: 160px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 488px; top: 116px; font-size: 11px; color: #3D4553; width: 150px">approvals + checks + threads resolved + no conflicts</span>
+  <span style="position: absolute; left: 480px; top: 182px; width: 160px; border-top: 1.5px dashed #92400E"></span>
+  <span style="position: absolute; left: 490px; top: 188px; font-size: 11px; color: #92400E; width: 150px">new version → stale approvals dismissed (if rule on)</span>
+  <span style="position: absolute; left: 810px; top: 170px; width: 150px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 850px; top: 150px; font-size: 11px; color: #3D4553">Merge / Squash</span>
+  <span style="position: absolute; left: 404px; top: 200px; height: 100px; border-left: 1.5px dashed #5B6474"></span>
+  <span style="position: absolute; left: 412px; top: 240px; font-size: 11px; color: #3D4553">Close ⇄ Reopen</span>
+  <span style="position: absolute; left: 120px; top: 120px; width: 300px; height: 20px; border: 1.5px solid #5B6474; border-bottom: none; border-radius: 10px 10px 0 0"></span>
+  <span style="position: absolute; left: 190px; top: 102px; font-size: 11px; color: #3D4553">Convert to draft</span>
+
+  <!-- Version graph -->
+  <span style="position: absolute; left: 48px; top: 430px; font-size: 15px; font-weight: 600">Versions: main line and a proposal</span>
+  <span style="position: absolute; left: 48px; top: 492px; width: 70px; font-weight: 600; color: #4338CA">main</span>
+  <span style="position: absolute; left: 130px; top: 500px; width: 1180px; border-top: 3px solid #4F46E5"></span>
+  <sc-for list="{{main}}" as="v" hint-placeholder-count="7">
+    <span style="position: absolute; left: {{v.x}}px; top: 489px; width: 22px; height: 22px; border-radius: 11px; background: {{v.fill}}; border: 3px solid #4F46E5; box-sizing: border-box"></span>
+    <span style="position: absolute; left: {{v.lx}}px; top: 520px; width: 130px; text-align: center; font-size: 11px; color: #3D4553">{{v.label}}</span>
+  </sc-for>
+
+  <span style="position: absolute; left: 48px; top: 652px; width: 80px; font-weight: 600; color: #047857">#14</span>
+  <span style="position: absolute; left: 360px; top: 510px; width: 3px; height: 150px; background: #15803D"></span>
+  <span style="position: absolute; left: 360px; top: 660px; width: 650px; border-top: 3px solid #15803D"></span>
+  <span style="position: absolute; left: 1010px; top: 510px; width: 3px; height: 153px; background: #15803D"></span>
+  <span style="position: absolute; left: 640px; top: 510px; width: 3px; height: 150px; border-left: 3px dashed #15803D; box-sizing: border-box"></span>
+  <sc-for list="{{prop}}" as="v" hint-placeholder-count="4">
+    <span style="position: absolute; left: {{v.x}}px; top: 649px; width: 22px; height: 22px; border-radius: 11px; background: #FFFFFF; border: 3px solid #15803D; box-sizing: border-box"></span>
+    <span style="position: absolute; left: {{v.lx}}px; top: 680px; width: 130px; text-align: center; font-size: 11px; color: #3D4553">{{v.label}}</span>
+  </sc-for>
+  <span style="position: absolute; left: 370px; top: 580px; font-size: 11px; color: #047857">fork · base = v11</span>
+  <span style="position: absolute; left: 650px; top: 580px; font-size: 11px; color: #047857">update from main (3-way)</span>
+  <span style="position: absolute; left: 1020px; top: 580px; font-size: 11px; color: #047857">merge → v14 (2 parents)</span>
+
+  <section style="position: absolute; left: 48px; top: 750px; right: 48px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+    <div style="padding: 12px; background: #F6F7F9; border-radius: 10px"><strong>Immutable versions</strong><br><span style="color: #5B6474">Restore and revert add a version on top — history is never rewritten.</span></div>
+    <div style="padding: 12px; background: #F6F7F9; border-radius: 10px"><strong>Semantic diff by id</strong><br><span style="color: #5B6474">Added · removed · renamed · property · re-parented; layout collapsed.</span></div>
+    <div style="padding: 12px; background: #F6F7F9; border-radius: 10px"><strong>3-way merge per element</strong><br><span style="color: #5B6474">Conflicts only when the same property or a delete-vs-edit collides.</span></div>
+    <div style="padding: 12px; background: #F6F7F9; border-radius: 10px"><strong>Comments know when</strong><br><span style="color: #5B6474">Anchored to element/region + version; outdated and detached states.</span></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const v = (x, label, named) => ({ x, lx: x - 54, label, fill: named ? '#4F46E5' : '#FFFFFF' });
+    const p = (x, label) => ({ x, lx: x - 54, label });
+    return {
+      main: [v(150, 'v9 · import', true), v(250, 'autosave'), v(350, 'v11 · named', true), v(500, 'autosave'), v(630, 'v12 · sync'), v(800, 'v13 · named', true), v(1000, 'v14 · merge #14', true), v(1200, 'v15 · restore of v13')],
+      prop: [p(450, 'v11.1'), p(560, 'v11.2'), p(720, 'merge main'), p(880, 'v11.4 · suggestion applied')]
+    };
+  }
+}
+</script>
+</body>
+</html>

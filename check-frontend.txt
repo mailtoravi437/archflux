@@ -1,3 +1,0 @@
-curl -I localhost:8080/assets/index-Cngu_0By.js
-curl -I localhost:8080/assets/index-BauZ4933.css
-docker logs archflux-web-1 --tail=20

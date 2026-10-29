@@ -1,0 +1,206 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  ArchFlux on AWS (SERVICES_SPEC §10.1): one EC2 instance running the integrated
+  docker compose stack, ECR repositories for archflux-api / archflux-web, and a
+  GitHub OIDC role that lets CI push images (no long-lived AWS keys).
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.small
+    AllowedValues: [t3.micro, t3.small, t3.medium, t3.large]
+    Description: x86_64 to match the CI-built images. t3.micro (1 GB) works with the swap file but is tight.
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: SSH key pair used by the deploy workflows (GitHub secret VM_SSH_KEY holds the private half).
+  SshCidr:
+    Type: String
+    AllowedPattern: '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'
+    Description: >-
+      CIDR allowed to SSH (port 22). GitHub-hosted runners use changing IPs, so CI
+      deploys need 0.0.0.0/0 here (key-only auth) or a self-hosted runner range.
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the instance (the default VPC is fine).
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: A PUBLIC subnet in that VPC.
+  GitHubRepo:
+    Type: String
+    Default: mailtoravi437/archflux
+    AllowedPattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'
+    Description: owner/repo allowed to assume the CI image-push role.
+  CreateGitHubOidcProvider:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Set false if the account already has the token.actions.githubusercontent.com OIDC provider.
+  VolumeSizeGiB:
+    Type: Number
+    Default: 30
+    MinValue: 20
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
+
+Conditions:
+  MakeOidcProvider: !Equals [!Ref CreateGitHubOidcProvider, 'true']
+
+Resources:
+  ApiRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: archflux-api
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: MUTABLE
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"keep last 20","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":20},"action":{"type":"expire"}}]}'
+
+  WebRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: archflux-web
+      ImageScanningConfiguration: { ScanOnPush: true }
+      ImageTagMutability: MUTABLE
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"keep last 20","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":20},"action":{"type":"expire"}}]}'
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ec2.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: ecr-pull
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action: [ecr:BatchGetImage, ecr:GetDownloadUrlForLayer, ecr:BatchCheckLayerAvailability]
+                Resource: [!GetAtt ApiRepository.Arn, !GetAtt WebRepository.Arn]
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref InstanceRole]
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ArchFlux web (80/443) and restricted SSH
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0, Description: 'HTTP (redirect to HTTPS, ACME)' }
+        - { IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0, Description: 'HTTPS' }
+        - { IpProtocol: udp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0, Description: 'HTTP/3' }
+        - { IpProtocol: tcp, FromPort: 22, ToPort: 22, CidrIp: !Ref SshCidr, Description: 'SSH deploys' }
+
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref InstanceProfile
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds: [!Ref SecurityGroup]
+      MetadataOptions:
+        HttpTokens: required
+        HttpPutResponseHopLimit: 2
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs: { VolumeSize: !Ref VolumeSizeGiB, VolumeType: gp3, Encrypted: true, DeleteOnTermination: false }
+      Tags:
+        - { Key: Name, Value: archflux }
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          set -euxo pipefail
+          dnf install -y docker rsync
+          systemctl enable --now docker
+          usermod -aG docker ec2-user
+          # Compose v2 plugin (not packaged for AL2023).
+          mkdir -p /usr/local/lib/docker/cli-plugins
+          curl -fsSL "https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64" \
+            -o /usr/local/lib/docker/cli-plugins/docker-compose
+          chmod 755 /usr/local/lib/docker/cli-plugins/docker-compose
+          # 2 GB swap: JVM + Postgres + Redis + nginx on a small instance.
+          if [ ! -f /swapfile ]; then
+            dd if=/dev/zero of=/swapfile bs=1M count=2048
+            chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+            echo '/swapfile none swap sw 0 0' >> /etc/fstab
+          fi
+          install -d -m 700 -o ec2-user -g ec2-user /opt/archflux
+
+  ElasticIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Instance
+
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: MakeOidcProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+      ThumbprintList: [6938fd4d98bab03faadb97b34396831e3780aea1]
+
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: GitHub Actions (main branch) pushes archflux images to ECR.
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              StringLike:
+                token.actions.githubusercontent.com:sub:
+                  - !Sub repo:${GitHubRepo}:ref:refs/heads/main
+                  - !Sub repo:${GitHubRepo}:environment:production
+      Policies:
+        - PolicyName: ecr-push
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource: [!GetAtt ApiRepository.Arn, !GetAtt WebRepository.Arn]
+
+Outputs:
+  PublicIp:
+    Description: Point your domain's A record here, and set GitHub secret VM_HOST to it.
+    Value: !Ref ElasticIp
+  EcrRegistry:
+    Description: ECR_REGISTRY for /opt/archflux/.env and the GitHub variable of the same name.
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com
+  DeployRoleArn:
+    Description: GitHub variable AWS_DEPLOY_ROLE_ARN.
+    Value: !GetAtt GitHubDeployRole.Arn
+  InstanceId:
+    Value: !Ref Instance

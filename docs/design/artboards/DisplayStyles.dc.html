@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Display styles and editing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1000px; box-sizing: border-box; padding: 40px 48px; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; gap: 24px">
+  <div style="display: flex; align-items: flex-end; gap: 24px">
+    <div style="flex-grow: 1">
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700">Display styles &amp; editing</h1>
+      <p style="margin: 4px 0 0; color: #5B6474">One element, three styles. Switching keeps text, icon, properties and connections. Press Play and try the controls.</p>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <span style="font-size: 12px; color: #5B6474">Display</span>
+      <div role="radiogroup" aria-label="Display style" style="display: flex; padding: 2px; background: #F1F2F5; border-radius: 8px">
+        <button role="radio" aria-checked="{{iconChecked}}" onClick="{{pickIcon}}" style="{{iconTab}}">Icon</button>
+        <button role="radio" aria-checked="{{cardChecked}}" onClick="{{pickCard}}" style="{{cardTab}}">Card</button>
+        <button role="radio" aria-checked="{{shapeChecked}}" onClick="{{pickShape}}" style="{{shapeTab}}">Shape</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live samples -->
+  <section aria-label="Samples" style="height: 230px; background-color: #F6F7F9; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; border-radius: 12px; display: flex; align-items: center; justify-content: space-around; padding: 0 24px">
+
+    <sc-if value="{{isIcon}}" hint-placeholder-val="{{false}}">
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+        <div style="width: 150px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+          <span style="width: 64px; height: 64px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: {{it.tile}}">
+            <sc-if value="{{it.hasImg}}" hint-placeholder-val="{{true}}"><img src="{{it.img}}" alt="" style="width: 56px; height: 56px; border-radius: 8px"></sc-if>
+            <sc-if value="{{it.noImg}}" hint-placeholder-val="{{false}}"><span style="font-size: 26px; font-weight: 700; color: {{it.color}}">{{it.glyph}}</span></sc-if>
+          </span>
+          <span style="font-weight: 600; text-align: center; line-height: 17px">{{it.name}}</span>
+          <span style="font-size: 11px; color: #5B6474; text-align: center">{{it.tech}}</span>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <sc-if value="{{isCard}}" hint-placeholder-val="{{true}}">
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+        <div style="width: 220px; height: 84px; box-sizing: border-box; padding: 12px; border: 1.5px solid {{it.color}}; border-radius: 8px; background: #FFFFFF; display: flex; gap: 10px">
+          <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: {{it.tile}}">
+            <sc-if value="{{it.hasImg}}" hint-placeholder-val="{{true}}"><img src="{{it.img}}" alt="" style="width: 32px; height: 32px; border-radius: 4px"></sc-if>
+            <sc-if value="{{it.noImg}}" hint-placeholder-val="{{false}}"><span style="font-size: 15px; font-weight: 700; color: {{it.color}}">{{it.glyph}}</span></sc-if>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-weight: 600">{{it.name}}</span><span style="font-size: 11px; color: #5B6474">{{it.tech}}</span></span>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <sc-if value="{{isShape}}" hint-placeholder-val="{{false}}">
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+        <div style="position: relative; width: 220px; height: 110px">
+          <sc-if value="{{it.isCyl}}" hint-placeholder-val="{{false}}">
+            <svg width="200" height="104" viewBox="0 0 200 104" aria-hidden="true" style="position: absolute; left: 10px; top: 3px"><path d="M1 14v76c0 7 44.3 13 99 13s99-6 99-13V14" fill="#FFFFFF" stroke="{{it.color}}" stroke-width="1.5"/><ellipse cx="100" cy="14" rx="99" ry="13" fill="#FFFFFF" stroke="{{it.color}}" stroke-width="1.5"/></svg>
+          </sc-if>
+          <sc-if value="{{it.isPipe}}" hint-placeholder-val="{{false}}">
+            <svg width="210" height="76" viewBox="0 0 210 76" aria-hidden="true" style="position: absolute; left: 5px; top: 17px"><path d="M16 1h178c8 0 15 16.6 15 37s-7 37-15 37H16C8 75 1 58.4 1 38S8 1 16 1z" fill="#FFFFFF" stroke="{{it.color}}" stroke-width="1.5"/><ellipse cx="194" cy="38" rx="15" ry="37" fill="#FFFFFF" stroke="{{it.color}}" stroke-width="1.5"/></svg>
+          </sc-if>
+          <sc-if value="{{it.isCard}}" hint-placeholder-val="{{true}}">
+            <span style="position: absolute; left: 10px; top: 13px; width: 200px; height: 84px; box-sizing: border-box; border: 1.5px solid {{it.color}}; border-radius: 8px; background: #FFFFFF"></span>
+          </sc-if>
+          <span style="position: absolute; left: 26px; top: 40px; display: flex; gap: 8px; align-items: center">
+            <sc-if value="{{it.hasImg}}" hint-placeholder-val="{{true}}"><img src="{{it.img}}" alt="" style="width: 28px; height: 28px; border-radius: 4px"></sc-if>
+            <sc-if value="{{it.noImg}}" hint-placeholder-val="{{false}}"><span style="width: 28px; height: 28px; border-radius: 6px; background: {{it.tile}}; color: {{it.color}}; font-weight: 700; display: flex; align-items: center; justify-content: center">{{it.glyph}}</span></sc-if>
+            <span style="display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">{{it.name}}</span><span style="font-size: 11px; color: #5B6474">{{it.tech}}</span></span>
+          </span>
+        </div>
+      </sc-for>
+    </sc-if>
+  </section>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+
+    <!-- Try it: edit text -->
+    <section style="border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Edit text — try it</h2>
+      <p style="margin: 0; color: #5B6474">Changes the first sample above, in every style.</p>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Name<input value="{{name}}" onChange="{{setName}}" style="height: 34px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; color: #1B1F27"></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Technology<input value="{{tech}}" onChange="{{setTech}}" style="height: 34px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; color: #1B1F27"></label>
+      <p style="margin: 0; font-size: 12px; color: #5B6474">On canvas: double-click or Enter to edit · Tab to technology · Enter saves · Esc cancels.</p>
+    </section>
+
+    <!-- Inline editing state -->
+    <section style="border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Inline editing on the canvas</h2>
+      <div style="height: 150px; background: #F6F7F9; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+        <div style="width: 230px; height: 84px; box-sizing: border-box; padding: 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(79,70,229,.25); display: flex; gap: 10px">
+          <img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 32px; height: 32px; border-radius: 4px">
+          <span style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1">
+            <span style="height: 22px; box-sizing: border-box; padding: 0 6px; border: 1.5px solid #4F46E5; border-radius: 4px; font-weight: 600; display: flex; align-items: center">Order Service<span style="width: 1.5px; height: 14px; background: #4F46E5; margin-left: 1px"></span></span>
+            <span style="height: 20px; box-sizing: border-box; padding: 0 6px; border: 1px dashed #C3C8D1; border-radius: 4px; font-size: 11px; color: #5B6474; display: flex; align-items: center">ECS · Java</span>
+          </span>
+        </div>
+        <span style="font-size: 11px; color: #5B6474">Enter save · Tab technology · Esc cancel</span>
+      </div>
+      <p style="margin: 0; font-size: 12px; color: #5B6474">Name wraps to 2 lines, then “…”; the full text stays in the tooltip and outline.</p>
+    </section>
+
+    <!-- Icon picker -->
+    <section style="border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Replace icon — click the icon slot</h2>
+      <div style="border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 8px 24px rgba(16,24,40,.12); padding: 10px; display: flex; flex-direction: column; gap: 8px">
+        <label style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 1px solid #4F46E5; border-radius: 6px; color: #5B6474"><input aria-label="Search icons" value="queue" style="border: none; outline: none; font: inherit; flex-grow: 1; color: #1B1F27"></label>
+        <div role="tablist" aria-label="Icon sets" style="display: flex; gap: 4px; flex-wrap: wrap">
+          <button role="tab" aria-selected="false" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Recent</button>
+          <button role="tab" aria-selected="true" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #EEF0FF; color: #4338CA; font: inherit; font-size: 11px; font-weight: 600">AWS</button>
+          <button role="tab" aria-selected="false" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Google Cloud</button>
+          <button role="tab" aria-selected="false" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Azure</button>
+          <button role="tab" aria-selected="false" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Generic</button>
+          <button role="tab" aria-selected="false" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Uploaded</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+          <button aria-label="Amazon SQS" style="height: 64px; border: 1.5px solid #4F46E5; border-radius: 8px; background: #EEF0FF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; font-size: 10px"><img src="/_blob/67ab0cc4e093ff99e36923cbfa13c76c" alt="" style="width: 28px; height: 28px; border-radius: 4px">SQS</button>
+          <button aria-label="Amazon SNS" style="height: 64px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; font-size: 10px"><img src="/_blob/04329d9e8c4341b49f039f73b0e34fd5" alt="" style="width: 28px; height: 28px; border-radius: 4px">SNS</button>
+          <button aria-label="Generic queue" style="height: 64px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; font-size: 10px"><span style="width: 28px; height: 28px; border-radius: 6px; background: #FCE7F3; color: #BE185D; font-weight: 700; display: flex; align-items: center; justify-content: center">≡</span>Queue</button>
+          <button aria-label="Upload an icon" style="height: 64px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; font-size: 10px; color: #4338CA"><span style="font-size: 18px">+</span>Upload</button>
+        </div>
+        <button style="height: 28px; border: none; background: transparent; font: inherit; font-size: 12px; color: #5B6474; text-align: left">No icon</button>
+      </div>
+    </section>
+  </div>
+
+  <section style="display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: #F6F7F9; border-radius: 10px">
+    <span style="font-weight: 600">Card options</span>
+    <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox" checked>Icon</label>
+    <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox" checked>Technology line</label>
+    <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox">Property line</label>
+    <select aria-label="Property shown" style="height: 30px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; background: #FFFFFF"><option>Owner</option><option>SLO</option><option>Cost</option></select>
+    <label style="display: flex; align-items: center; gap: 6px"><input type="checkbox" checked>Status slot</label>
+    <span style="flex-grow: 1"></span>
+    <span style="font-size: 12px; color: #5B6474">Size snaps S / M / L · Alt for free resize · Alt+1/2/3 switches style</span>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { mode: 'card', name: 'Order Service', tech: 'ECS · Java' };
+  }
+  renderVals() {
+    const mode = this.state.mode;
+    const on = 'height: 30px; padding: 0 14px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-weight: 600; cursor: pointer';
+    const off = 'height: 30px; padding: 0 14px; border: none; border-radius: 6px; background: transparent; font: inherit; color: #3D4553; cursor: pointer';
+    const base = (o) => Object.assign({ hasImg: !!o.img, noImg: !o.img, isCyl: o.geo === 'cyl', isPipe: o.geo === 'pipe', isCard: o.geo === 'card' }, o);
+    return {
+      isIcon: mode === 'icon', isCard: mode === 'card', isShape: mode === 'shape',
+      iconChecked: String(mode === 'icon'), cardChecked: String(mode === 'card'), shapeChecked: String(mode === 'shape'),
+      iconTab: mode === 'icon' ? on : off, cardTab: mode === 'card' ? on : off, shapeTab: mode === 'shape' ? on : off,
+      pickIcon: () => this.setState({ mode: 'icon' }),
+      pickCard: () => this.setState({ mode: 'card' }),
+      pickShape: () => this.setState({ mode: 'shape' }),
+      name: this.state.name, tech: this.state.tech,
+      setName: (e) => this.setState({ name: e.target.value }),
+      setTech: (e) => this.setState({ tech: e.target.value }),
+      items: [
+        base({ name: this.state.name || 'Untitled', tech: this.state.tech, img: '/_blob/e9d65c3efbf0afdb9006180c72dbb273', color: '#2563EB', tile: 'transparent', geo: 'card' }),
+        base({ name: 'Orders DB', tech: 'Aurora · PostgreSQL', img: '/_blob/66032cf016f46026ff1c9185b589dc11', color: '#B45309', tile: 'transparent', geo: 'cyl' }),
+        base({ name: 'Cart cache', tech: 'Redis 7', img: '', glyph: 'ϟ', color: '#B91C1C', tile: '#FDE8E8', geo: 'cyl' }),
+        base({ name: 'receipts', tech: 'Queue · SQS', img: '/_blob/67ab0cc4e093ff99e36923cbfa13c76c', color: '#BE185D', tile: 'transparent', geo: 'pipe' })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

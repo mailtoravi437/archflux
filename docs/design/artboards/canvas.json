@@ -1,0 +1,614 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-24T12:30:00Z"
+  },
+  "title": "ArchFlux UI Revamp",
+  "launch": {
+    "view": "canvas",
+    "page": "core"
+  },
+  "pages": [
+    {
+      "id": "core",
+      "name": "1 \u00b7 Core screens"
+    },
+    {
+      "id": "start",
+      "name": "2 \u00b7 Start & library"
+    },
+    {
+      "id": "edit",
+      "name": "3 \u00b7 Edit & model"
+    },
+    {
+      "id": "collab",
+      "name": "4 \u00b7 Share & collaborate"
+    },
+    {
+      "id": "versions",
+      "name": "5 \u00b7 Versions & review"
+    },
+    {
+      "id": "sync",
+      "name": "6 \u00b7 Sync & rules"
+    },
+    {
+      "id": "present",
+      "name": "7 \u00b7 Present, export & AI"
+    },
+    {
+      "id": "admin",
+      "name": "8 \u00b7 Workspace admin"
+    },
+    {
+      "id": "components",
+      "name": "Components"
+    },
+    {
+      "id": "onboarding",
+      "name": "9 \u00b7 Onboarding, access & public view"
+    },
+    {
+      "id": "intel",
+      "name": "10 \u00b7 Search, impact & editing surfaces"
+    },
+    {
+      "id": "connect",
+      "name": "11 \u00b7 GitHub & notifications"
+    },
+    {
+      "id": "account",
+      "name": "12 \u00b7 Plans, trash & admin"
+    },
+    {
+      "id": "mobile",
+      "name": "13 \u00b7 Mobile"
+    }
+  ],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-12 Canvas workspace \u2014 node selected",
+      "page": "core"
+    },
+    "Library.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-06 Library",
+      "page": "core"
+    },
+    "Review.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-30 Review \u2014 Overview tab & merge box",
+      "page": "core"
+    },
+    "Sync.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-32 Sync overview",
+      "page": "core"
+    },
+    "Phone.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "SC-48 Canvas \u2014 phone",
+      "page": "core"
+    },
+    "Tokens.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1200,
+      "h": 900,
+      "title": "Design tokens & controls",
+      "page": "core"
+    },
+    "AppBar.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 48,
+      "title": "App bar (shared component)",
+      "page": "components"
+    },
+    "Elements.dc.html": {
+      "x": 0,
+      "y": 200,
+      "w": 1440,
+      "h": 1240,
+      "title": "Elements \u2014 standard notation (UI_REVAMP_SPEC \u00a75A.2)",
+      "page": "components"
+    },
+    "States.dc.html": {
+      "x": 1520,
+      "y": 200,
+      "w": 1440,
+      "h": 900,
+      "title": "Element anatomy, sizes & states (\u00a75A.1, \u00a75A.5)",
+      "page": "components"
+    },
+    "Boundaries.dc.html": {
+      "x": 1520,
+      "y": 1220,
+      "w": 1440,
+      "h": 900,
+      "title": "Boundaries & relationships (\u00a75A.3, \u00a75A.4)",
+      "page": "components"
+    },
+    "Example.dc.html": {
+      "x": 0,
+      "y": 1560,
+      "w": 1440,
+      "h": 900,
+      "title": "Example: checkout system in standard notation",
+      "page": "components"
+    },
+    "Home.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-05 Home",
+      "page": "start"
+    },
+    "NewDiagram.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-09 New diagram \u2014 AI tab",
+      "page": "start"
+    },
+    "ImportMap.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-10 Import mapping preview",
+      "page": "start"
+    },
+    "CanvasPro.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-12/13/15/16 Containers, pages, layers, outline, context toolbar",
+      "page": "edit"
+    },
+    "DataFormat.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-14/20/21 Properties, data linking & conditional formatting",
+      "page": "edit"
+    },
+    "Share.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-22 Share dialog",
+      "page": "collab"
+    },
+    "Live.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-23/24/25 Presence, comments, notifications",
+      "page": "collab"
+    },
+    "History.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-27/28 History & visual diff",
+      "page": "versions"
+    },
+    "Drift.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-33/35 Connect source & drift inbox",
+      "page": "sync"
+    },
+    "Policies.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-36/37 Policies & rule builder",
+      "page": "sync"
+    },
+    "Present.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-38 Present mode",
+      "page": "present"
+    },
+    "Assistant.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-40/11 AI assistant \u2014 proposed edit",
+      "page": "present"
+    },
+    "Export.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-39/26 Export & publish",
+      "page": "present"
+    },
+    "Members.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-41 Members & teams",
+      "page": "admin"
+    },
+    "DisplayStyles.dc.html": {
+      "x": 0,
+      "y": 2580,
+      "w": 1440,
+      "h": 1000,
+      "title": "Display styles (Icon \u00b7 Card \u00b7 Shape), inline editing & icon picker (\u00a75A.1b)",
+      "page": "components",
+      "is_interactive": true
+    },
+    "ReviewChanges.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-30b Review \u2014 Changes tab, inline comment + suggestion, submit review",
+      "page": "versions"
+    },
+    "MergeConflict.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-31b Merge conflict resolver",
+      "page": "versions"
+    },
+    "Proposals.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-29 Proposals list & create proposal",
+      "page": "versions"
+    },
+    "ReviewLifecycle.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "Review lifecycle & version model",
+      "page": "versions"
+    },
+    "CommentsDetail.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-24 Comment threads \u2014 anchors, states, suggestion, decision",
+      "page": "collab"
+    },
+    "Welcome.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-02 Workspace setup / join",
+      "page": "onboarding"
+    },
+    "FirstRun.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-04 First-run canvas + getting-started checklist",
+      "page": "onboarding"
+    },
+    "AccessStates.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-50 Access states: request access, read-only, expired, not found",
+      "page": "onboarding"
+    },
+    "PublicView.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-55 Public viewer (no account)",
+      "page": "onboarding"
+    },
+    "Search.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-07 / SC-51 Search + element page",
+      "page": "intel"
+    },
+    "Impact.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-52 Impact mode (blast radius)",
+      "page": "intel"
+    },
+    "Palette.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-17/18/19 Command palette, context menu, shape library",
+      "page": "intel"
+    },
+    "Mapping.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-34 Sync mapping",
+      "page": "intel"
+    },
+    "GitHub.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-43 GitHub integration setup",
+      "page": "connect"
+    },
+    "Notifications.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-25 / SC-53 Inbox + notification preferences",
+      "page": "connect"
+    },
+    "Limits.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-54 / SC-45 Limit reached + plan & billing",
+      "page": "account"
+    },
+    "Trash.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-08 Trash & recovery",
+      "page": "account"
+    },
+    "Audit.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-44 / SC-42 Audit log + SSO test-before-enforce",
+      "page": "account"
+    },
+    "MobileLibrary.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "SC-47 Mobile library",
+      "page": "mobile"
+    },
+    "MobileReview.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "SC-49 Mobile comment + review",
+      "page": "mobile"
+    },
+    "SystemStates.dc.html": {
+      "x": 0,
+      "y": 3700,
+      "w": 1440,
+      "h": 900,
+      "title": "SC-56 System states library",
+      "page": "components"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Library.dc.html",
+    "Review.dc.html",
+    "Sync.dc.html",
+    "Phone.dc.html",
+    "Tokens.dc.html",
+    "AppBar.dc.html",
+    "Elements.dc.html",
+    "States.dc.html",
+    "Boundaries.dc.html",
+    "Example.dc.html",
+    "DisplayStyles.dc.html",
+    "Home.dc.html",
+    "NewDiagram.dc.html",
+    "ImportMap.dc.html",
+    "CanvasPro.dc.html",
+    "DataFormat.dc.html",
+    "Share.dc.html",
+    "Live.dc.html",
+    "CommentsDetail.dc.html",
+    "History.dc.html",
+    "ReviewLifecycle.dc.html",
+    "Proposals.dc.html",
+    "MergeConflict.dc.html",
+    "ReviewChanges.dc.html",
+    "Drift.dc.html",
+    "Policies.dc.html",
+    "Present.dc.html",
+    "Assistant.dc.html",
+    "Export.dc.html",
+    "Members.dc.html",
+    "Welcome.dc.html",
+    "FirstRun.dc.html",
+    "AccessStates.dc.html",
+    "PublicView.dc.html",
+    "Search.dc.html",
+    "Impact.dc.html",
+    "Palette.dc.html",
+    "Mapping.dc.html",
+    "GitHub.dc.html",
+    "Notifications.dc.html",
+    "Limits.dc.html",
+    "Trash.dc.html",
+    "Audit.dc.html",
+    "MobileLibrary.dc.html",
+    "MobileReview.dc.html",
+    "SystemStates.dc.html"
+  ],
+  "notes": {
+    "title": {
+      "x": 0,
+      "y": -300,
+      "text": "ArchFlux UI Revamp \u2014 UI_REVAMP_SPEC v1.0",
+      "kind": "title1",
+      "maxW": 4240,
+      "page": "core"
+    },
+    "t-start": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-1/2/3 \u00b7 Start, library, create",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "start"
+    },
+    "t-edit": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-4/5 \u00b7 Edit & model",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "edit"
+    },
+    "t-collab": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-6 \u00b7 Share & collaborate",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "collab"
+    },
+    "t-versions": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-7 \u00b7 Versions & review",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "versions"
+    },
+    "t-sync": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-8/9 \u00b7 Living sync & rules",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "sync"
+    },
+    "t-present": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-10/11 \u00b7 Present, export & AI",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "present"
+    },
+    "t-admin": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-12 \u00b7 Workspace admin",
+      "kind": "title1",
+      "maxW": 1440,
+      "page": "admin"
+    },
+    "t-components": {
+      "x": 0,
+      "y": -300,
+      "text": "Diagram components \u2014 standard notation",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "components"
+    },
+    "t-onb": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-15/16/23 \u00b7 Onboarding, access & public view",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "onboarding"
+    },
+    "t-intel": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-17/18/19/25 \u00b7 Search, impact & editing surfaces",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "intel"
+    },
+    "t-connect": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-20/21 \u00b7 GitHub & notifications",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "connect"
+    },
+    "t-account": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-22/24/26 \u00b7 Plans, trash & admin",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "account"
+    },
+    "t-mobile": {
+      "x": 0,
+      "y": -300,
+      "text": "FL-27 \u00b7 Mobile",
+      "kind": "title1",
+      "maxW": 860,
+      "maxH": 200,
+      "page": "mobile"
+    }
+  },
+  "designSystems": []
+}

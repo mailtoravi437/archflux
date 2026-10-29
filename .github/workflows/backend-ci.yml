@@ -1,0 +1,55 @@
+# archflux-api CI (SERVICES_SPEC §6). Runs only when the backend service or
+# the integrated compose file changes; needs no Node.
+name: backend-ci
+
+on:
+  push:
+    paths: ['backend/**', 'compose.yml', 'deploy/aws/**', '.github/workflows/backend-ci.yml']
+  pull_request:
+    paths: ['backend/**', 'compose.yml', 'deploy/aws/**', '.github/workflows/backend-ci.yml']
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      # Testcontainers uses the runner's Docker daemon.
+      - run: mvn -q test
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build archflux-api image (own context only)
+        run: docker build -t archflux-api:ci .
+      - name: Validate compose files
+        working-directory: .
+        run: |
+          docker compose -f backend/compose.yml config --quiet
+          docker compose -f compose.yml config --quiet
+      - name: Validate AWS overlay (SERVICES_SPEC §10.2)
+        working-directory: .
+        run: |
+          bash -n deploy/aws/remote-deploy.sh
+          touch .env
+          export APP_DOMAIN=ci.example.com ACME_EMAIL=ci@example.com ECR_REGISTRY=ci.local \
+            POSTGRES_PASSWORD=x DB_APP_PASSWORD=x API_TOKEN=x JWT_SECRET=x
+          aws_config() { docker compose -f compose.yml -f deploy/aws/compose.aws.yml "$@"; }
+          aws_config config --quiet
+          # Only the TLS proxy may publish host ports.
+          test "$(aws_config config --format json | jq -c '[.services[] | select(.ports) | .ports[].published] | unique')" = '["443","80"]'
+          # A missing secret must abort, never fall back to a dev default.
+          if JWT_SECRET= aws_config config --quiet 2>/dev/null; then echo "overlay accepted an empty JWT_SECRET" >&2; exit 1; fi

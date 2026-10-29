@@ -1,111 +1,41 @@
-# ArchFlux compose stack (Agent C).
-# Prod:  docker compose -f compose.yml up -d --build   (skips dev override)
-# Dev:   docker compose up -d db   (override publishes postgres for `npm run dev`)
-# E2E:   docker compose -p archflux-e2e up -d --build
+# ArchFlux INTEGRATED topology (SERVICES_SPEC §5.1): same-origin, the web
+# container reverse-proxies /api, /ws and the OAuth/SAML paths to the API.
+# Service definitions live with each service; this file only composes them.
+#   Prod:  docker compose -f compose.yml up -d --build   (skips dev override)
+#   Dev:   docker compose up -d db redis                 (override publishes postgres)
+# Separate topology instead: backend/compose.yml + frontend/compose.yml.
 name: archflux
 
 services:
   db:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-archflux}
-      POSTGRES_USER: ${POSTGRES_USER:-archflux}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
-      # Consumed by docker/db-init/01-roles.sh on FIRST init only (fresh volume).
-      # Dev defaults are flagged DEV ONLY — prod must come from the secret manager.
-      DB_APP_USER: ${DB_APP_USER:-archflux_app}
-      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      # Self-provisions the least-privilege app role on fresh volumes.
-      # Runs once (empty data dir only); Flyway migrates afterwards.
-      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-archflux} -d $${POSTGRES_DB:-archflux}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    stop_grace_period: 30s
+    extends: { file: backend/compose.yml, service: db }
+    # Integrated prod keeps postgres off the host network; compose.override.yml re-publishes it for dev.
+    ports: !reset []
+
+  redis:
+    extends: { file: backend/compose.yml, service: redis }
 
   server:
-    build:
-      context: ./server
-    image: archflux-server:local
-    restart: unless-stopped
-    # init for correct SIGTERM forwarding / zombie reaping.
-    init: true
-    stop_grace_period: 30s
-    ports:
-      - "${SERVER_PORT:-3001}:3001"
+    extends: { file: backend/compose.yml, service: server }
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
-      PORT: 3001
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/${POSTGRES_DB:-archflux}}
-      SPRING_DATASOURCE_USERNAME: ${DB_APP_USER:-archflux_app}
-      SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}
-      APP_API_TOKEN: ${API_TOKEN:-f506189f13b9ff61e04350a8bd983008}
-      REDIS_HOST: redis
-      # Automated migrations (Phase 1): Flyway runs at server boot AS THE OWNER
-      # so pgcrypto/citext extensions can install. Tightening to a dedicated
-      # migrator role is a documented follow-up (see DEPLOY.md).
-      SPRING_FLYWAY_ENABLED: "true"
-      SPRING_FLYWAY_USER: ${POSTGRES_USER:-archflux}
-      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
-      APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
-      # application.yml currently reads SESSION_COOKIE_SECURE; keep it in sync
-      # with APP_COOKIE_SECURE until the server aligns on one name.
-      SESSION_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
-      # GitHub webhook HMAC secret. Empty (default) = webhook endpoint
-      # fail-closed ("Webhook secret not configured"). Set a strong random
-      # value to enable push delivery; same secret goes in the GitHub App /
-      # webhook settings. NEVER commit the real value (see .env.example).
-      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET:-}
+      # Browser origin is the web container; emailed links go through its /api proxy.
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${WEB_PORT:-8080}}
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:${WEB_PORT:-8080}/api}
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
-    healthcheck:
-      # curl probe (installed in the server image); image also bakes its own HEALTHCHECK.
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:3001/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
+        condition: service_healthy
 
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-      args:
-        VITE_API_URL: ${VITE_API_URL:-/api}
-    image: archflux-web:local
-    restart: unless-stopped
-    stop_grace_period: 10s
-    ports:
-      - "${WEB_PORT:-8080}:80"
+    extends: { file: frontend/compose.yml, service: web }
     environment:
-      # Runtime API base for /config.json (Phase-2 frontend reads it).
-      API_URL: ${VITE_API_URL:-/api}
+      API_URL: /api
+      WS_URL: ""
+      API_UPSTREAM: http://server:3001
     depends_on:
       server:
         condition: service_healthy
-    # Healthcheck is baked into the image (Dockerfile.web HEALTHCHECK).
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    # No published ports: reachable only via service DNS (server uses REDIS_HOST=redis).
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
 volumes:
   pgdata:

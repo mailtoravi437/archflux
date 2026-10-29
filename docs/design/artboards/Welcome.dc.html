@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Workspace setup</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px">
+    <div style="display: flex; align-items: center; gap: 10px"><div style="width: 32px; height: 32px; border-radius: 8px; background: #4F46E5; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></div><span style="font-weight: 700; font-size: 18px">ArchFlux</span></div>
+    <div style="text-align: center"><h1 style="margin: 0; font-size: 26px; font-weight: 700">Welcome, [Name]</h1><p style="margin: 6px 0 0; color: #5B6474">Signed in as [you@company.com] · Step 1 of 3</p></div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; width: 880px">
+      <section style="background: #FFFFFF; border: 1.5px solid #4F46E5; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 0 0 4px rgba(79,70,229,.10)">
+        <span style="padding: 2px 10px; width: fit-content; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-size: 12px; font-weight: 600">Recommended</span>
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700">Join [Company]</h2>
+        <p style="margin: 0; color: #5B6474">24 people from @[company] already use ArchFlux. Your admin allows anyone with a company email to join.</p>
+        <div style="display: flex; align-items: center"><span style="width: 28px; height: 28px; border-radius: 14px; background: #DCF3E6; color: #047857; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF">A</span><span style="width: 28px; height: 28px; border-radius: 14px; background: #E8F0FE; color: #1D4ED8; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF; margin-left: -8px">P</span><span style="width: 28px; height: 28px; border-radius: 14px; background: #FCE7F3; color: #BE185D; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF; margin-left: -8px">E</span><span style="margin-left: 8px; color: #5B6474">and 21 more</span></div>
+        <a href="FirstRun.dc.html" style="height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font-weight: 600; text-decoration: none">Join [Company]</a>
+      </section>
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 700">Create a new workspace</h2>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Workspace name<input value="[Team name]" style="height: 38px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit; font-size: 14px; color: #1B1F27"></label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Invite teammates (optional)<input placeholder="name@company.com, …" style="height: 38px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit; font-size: 14px"></label>
+        <span style="font-size: 12px; color: #5B6474">You'll be the owner. Free plan: 3 cloud diagrams, 3 editors.</span>
+        <a href="FirstRun.dc.html" style="height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #E3E6EB; color: #1B1F27; font-weight: 600; text-decoration: none">Create workspace</a>
+      </section>
+    </div>
+    <a href="FirstRun.dc.html" style="font-size: 12px">Skip — work locally as a guest</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -14,6 +14,39 @@ lifecycle, design token engine, and Living Infrastructure Reconciler specificati
 | **Rendering** | 2D canvas, orthogonal router (WebGL-ready layer) |
 | **Status** | Approved for Implementation |
 
+## Services (start here)
+
+ArchFlux is two independently built and deployed services — contract in [SERVICES_SPEC.md](docs/specs/SERVICES_SPEC.md),
+master index in [SPEC.md](SPEC.md) (spec-driven: update the spec first, then the code).
+
+| Service | Directory | Stack | Run locally |
+|---|---|---|---|
+| **archflux-web** | [`frontend/`](frontend/) | React 19 + Vite SPA, nginx image | `cd frontend && npm install && npm run dev` → :5173 |
+| **archflux-api** | [`backend/`](backend/) | Spring Boot 3.5 / Java 21, PostgreSQL 17, Redis 7 | `docker compose -f backend/compose.yml up -d db redis && cd backend && mvn spring-boot:run` → :3001 |
+
+Full stack: `docker compose up -d --build` (same-origin, :8080) or the two per-service compose files (cross-origin).
+A fresh browser starts with an empty workspace — there is no built-in sample data; use **Blueprints** for
+starter topologies.
+
+**Production:** AWS — one EC2 instance running the compose stack behind Caddy (HTTPS), images in ECR, deployed by
+GitHub Actions. Setup guide: [docs/deploy/AWS.md](docs/deploy/AWS.md).
+
+### Repository layout
+
+```
+README.md  SPEC.md            entry points (SPEC.md = master spec index)
+compose.yml  .env.example     integrated local stack
+frontend/   backend/          the two services (each builds, tests and deploys on its own)
+deploy/aws/                   CloudFormation, compose overlay, Caddyfile, remote deploy script
+docs/specs/                   service, frontend, backend, product and UI specs
+docs/deploy/  docs/ops/       AWS + operating guides, runbooks, alerts
+docs/design/  docs/qa/        design proposals, accessibility and test plans
+docs/archive/                 superseded documents
+scripts/                      cross-service checks
+```
+
+---
+
 ## 0. Executive Summary & Design System Foundations
 
 ArchFlux is a developer-first cloud topology authoring platform bridging the gap between conceptual
@@ -280,5 +313,5 @@ properties in `src/styles.css` (`:root`/light, `[data-theme="dark"]`, `[data-the
   canvas center, canvas actions (auto-layout, heal-all, exports), diagram switcher. Up/Down + Enter +
   Esc, `aria-activedescendant` listbox semantics.
 - **Crash & error boundary** — friendly non-blocking modal: "Reload Canvas" (safe re-mount),
-  "Load Safe Default Graph" (stashes corruption to `archflux:corrupt-backup`, loads sample mesh),
+  "Start Empty Canvas" (stashes corruption to `archflux:corrupt-backup`, starts an empty canvas),
   "Copy Debug Trace" (stack + payload for reports).

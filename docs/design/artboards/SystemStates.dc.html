@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — System states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; gap: 18px; padding: 28px 32px; box-sizing: border-box; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <div><h1 style="margin: 0; font-size: 22px; font-weight: 700">System states</h1><p style="margin: 4px 0 0; color: #5B6474">One pattern per failure: say what happened, what is safe, and the one next action. Never a blank screen, never a fake success (FL-28).</p></div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+    <sc-for list="{{banners}}" as="b" hint-placeholder-count="6">
+      <section aria-label="{{b.title}}" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
+        <div role="status" style="padding: 10px 14px; background: {{b.bg}}; color: {{b.fg}}; display: flex; align-items: center; gap: 8px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{b.fg}}"></span>{{b.title}}</div>
+        <div style="padding: 14px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1">
+          <span style="color: #3D4553">{{b.body}}</span>
+          <span style="font-size: 12px; color: #5B6474"><strong style="color: #1B1F27">Safe:</strong> {{b.safe}}</span>
+          <span style="display: flex; gap: 6px; margin-top: auto"><button style="height: 30px; padding: 0 12px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">{{b.cta}}</button><button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit">{{b.alt}}</button></span>
+        </div>
+      </section>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; flex-grow: 1; min-height: 0">
+    <section aria-label="Loading" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em">Loading · skeleton after 300 ms</span>
+      <sc-for list="{{skel}}" as="s" hint-placeholder-count="4">
+        <span style="height: {{s.h}}; width: {{s.w}}; border-radius: 6px; background: linear-gradient(90deg, #EEF0F3 0, #F6F7F9 100px, #EEF0F3 200px); background-size: 400px 100%; animation: shimmer 1.4s linear infinite"></span>
+      </sc-for>
+      <span style="font-size: 12px; color: #5B6474; margin-top: auto">After 10 s: “Still loading — the server is slow. Keep waiting or open the offline copy.”</span>
+    </section>
+    <section aria-label="Empty" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; text-align: center">
+      <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em">Empty · teaches the next step</span>
+      <span style="width: 56px; height: 56px; border-radius: 14px; border: 1.5px dashed #C3C8D1"></span>
+      <strong style="font-size: 15px">No proposals yet</strong>
+      <span style="color: #5B6474; max-width: 300px">Propose a change to get a review before it reaches main. Edits stay private until you open it.</span>
+      <button style="height: 32px; padding: 0 14px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Start a proposal</button>
+    </section>
+    <section aria-label="Not found" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; text-align: center">
+      <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em">Not found · no existence leak</span>
+      <strong style="font-size: 15px">We can't open this diagram</strong>
+      <span style="color: #5B6474; max-width: 300px">It may have been deleted, moved, or you don't have access. Signed in as [you@company.com].</span>
+      <span style="display: flex; gap: 6px"><button style="height: 32px; padding: 0 14px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Request access</button><button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit">Switch account</button></span>
+      <span style="font-size: 12px; color: #5B6474">Error ID af-7Q2K · copy for support</span>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const warn = { bg: '#FEF3C7', fg: '#92400E' }, err = { bg: '#FDE8E8', fg: '#B91C1C' }, info = { bg: '#EEF0FF', fg: '#4338CA' };
+    const b = (title, body, safe, cta, alt, t) => Object.assign({ title, body, safe, cta, alt }, t);
+    return {
+      banners: [
+        b('Offline — editing locally', 'Changes are saved on this device and upload when you reconnect.', '14 unsynced edits stored locally; closing the tab keeps them.', 'Retry now', 'Download copy', warn),
+        b('Couldn\'t save to cloud', 'The server returned an error on save (attempt 3 of 5, next in 20 s).', 'Your edits are kept locally; nothing was lost.', 'Retry now', 'Save as file', err),
+        b('Someone saved a newer version', '[Architect] saved v15 while you were editing v14.', 'Your changes are kept as a draft; nothing is overwritten.', 'Review & merge', 'Save as proposal', warn),
+        b('Your access changed', '[Owner] changed you to Viewer. Editing is off for this diagram.', 'Unsaved edits are kept as a private copy you can export.', 'Request edit access', 'Export my copy', info),
+        b('Session expired', 'Sign in again to keep saving. We\'ll bring you back here.', 'Edits stay in this tab and save after sign-in.', 'Sign in', 'Keep working offline', info),
+        b('Slow down — too many requests', 'You hit the request limit; ArchFlux will retry in 30 s.', 'Queued actions run automatically; nothing was dropped.', 'Got it', 'Status page', warn)
+      ],
+      skel: [{ h: '28px', w: '60%' }, { h: '120px', w: '100%' }, { h: '16px', w: '80%' }, { h: '16px', w: '45%' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Share</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v12" hint-size="1440px,48px"></dc-import>
+  <div style="position: absolute; left: 0; right: 0; top: 48px; bottom: 0; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px"></div>
+  <div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(15,18,25,.45)"></div>
+
+  <section role="dialog" aria-modal="true" aria-label="Share checkout-mesh.arch" style="position: absolute; left: 440px; top: 110px; width: 560px; box-sizing: border-box; background: #FFFFFF; border-radius: 14px; box-shadow: 0 24px 64px rgba(16,24,40,.25); padding: 24px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: center"><h1 style="margin: 0; font-size: 17px; font-weight: 700; flex-grow: 1">Share “checkout-mesh.arch”</h1><button aria-label="Close" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; font-size: 18px; color: #5B6474">×</button></div>
+
+    <div style="display: flex; gap: 8px">
+      <label style="flex-grow: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; padding: 4px 8px; border: 1px solid #4F46E5; border-radius: 8px; box-shadow: 0 0 0 3px rgba(79,70,229,.15)">
+        <span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-weight: 500">[teammate@company.com] <span aria-hidden="true">×</span></span>
+        <span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-weight: 500">Platform team <span aria-hidden="true">×</span></span>
+        <input aria-label="Add people, teams or emails" placeholder="Add people, teams or emails" style="flex-grow: 1; min-width: 120px; border: none; outline: none; font: inherit">
+      </label>
+      <select aria-label="Role for new people" style="height: 40px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit"><option>Can edit</option><option>Can comment</option><option>Can view</option></select>
+      <button style="height: 40px; padding: 0 16px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Invite</button>
+    </div>
+    <label style="display: flex; align-items: center; gap: 8px; color: #3D4553"><input type="checkbox" checked>Notify people and add a message</label>
+
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; font-weight: 600; color: #5B6474">People with access</span>
+      <sc-for list="{{people}}" as="p" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0">
+          <span style="width: 32px; height: 32px; border-radius: 16px; background: {{p.bg}}; color: {{p.fg}}; font-weight: 700; display: flex; align-items: center; justify-content: center">{{p.initial}}</span>
+          <span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 600">{{p.name}}</span><span style="font-size: 12px; color: #5B6474">{{p.sub}}</span></span>
+          <select aria-label="Role for {{p.name}}" style="height: 32px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>{{p.role}}</option></select>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid #EEF0F3">
+      <span style="font-size: 12px; font-weight: 600; color: #5B6474">General access</span>
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #E8F0FE; color: #1D4ED8; display: flex; align-items: center; justify-content: center" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></span>
+        <span style="flex-grow: 1; display: flex; flex-direction: column"><select aria-label="General access" style="width: fit-content; height: 30px; border: none; font: inherit; font-weight: 600; padding: 0"><option>Anyone at [Company] workspace</option><option>Restricted</option><option>Anyone with the link</option></select><span style="font-size: 12px; color: #5B6474">can find and view; link expires never</span></span>
+        <select aria-label="Workspace role" style="height: 32px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>Can view</option></select>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid #EEF0F3">
+      <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 500">Copy link</button>
+      <a href="Export.dc.html" style="height: 36px; display: flex; align-items: center; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 8px; color: #1B1F27; text-decoration: none; font-weight: 500">Embed &amp; publish</a>
+      <span style="flex-grow: 1"></span>
+      <button style="height: 36px; padding: 0 16px; border: none; border-radius: 8px; background: #1B1F27; color: #FFFFFF; font: inherit; font-weight: 600">Done</button>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      people: [
+        { name: '[Your name] (you)', sub: 'Owner', role: 'Owner', initial: 'R', bg: '#E8EAFD', fg: '#4338CA' },
+        { name: '[Architect]', sub: 'Reviewer on v12', role: 'Can edit', initial: 'A', bg: '#DCF3E6', fg: '#047857' },
+        { name: 'Payments team', sub: '8 members', role: 'Can edit', initial: 'P', bg: '#E8F0FE', fg: '#1D4ED8' },
+        { name: '[Contractor]', sub: 'External · expires in 30 days', role: 'Can comment', initial: 'C', bg: '#FEF3E2', fg: '#92400E' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

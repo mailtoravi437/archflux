@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Canvas workspace</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+
+  <!-- App bar 48px -->
+  <header style="height: 48px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 26px; height: 26px; border-radius: 7px; background: {{accent}}; display: flex; align-items: center; justify-content: center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>
+      </div>
+      <span style="font-weight: 700; font-size: 15px; letter-spacing: -0.01em">ArchFlux</span>
+    </div>
+    <span style="width: 1px; height: 20px; background: #E3E6EB"></span>
+    <button style="display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 6px; background: transparent; font: inherit; font-weight: 600; color: #1B1F27; cursor: pointer" aria-label="Switch diagram — checkout-mesh.arch">
+      checkout-mesh.arch
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+    <nav aria-label="Primary" style="display: flex; gap: 2px; margin-left: 12px">
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Library</a>
+      <a href="Main.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; background: #EEF0FF; color: #4338CA; text-decoration: none; font-weight: 600" aria-current="page">Canvas</a>
+      <a href="Review.dc.html" style="height: 32px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Review <span style="min-width: 18px; height: 18px; border-radius: 9px; background: #E3E6EB; color: #1B1F27; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">2</span></a>
+      <a href="Sync.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Sync</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Blueprints</a>
+    </nav>
+
+    <div style="flex-grow: 1"></div>
+
+    <button style="display: flex; align-items: center; gap: 8px; height: 32px; width: 220px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #F6F7F9; font: inherit; color: #5B6474; cursor: pointer" aria-label="Search and commands (Command K)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span style="flex-grow: 1; text-align: left">Search or run a command</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 1px 5px; border: 1px solid #E3E6EB; border-radius: 4px; background: #FFFFFF">⌘K</span>
+    </button>
+
+    <button style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; color: #1B1F27; cursor: pointer" aria-label="Status: local diagram, 3 lint issues. Open status menu">
+      <span style="width: 8px; height: 8px; border-radius: 4px; background: #8A93A3" aria-hidden="true"></span>
+      <span style="font-weight: 500">Local</span>
+      <span style="color: #C3C8D1">·</span>
+      <span style="font-weight: 600; color: #92400E">3 issues</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+    <button style="height: 32px; padding: 0 14px; border: none; border-radius: 6px; background: {{accent}}; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Save</button>
+
+    <button style="width: 32px; height: 32px; border: 1px solid transparent; border-radius: 6px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer" aria-label="More: export, import, focus, shortcuts">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#5B6474" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+    </button>
+    <button style="width: 32px; height: 32px; border: 1px solid transparent; border-radius: 6px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer" aria-label="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+    <button style="width: 32px; height: 32px; border-radius: 16px; border: none; background: #E8EAFD; color: #4338CA; font: inherit; font-weight: 700; cursor: pointer" aria-label="Account — Ravi">R</button>
+  </header>
+
+  <!-- Workspace -->
+  <div style="flex-grow: 1; position: relative; display: flex; min-height: 0">
+
+    <!-- Canvas -->
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+
+      <!-- Tool rail -->
+      <div role="toolbar" aria-label="Canvas tools" aria-orientation="vertical" style="position: absolute; left: 12px; top: 12px; width: 48px; padding: 6px 4px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.06)">
+        <button aria-label="Select (V)" title="Select  V" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: #EEF0FF; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4338CA" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m4 3 7 18 2.5-7.5L21 11z"/></svg></button>
+        <button aria-label="Pan (H)" title="Pan  H" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/></svg></button>
+        <span style="width: 24px; height: 1px; background: #E3E6EB; margin: 4px 0"></span>
+        <button aria-label="Service (S)" title="Service  S" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
+        <button aria-label="Gateway (G)" title="Gateway  G" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></button>
+        <button aria-label="Database (D)" title="Database  D" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></button>
+        <button aria-label="Queue (Q)" title="Queue  Q" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <button aria-label="Shapes library (L)" title="Shapes  L" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><path d="m7 13 5 8H2zM17 13v8M13 17h8"/></svg></button>
+        <span style="width: 24px; height: 1px; background: #E3E6EB; margin: 4px 0"></span>
+        <button aria-label="Connect (C)" title="Connect  C" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M7 17 17 7"/></svg></button>
+        <button aria-label="Draw (P)" title="Draw  P" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button>
+        <button aria-label="Text (T)" title="Text  T" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7V5h16v2M9 19h6M12 5v14"/></svg></button>
+        <button aria-label="Comment (M)" title="Comment  M" style="width: 38px; height: 38px; border: none; border-radius: 8px; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+      </div>
+
+      <!-- Edges (orthogonal) -->
+      <div style="position: absolute; left: 318px; top: 205px; width: 102px; height: 1.5px; background: #8A93A3"></div>
+      <div style="position: absolute; left: 600px; top: 205px; width: 100px; height: 1.5px; background: #8A93A3"></div>
+      <div style="position: absolute; left: 510px; top: 240px; width: 1.5px; height: 110px; background: #8A93A3"></div>
+      <div style="position: absolute; left: 880px; top: 205px; width: 100px; height: 1.5px; background: #8A93A3"></div>
+      <div style="position: absolute; left: 790px; top: 240px; width: 1.5px; height: 110px; background: #8A93A3"></div>
+      <div style="position: absolute; left: 1070px; top: 240px; width: 1.5px; height: 110px; background: #8A93A3"></div>
+      <!-- Edge label pills -->
+      <span style="position: absolute; left: 336px; top: 194px; padding: 2px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; color: #3D4553">gRPC · TLS</span>
+      <span style="position: absolute; left: 610px; top: 194px; padding: 2px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; color: #3D4553">POST /orders</span>
+      <span style="position: absolute; left: 892px; top: 194px; padding: 2px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; color: #3D4553">order-created</span>
+      <span style="position: absolute; left: 470px; top: 286px; padding: 2px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; color: #3D4553">verify token</span>
+      <span style="position: absolute; left: 752px; top: 286px; padding: 2px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; color: #3D4553">commit</span>
+
+      <!-- Nodes -->
+      <div style="position: absolute; left: 138px; top: 170px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px solid #2563EB; border-radius: 8px; display: flex; gap: 10px; align-items: flex-start; box-shadow: 0 0 0 3px rgba(79,70,229,.25)">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #E8F0FE; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-weight: 600; font-size: 13px">Client Gateway</span><span style="font-size: 11px; color: #5B6474">Web / Mobile</span></span>
+      </div>
+      <span style="position: absolute; left: 133px; top: 165px; width: 8px; height: 8px; background: #FFFFFF; border: 1.5px solid #4F46E5; border-radius: 2px"></span>
+      <span style="position: absolute; left: 313px; top: 165px; width: 8px; height: 8px; background: #FFFFFF; border: 1.5px solid #4F46E5; border-radius: 2px"></span>
+      <span style="position: absolute; left: 133px; top: 237px; width: 8px; height: 8px; background: #FFFFFF; border: 1.5px solid #4F46E5; border-radius: 2px"></span>
+      <span style="position: absolute; left: 313px; top: 237px; width: 8px; height: 8px; background: #FFFFFF; border: 1.5px solid #4F46E5; border-radius: 2px"></span>
+
+      <!-- Selection toolbar placement rule (2026-10-26, owner-reported: the bar covered the selected card).
+           The bar ("Element actions": Display · Replace icon · Format painter) anchors ABOVE the selection box:
+           bottom edge = selection top - 12 px (bar height 44 px, so top = selection top - 56 px here: 170 - 56 = 114).
+           Horizontal: centred on the selection, kept 76 px clear of the left edge (tool rail) and inside the canvas.
+           Flip: when selection top - 56 px < 8 px (no room above) the bar goes BELOW: top = selection bottom + 12 px.
+           The bar never intersects the selection rectangle and never covers the selected element.
+           Z-order of canvas chrome (low to high): canvas 0 · selection toolbar 40 · Shapes drawer 46 (above the
+           minimap, View toolbar and pages bar, all 44; the drawer owns the full left column while open) ·
+           menus and popovers 90 · modal dialogs 90+. -->
+      <div role="toolbar" aria-label="Element actions" style="position: absolute; left: 228px; top: 114px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 8px; box-sizing: border-box; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.06); z-index: 40">
+        <span style="font-size: 12px; color: #5B6474">Display</span>
+        <span role="radiogroup" aria-label="Display style" style="display: flex; padding: 2px; background: #F1F2F5; border-radius: 8px"><span role="radio" aria-checked="false" style="height: 28px; padding: 0 12px; display: flex; align-items: center; font-size: 12px; font-weight: 500; color: #5B6474">Icon</span><span role="radio" aria-checked="true" style="height: 28px; padding: 0 12px; display: flex; align-items: center; font-size: 12px; font-weight: 600; background: #FFFFFF; border-radius: 6px; box-shadow: 0 1px 2px rgba(16,24,40,.08)">Card</span><span role="radio" aria-checked="false" style="height: 28px; padding: 0 12px; display: flex; align-items: center; font-size: 12px; font-weight: 500; color: #5B6474">Shape</span></span>
+        <button aria-label="Replace icon" style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Replace icon</button>
+        <button aria-label="Format painter" style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Format painter</button>
+      </div>
+
+      <div style="position: absolute; left: 420px; top: 170px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px solid #7C3AED; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #F1EBFE; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Envoy Ingress</span><span style="font-size: 11px; color: #5B6474">Envoy 1.28</span></span>
+      </div>
+      <div style="position: absolute; left: 700px; top: 170px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px solid #2563EB; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #E8F0FE; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">Spring Boot 3.3</span></span>
+      </div>
+      <div style="position: absolute; left: 980px; top: 170px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px solid #7C3AED; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #F1EBFE; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Kafka Event Mesh</span><span style="font-size: 11px; color: #5B6474">Kafka 3.6</span></span>
+      </div>
+      <div style="position: absolute; left: 420px; top: 350px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px solid #D97706; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #FEF3E2; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Auth Gateway</span><span style="font-size: 11px; color: #5B6474">Go 1.22 · OAuth2</span></span>
+      </div>
+      <div style="position: absolute; left: 700px; top: 350px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px solid #2563EB; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #E8F0FE; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Aurora Postgres</span><span style="font-size: 11px; color: #5B6474">RDS Multi-AZ</span></span>
+      </div>
+      <div style="position: absolute; left: 980px; top: 350px; width: 180px; height: 72px; box-sizing: border-box; padding: 12px; background: #FFFFFF; border: 1.5px dashed #8A93A3; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #F1F2F5; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Billing Worker</span><span style="font-size: 11px; color: #92400E; font-weight: 500">Not connected</span></span>
+      </div>
+
+      <!-- Bottom canvas toolbar -->
+      <div role="toolbar" aria-label="View" style="position: absolute; left: 72px; bottom: 16px; height: 40px; padding: 0 4px; display: flex; align-items: center; gap: 2px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.06)">
+        <button aria-label="Zoom out" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 16px; color: #3D4553">−</button>
+        <button aria-label="Reset zoom to 100%" style="height: 32px; padding: 0 6px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font: inherit; font-weight: 500; color: #1B1F27; min-width: 48px">100%</button>
+        <button aria-label="Zoom in" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 16px; color: #3D4553">+</button>
+        <button aria-label="Fit to screen (F)" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 9V5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4"/></svg></button>
+        <span style="width: 1px; height: 20px; background: #E3E6EB; margin: 0 4px"></span>
+        <button aria-label="Undo" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+        <button aria-label="Redo" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
+        <span style="width: 1px; height: 20px; background: #E3E6EB; margin: 0 4px"></span>
+        <button aria-label="Hide minimap" aria-pressed="true" style="width: 32px; height: 32px; border: none; background: #EEF0FF; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4338CA" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/></svg></button>
+        <button aria-label="Focus mode" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D4553" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+      </div>
+
+      <!-- Minimap above the toolbar -->
+      <div role="img" aria-label="Minimap overview" style="position: absolute; left: 72px; bottom: 66px; width: 176px; height: 108px; box-sizing: border-box; padding: 8px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 12px rgba(16,24,40,.06)">
+        <div style="position: relative; width: 100%; height: 100%; background: #F6F7F9; border-radius: 6px">
+          <span style="position: absolute; left: 6px; top: 22px; width: 26px; height: 10px; background: #93B4F5; border-radius: 2px"></span>
+          <span style="position: absolute; left: 44px; top: 22px; width: 26px; height: 10px; background: #B9A1F5; border-radius: 2px"></span>
+          <span style="position: absolute; left: 82px; top: 22px; width: 26px; height: 10px; background: #93B4F5; border-radius: 2px"></span>
+          <span style="position: absolute; left: 120px; top: 22px; width: 26px; height: 10px; background: #B9A1F5; border-radius: 2px"></span>
+          <span style="position: absolute; left: 44px; top: 48px; width: 26px; height: 10px; background: #F1C27D; border-radius: 2px"></span>
+          <span style="position: absolute; left: 82px; top: 48px; width: 26px; height: 10px; background: #93B4F5; border-radius: 2px"></span>
+          <span style="position: absolute; left: 120px; top: 48px; width: 26px; height: 10px; background: #C3C8D1; border-radius: 2px"></span>
+          <span style="position: absolute; left: 2px; top: 10px; width: 112px; height: 58px; border: 1.5px solid #4F46E5; border-radius: 3px"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inspector 320px -->
+    <aside aria-label="Inspector" style="width: 320px; flex-shrink: 0; background: #FFFFFF; border-left: 1px solid #E3E6EB; display: flex; flex-direction: column; min-height: 0">
+      <!-- 2026-10-26: tabs are Inspector · AI assistant · Live · History (text only, no count pills). The lint list is no longer a dock tab: it opens from the status menu (AppBar.dc.html, "Linter"). The AI assistant tab is an honest R2 placeholder: see Assistant.dc.html, section "R1 state". -->
+      <div role="tablist" aria-label="Right panel" style="display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid #E3E6EB">
+        <button role="tab" aria-selected="true" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid {{accent}}; background: transparent; font: inherit; font-weight: 600; color: #1B1F27; cursor: pointer">Inspector</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #5B6474; cursor: pointer">AI assistant</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #5B6474; cursor: pointer">Live</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #5B6474; cursor: pointer">History</button>
+        <span style="flex-grow: 1"></span>
+        <button aria-label="Close panel" style="width: 28px; height: 28px; align-self: center; border: none; background: transparent; border-radius: 6px; cursor: pointer; color: #5B6474; font-size: 16px">×</button>
+      </div>
+
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 32px; height: 32px; border-radius: 8px; background: #E8F0FE; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+          <span style="display: flex; flex-direction: column"><span style="font-weight: 600; font-size: 15px">Client Gateway</span><span style="font-size: 11px; color: #5B6474">Service · 2 connections</span></span>
+        </div>
+
+        <section style="display: flex; flex-direction: column; gap: 10px">
+          <button style="display: flex; align-items: center; justify-content: space-between; padding: 0; border: none; background: transparent; font: inherit; font-weight: 600; font-size: 12px; color: #1B1F27; cursor: pointer" aria-expanded="true">Content <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Label<input value="Client Gateway" style="height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; color: #1B1F27"></label>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Technology<input value="Web / Mobile" style="height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; color: #1B1F27"></label>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Details<textarea placeholder="Shown inside the node — e.g. region, replicas" style="height: 56px; padding: 8px 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; resize: none"></textarea></label>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 10px; padding-top: 12px; border-top: 1px solid #EEF0F3">
+          <button style="display: flex; align-items: center; justify-content: space-between; padding: 0; border: none; background: transparent; font: inherit; font-weight: 600; font-size: 12px; color: #1B1F27; cursor: pointer" aria-expanded="true">Appearance <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 12px; color: #5B6474">Colour</span>
+            <div style="display: flex; gap: 8px">
+              <button aria-label="Blue" aria-pressed="true" style="width: 24px; height: 24px; border-radius: 12px; background: #2563EB; border: none; box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB; cursor: pointer"></button>
+              <button aria-label="Violet" style="width: 24px; height: 24px; border-radius: 12px; background: #7C3AED; border: none; cursor: pointer"></button>
+              <button aria-label="Green" style="width: 24px; height: 24px; border-radius: 12px; background: #15803D; border: none; cursor: pointer"></button>
+              <button aria-label="Amber" style="width: 24px; height: 24px; border-radius: 12px; background: #D97706; border: none; cursor: pointer"></button>
+              <button aria-label="Red" style="width: 24px; height: 24px; border-radius: 12px; background: #DC2626; border: none; cursor: pointer"></button>
+              <button aria-label="Gray" style="width: 24px; height: 24px; border-radius: 12px; background: #6B7280; border: none; cursor: pointer"></button>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 12px; color: #5B6474">Shape</span>
+            <div role="radiogroup" aria-label="Shape" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 2px; background: #F1F2F5; border-radius: 8px">
+              <button role="radio" aria-checked="true" style="height: 28px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer">Card</button>
+              <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553; cursor: pointer">Box</button>
+              <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553; cursor: pointer">Icon</button>
+              <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553; cursor: pointer">Cylinder</button>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 12px; color: #5B6474">Border</span>
+            <div role="radiogroup" aria-label="Border width" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 2px; background: #F1F2F5; border-radius: 8px">
+              <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553; cursor: pointer">Thin</button>
+              <button role="radio" aria-checked="true" style="height: 28px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer">Regular</button>
+              <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553; cursor: pointer">Bold</button>
+              <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553; cursor: pointer">Dashed</button>
+            </div>
+          </div>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid #EEF0F3">
+          <button style="display: flex; align-items: center; justify-content: space-between; padding: 0; border: none; background: transparent; font: inherit; font-weight: 600; font-size: 12px; color: #1B1F27; cursor: pointer" aria-expanded="false">Icon <span style="display: flex; align-items: center; gap: 6px; font-weight: 500; color: #5B6474">Monitor <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></button>
+        </section>
+        <section style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid #EEF0F3">
+          <button style="display: flex; align-items: center; justify-content: space-between; padding: 0; border: none; background: transparent; font: inherit; font-weight: 600; font-size: 12px; color: #1B1F27; cursor: pointer" aria-expanded="false">Metadata <span style="display: flex; align-items: center; gap: 6px; font-weight: 500; color: #5B6474">Port, repo, spec <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span></button>
+        </section>
+
+        <div style="display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid #EEF0F3">
+          <button style="flex-grow: 1; height: 32px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Duplicate</button>
+          <button style="flex-grow: 1; height: 32px; border: 1px solid #F5C2C2; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; color: #B91C1C; cursor: pointer">Delete</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#2563EB","#0F766E","#1B1F27"]},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#4F46E5' };
+  }
+}
+</script>
+</body>
+</html>

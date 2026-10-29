@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Impact mode</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v13" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+      <div style="position: absolute; left: 16px; top: 14px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #1B1F27; color: #FFFFFF; border-radius: 10px; z-index: 2">
+        <strong>Impact of Payments DB</strong>
+        <span style="color: #C3C8D1">Depth</span>
+        <div role="radiogroup" aria-label="Depth" style="display: flex; gap: 2px"><button role="radio" aria-checked="false" style="width: 28px; height: 26px; border: none; border-radius: 6px; background: #2B313C; color: #FFFFFF; font: inherit">1</button><button role="radio" aria-checked="true" style="width: 28px; height: 26px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 700">2</button><button role="radio" aria-checked="false" style="width: 28px; height: 26px; border: none; border-radius: 6px; background: #2B313C; color: #FFFFFF; font: inherit">3</button></div>
+        <label style="display: flex; align-items: center; gap: 6px; color: #C3C8D1"><input type="checkbox" checked>Upstream</label>
+        <label style="display: flex; align-items: center; gap: 6px; color: #C3C8D1"><input type="checkbox" checked>Downstream</label>
+        <a href="Main.dc.html" style="color: #A5B4FC">Exit (Esc)</a>
+      </div>
+
+      <!-- dimmed -->
+      <div style="position: absolute; left: 60px; top: 120px; width: 170px; height: 60px; border: 1.5px solid #C3C8D1; border-radius: 8px; background: #FFFFFF; opacity: .35; padding: 10px; box-sizing: border-box"><strong>CDN</strong></div>
+      <div style="position: absolute; left: 60px; top: 420px; width: 170px; height: 60px; border: 1.5px solid #C3C8D1; border-radius: 8px; background: #FFFFFF; opacity: .35; padding: 10px; box-sizing: border-box"><strong>Search</strong></div>
+      <!-- upstream depth 2 -->
+      <div style="position: absolute; left: 290px; top: 200px; width: 180px; height: 60px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; padding: 10px; box-sizing: border-box"><strong>Order Service</strong><br><span style="font-size: 11px; color: #5B6474">upstream · depth 2</span></div>
+      <span style="position: absolute; left: 470px; top: 230px; width: 70px; border-top: 2px solid #4F46E5"></span>
+      <div style="position: absolute; left: 540px; top: 200px; width: 180px; height: 60px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; padding: 10px; box-sizing: border-box"><strong>Payment Service</strong><br><span style="font-size: 11px; color: #5B6474">upstream · sync SQL</span></div>
+      <div style="position: absolute; left: 540px; top: 320px; width: 180px; height: 60px; border: 1.5px solid #7C3AED; border-radius: 8px; background: #FFFFFF; padding: 10px; box-sizing: border-box"><strong>Saga Orchestrator</strong><br><span style="font-size: 11px; color: #5B6474">upstream · sync SQL</span></div>
+      <span style="position: absolute; left: 720px; top: 230px; width: 80px; border-top: 2px solid #4F46E5"></span>
+      <span style="position: absolute; left: 720px; top: 350px; width: 80px; border-top: 2px solid #4F46E5"></span>
+      <!-- focus -->
+      <div style="position: absolute; left: 800px; top: 250px; width: 200px; height: 90px">
+        <svg width="200" height="90" viewBox="0 0 200 90" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M1 12v66c0 6 44 11 99 11s99-5 99-11V12" fill="#FFF7ED" stroke="#B45309" stroke-width="2.5"/><ellipse cx="100" cy="12" rx="99" ry="11" fill="#FFF7ED" stroke="#B45309" stroke-width="2.5"/></svg>
+        <span style="position: absolute; left: 16px; top: 34px"><strong>Payments DB</strong><br><span style="font-size: 11px; color: #5B6474">selected</span></span>
+      </div>
+      <!-- downstream -->
+      <span style="position: absolute; left: 1000px; top: 280px; width: 70px; border-top: 2px dashed #D97706"></span>
+      <div style="position: absolute; left: 1070px; top: 250px; width: 170px; height: 60px; border: 1.5px solid #B45309; border-radius: 8px; background: #FFFFFF; padding: 10px; box-sizing: border-box"><strong>Read replica</strong><br><span style="font-size: 11px; color: #5B6474">downstream · replicates</span></div>
+      <div style="position: absolute; left: 1070px; top: 360px; width: 170px; height: 60px; border: 1.5px solid #15803D; border-radius: 8px; background: #FFFFFF; padding: 10px; box-sizing: border-box"><strong>S3 backups</strong><br><span style="font-size: 11px; color: #5B6474">downstream · writes</span></div>
+    </div>
+
+    <aside aria-label="Blast radius" style="width: 340px; flex-shrink: 0; background: #FFFFFF; border-left: 1px solid #E3E6EB; padding: 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Blast radius</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+        <div style="padding: 10px; background: #F6F7F9; border-radius: 8px"><strong style="font-size: 18px">5</strong><br><span style="font-size: 11px; color: #5B6474">elements</span></div>
+        <div style="padding: 10px; background: #F6F7F9; border-radius: 8px"><strong style="font-size: 18px">3</strong><br><span style="font-size: 11px; color: #5B6474">teams</span></div>
+        <div style="padding: 10px; background: #F6F7F9; border-radius: 8px"><strong style="font-size: 18px">4</strong><br><span style="font-size: 11px; color: #5B6474">diagrams</span></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-weight: 600">Synchronous dependents (outage risk)</span>
+        <span>Payment Service · Payments · tier 1</span>
+        <span>Saga Orchestrator · Payments · tier 1</span>
+        <span>Order Service · Orders · tier 1 (via Payment)</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-weight: 600">Async / data (lag risk)</span>
+        <span>Read replica · S3 backups · Ledger projector</span>
+      </div>
+      <div style="padding: 10px 12px; background: #FFFBEB; border: 1px solid #F3D9A4; border-radius: 8px; color: #92400E">Single point of failure for 3 tier-1 services. Rule “No SPOF on tier-1” warns.</div>
+      <span style="flex-grow: 1"></span>
+      <button style="height: 36px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Notify owners (3 teams)</button>
+      <button style="height: 36px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Copy impact summary</button>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

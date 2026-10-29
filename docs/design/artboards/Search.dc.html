@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Search and element page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <section aria-label="Search results" style="width: 560px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #E3E6EB; display: flex; flex-direction: column">
+      <div style="padding: 16px; border-bottom: 1px solid #EEF0F3; display: flex; flex-direction: column; gap: 10px">
+        <label style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border: 1.5px solid #4F46E5; border-radius: 8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input aria-label="Search" value="payments db" style="flex-grow: 1; border: none; outline: none; font: inherit; font-size: 15px"></label>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap">
+          <button aria-pressed="true" style="height: 26px; padding: 0 10px; border: 1px solid #4F46E5; border-radius: 999px; background: #EEF0FF; color: #4338CA; font: inherit; font-size: 12px; font-weight: 600">All</button>
+          <button style="height: 26px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Elements 4</button>
+          <button style="height: 26px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Diagrams 3</button>
+          <button style="height: 26px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Comments 2</button>
+          <button style="height: 26px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Owner: Payments ▾</button>
+        </div>
+      </div>
+      <div style="padding: 8px; display: flex; flex-direction: column; gap: 2px; overflow: hidden">
+        <sc-for list="{{results}}" as="r" hint-placeholder-count="8">
+          <span style="{{r.head}}">{{r.group}}</span>
+          <a href="Search.dc.html" style="{{r.row}}"><span style="width: 8px; height: 8px; border-radius: 2px; background: {{r.dot}}; flex-shrink: 0"></span><span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 600">{{r.title}}</span><span style="font-size: 12px; color: #5B6474">{{r.sub}}</span></span><span style="font-size: 11px; color: #5B6474">{{r.meta}}</span></a>
+        </sc-for>
+      </div>
+      <span style="margin-top: auto; padding: 10px 16px; border-top: 1px solid #EEF0F3; font-size: 12px; color: #5B6474">↑↓ navigate · ↵ open · ⌘↵ open in new tab · Esc close</span>
+    </section>
+
+    <main aria-label="Element page" style="flex-grow: 1; padding: 24px 28px; overflow: hidden; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <div style="position: relative; width: 64px; height: 52px"><svg width="64" height="52" viewBox="0 0 64 52" aria-hidden="true"><path d="M1 8v36c0 4 14 7 31 7s31-3 31-7V8" fill="#FFFFFF" stroke="#B45309" stroke-width="1.5"/><ellipse cx="32" cy="8" rx="31" ry="7" fill="#FFFFFF" stroke="#B45309" stroke-width="1.5"/></svg></div>
+        <div style="flex-grow: 1"><h1 style="margin: 0; font-size: 22px; font-weight: 700">Payments DB</h1><p style="margin: 2px 0 0; color: #5B6474">Relational database · Aurora PostgreSQL · Owner: Payments · Tier 1 · data class PCI</p></div>
+        <a href="Impact.dc.html" style="height: 36px; display: flex; align-items: center; padding: 0 14px; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font-weight: 600; text-decoration: none">Show impact</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Appears in 4 diagrams</h2>
+          <a href="Main.dc.html">checkout-mesh.arch · Containers, Deployment</a>
+          <a href="Main.dc.html">payments-saga.arch · Containers</a>
+          <a href="Main.dc.html">dr-failover.arch (proposal #17)</a>
+          <a href="Main.dc.html">platform-overview.arch · Context</a>
+          <span style="font-size: 12px; color: #5B6474">One element, many views — rename it once, every view updates.</span>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Relationships</h2>
+          <span><strong>In</strong> · Payment Service (SQL), Saga Orchestrator (SQL), Ledger Projector (CDC)</span>
+          <span><strong>Out</strong> · Read replica (replicates), S3 backups (writes)</span>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Reality</h2>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px">rds:cluster/payments-prod</span>
+          <span style="display: flex; gap: 6px; align-items: center"><span style="width: 8px; height: 8px; border-radius: 4px; background: #D97706"></span>Drift: instance class changed (db.r6g.large → xlarge)</span>
+          <a href="Drift.dc.html" style="font-size: 12px">Open in Sync</a>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Discussion &amp; decisions</h2>
+          <span>2 open threads · 1 decision: “Keep single-writer; reads via replica”</span>
+          <span style="font-size: 12px; color: #5B6474">Last changed in v13 by [Architect] · merged proposal #12</span>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const head = 'font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em; padding: 10px 8px 4px';
+    const hide = 'display: none';
+    const row = (sel) => 'display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 6px; text-decoration: none; color: inherit; ' + (sel ? 'background: #EEF0FF' : '');
+    const r = (group, title, sub, meta, dot, first, sel) => ({ group, title, sub, meta, dot, head: first ? head : hide, row: row(sel) });
+    return {
+      no: false,
+      results: [
+        r('Elements', 'Payments DB', 'Aurora PostgreSQL · Payments', 'in 4 diagrams', '#B45309', true, true),
+        r('', 'Payments DB read replica', 'Aurora · Payments', 'in 2', '#B45309'),
+        r('', 'payment-jobs', 'Queue · SQS · Payments', 'in 1', '#BE185D'),
+        r('', 'Payment Service', 'ECS · Go · Payments', 'in 3', '#2563EB'),
+        r('Diagrams', 'payments-saga.arch', 'Payments space', 'v4', '#4F46E5', true),
+        r('', 'checkout-mesh.arch', 'Payments space', 'v13', '#4F46E5'),
+        r('Comments', '“Keep single-writer; reads via replica”', 'Decision on Payments DB', 'Tue', '#15803D', true),
+        r('', '“Card data must not leave the PCI zone”', 'Thread on Payment Service', 'Mon', '#8A93A3')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Library</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+
+  <header style="height: 48px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 26px; height: 26px; border-radius: 7px; background: #4F46E5; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></div>
+      <span style="font-weight: 700; font-size: 15px">ArchFlux</span>
+    </div>
+    <nav aria-label="Primary" style="display: flex; gap: 2px; margin-left: 24px">
+      <a href="Library.dc.html" aria-current="page" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; background: #EEF0FF; color: #4338CA; text-decoration: none; font-weight: 600">Library</a>
+      <a href="Main.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Canvas</a>
+      <a href="Review.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Review</a>
+      <a href="Sync.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Sync</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Blueprints</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <button style="display: flex; align-items: center; gap: 8px; height: 32px; width: 220px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #F6F7F9; font: inherit; color: #5B6474; cursor: pointer" aria-label="Search and commands (Command K)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span style="flex-grow: 1; text-align: left">Search or run a command</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 1px 5px; border: 1px solid #E3E6EB; border-radius: 4px; background: #FFFFFF">⌘K</span></button>
+    <button style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center" aria-label="Settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></button>
+    <button style="width: 32px; height: 32px; border-radius: 16px; border: none; background: #E8EAFD; color: #4338CA; font: inherit; font-weight: 700; cursor: pointer" aria-label="Account — Ravi">R</button>
+  </header>
+
+  <main style="flex-grow: 1; overflow: hidden; padding: 28px 32px">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Library</h1>
+          <p style="margin: 4px 0 0; color: #5B6474; font-size: 13px">6 diagrams · 4 saved to the server · 2 on this device</p>
+        </div>
+        <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Import .arch</button>
+        <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>New diagram</button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px">
+        <label style="flex-grow: 1; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; color: #5B6474"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input aria-label="Search diagrams" placeholder="Search diagrams by name or tag" style="flex-grow: 1; border: none; outline: none; font: inherit; background: transparent"></label>
+        <div role="radiogroup" aria-label="Source" style="display: flex; padding: 2px; background: #EBEDF1; border-radius: 8px">
+          <button role="radio" aria-checked="true" style="height: 32px; padding: 0 12px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-weight: 600; cursor: pointer">All</button>
+          <button role="radio" aria-checked="false" style="height: 32px; padding: 0 12px; border: none; border-radius: 6px; background: transparent; font: inherit; color: #3D4553; cursor: pointer">Server</button>
+          <button role="radio" aria-checked="false" style="height: 32px; padding: 0 12px; border: none; border-radius: 6px; background: transparent; font: inherit; color: #3D4553; cursor: pointer">This device</button>
+        </div>
+        <label style="display: flex; align-items: center; gap: 6px; color: #5B6474">Sort<select style="height: 36px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; color: #1B1F27"><option>Last modified</option><option>Name</option></select></label>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+        <sc-for list="{{docs}}" as="doc" hint-placeholder-count="6">
+          <a href="Main.dc.html" style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit">
+            <div style="height: 132px; background: #F6F7F9; border-bottom: 1px solid #EEF0F3; position: relative">
+              <span style="position: absolute; left: 22px; top: 34px; width: 52px; height: 22px; border: 1.5px solid #2563EB; border-radius: 4px; background: #FFFFFF"></span>
+              <span style="position: absolute; left: 96px; top: 34px; width: 52px; height: 22px; border: 1.5px solid #7C3AED; border-radius: 4px; background: #FFFFFF"></span>
+              <span style="position: absolute; left: 170px; top: 34px; width: 52px; height: 22px; border: 1.5px solid #2563EB; border-radius: 4px; background: #FFFFFF"></span>
+              <span style="position: absolute; left: 96px; top: 80px; width: 52px; height: 22px; border: 1.5px solid #D97706; border-radius: 4px; background: #FFFFFF"></span>
+              <span style="position: absolute; left: 74px; top: 44px; width: 22px; height: 1.5px; background: #8A93A3"></span>
+              <span style="position: absolute; left: 148px; top: 44px; width: 22px; height: 1.5px; background: #8A93A3"></span>
+              <span style="position: absolute; left: 121px; top: 56px; width: 1.5px; height: 24px; background: #8A93A3"></span>
+            </div>
+            <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-weight: 600; font-size: 14px">{{doc.title}}</span>
+              <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5B6474">
+                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; background: {{doc.chipBg}}; color: {{doc.chipFg}}; font-weight: 500">{{doc.source}}</span>
+                <span>{{doc.meta}}</span>
+              </span>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+
+      <p style="margin: 4px 0 0; font-size: 12px; color: #5B6474">This device: 2 of 25 diagrams · 48 KB used · <a href="Library.dc.html">Manage storage</a></p>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const server = { chipBg: '#E8EAFD', chipFg: '#4338CA' };
+    const local = { chipBg: '#F1F2F5', chipFg: '#3D4553' };
+    return {
+      docs: [
+        { title: 'checkout-mesh.arch', source: 'Saved v12', meta: '9 nodes · 2 min ago', ...server },
+        { title: 'payments-saga.arch', source: 'Saved v4', meta: '6 nodes · yesterday', ...server },
+        { title: 'edge-routing.arch', source: 'Saved v7', meta: '5 nodes · 3 days ago', ...server },
+        { title: 'identity-platform.arch', source: 'Saved v2', meta: '8 nodes · last week', ...server },
+        { title: 'untitled.arch', source: 'This device', meta: '0 nodes · just now', ...local },
+        { title: 'rag-pipeline.arch', source: 'This device', meta: '6 nodes · 2 weeks ago', ...local }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

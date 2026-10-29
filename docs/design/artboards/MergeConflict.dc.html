@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Merge conflict resolver</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Review" status="Resolving conflicts" status-dot="#D97706" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 24px; overflow: hidden">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <p style="margin: 0 0 4px; font-size: 12px; color: #5B6474">#14 Introduce saga orchestration › Merge into main</p>
+          <h1 style="margin: 0; font-size: 22px; font-weight: 700">Resolve 2 conflicts</h1>
+          <p style="margin: 4px 0 0; color: #5B6474">11 changes merged automatically · 2 need a decision · base v11, main v13, proposal v15</p>
+        </div>
+        <a href="Review.dc.html" style="height: 36px; display: flex; align-items: center; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; color: #1B1F27; font-weight: 500; text-decoration: none">Cancel</a>
+        <button disabled style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #E3E6EB; color: #5B6474; font: inherit; font-weight: 600">Complete merge · 1 of 2 resolved</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px">
+        <aside style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em; padding: 6px 8px">Conflicts</span>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 6px; background: #EEF0FF"><span style="width: 18px; height: 18px; border-radius: 9px; background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">1</span><span style="flex-grow: 1; font-weight: 600">Payment Service · technology</span></div>
+          <div style="display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 6px"><span style="width: 18px; height: 18px; border-radius: 9px; background: #DCF3E6; color: #047857; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">✓</span><span style="flex-grow: 1">Payment Lock (Redis) · deleted vs edited</span></div>
+          <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em; padding: 12px 8px 6px">Merged automatically · 11</span>
+          <span style="padding: 4px 8px; color: #3D4553">Saga Orchestrator added</span>
+          <span style="padding: 4px 8px; color: #3D4553">Order Service owner (main) + tier (proposal)</span>
+          <span style="padding: 4px 8px; color: #3D4553">14 layout changes → proposal</span>
+          <a href="ReviewChanges.dc.html" style="padding: 4px 8px; font-size: 12px">Review all 11</a>
+        </aside>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: center; gap: 10px"><h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Payment Service · technology — both sides changed it</h2><a href="ReviewChanges.dc.html" style="font-size: 12px">Show on canvas</a></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+            <div style="border: 1px solid #E3E6EB; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #FAFBFC">
+              <span style="font-size: 12px; font-weight: 600; color: #5B6474">Base · v11</span>
+              <span style="font-family: 'JetBrains Mono', monospace">Go 1.21</span>
+              <span style="font-size: 12px; color: #5B6474">Common ancestor</span>
+            </div>
+            <div style="border: 1.5px solid #4F46E5; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 0 0 3px rgba(79,70,229,.12)">
+              <span style="font-size: 12px; font-weight: 600; color: #4338CA">main · v13 · [Architect]</span>
+              <span style="font-family: 'JetBrains Mono', monospace">Go 1.22</span>
+              <span style="font-size: 12px; color: #5B6474">“Platform upgrade wave 3”</span>
+              <label style="display: flex; align-items: center; gap: 8px; margin-top: 4px"><input type="radio" name="c1" checked>Keep main</label>
+            </div>
+            <div style="border: 1px solid #E3E6EB; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 12px; font-weight: 600; color: #3D4553">Proposal · v15 · [Engineer]</span>
+              <span style="font-family: 'JetBrains Mono', monospace">Go 1.22 + Temporal SDK</span>
+              <span style="font-size: 12px; color: #5B6474">“Add saga worker”</span>
+              <label style="display: flex; align-items: center; gap: 8px; margin-top: 4px"><input type="radio" name="c1">Keep proposal</label>
+            </div>
+          </div>
+          <label style="display: flex; align-items: center; gap: 8px"><input type="radio" name="c1">Edit manually</label>
+          <input aria-label="Manual value" value="Go 1.22 + Temporal SDK" style="height: 34px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px">
+          <div style="display: flex; gap: 8px; align-items: center; padding: 10px 12px; background: #F6F7F9; border-radius: 8px">
+            <span style="flex-grow: 1; color: #5B6474">Thread on this property: “Can we also mark this tier-1?” — stays attached after merge.</span>
+            <button style="height: 30px; padding: 0 12px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Mark resolved &amp; next</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

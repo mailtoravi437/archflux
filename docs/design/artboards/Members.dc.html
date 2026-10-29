@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Workspace members</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <nav aria-label="Workspace settings" style="width: 232px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #E3E6EB; padding: 20px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em; margin: 0 10px 8px">[Company] workspace</span>
+      <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+        <a href="Members.dc.html" style="{{n.style}}">{{n.label}}</a>
+      </sc-for>
+    </nav>
+    <main style="flex-grow: 1; padding: 28px 32px; overflow: hidden">
+      <div style="max-width: 1040px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; align-items: flex-end; gap: 16px">
+          <div style="flex-grow: 1">
+            <h1 style="margin: 0; font-size: 22px; font-weight: 700">Members</h1>
+            <p style="margin: 4px 0 0; color: #5B6474">24 members · 3 pending invites · 26 of 30 seats used</p>
+          </div>
+          <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Export CSV</button>
+          <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Invite members</button>
+        </div>
+        <div style="display: flex; gap: 10px">
+          <label style="flex-grow: 1; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; color: #5B6474"><input aria-label="Search members" placeholder="Search by name or email" style="flex-grow: 1; border: none; outline: none; font: inherit"></label>
+          <select aria-label="Role filter" style="height: 36px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit"><option>All roles</option></select>
+          <select aria-label="Team filter" style="height: 36px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit"><option>All teams</option></select>
+        </div>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden">
+          <div style="display: grid; grid-template-columns: 2.2fr 1.2fr 1.4fr 1fr 40px; gap: 12px; padding: 10px 16px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em"><span>Member</span><span>Role</span><span>Teams</span><span>Last active</span><span></span></div>
+          <sc-for list="{{members}}" as="m" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: 2.2fr 1.2fr 1.4fr 1fr 40px; gap: 12px; padding: 12px 16px; border-top: 1px solid #F1F2F5; align-items: center">
+              <span style="display: flex; align-items: center; gap: 10px"><span style="width: 32px; height: 32px; border-radius: 16px; background: {{m.bg}}; color: {{m.fg}}; font-weight: 700; display: flex; align-items: center; justify-content: center">{{m.initial}}</span><span style="display: flex; flex-direction: column"><span style="font-weight: 600">{{m.name}}</span><span style="font-size: 12px; color: #5B6474">{{m.email}}</span></span></span>
+              <select aria-label="Role for {{m.name}}" style="height: 32px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; width: fit-content"><option>{{m.role}}</option><option>Admin</option><option>Editor</option><option>Commenter</option><option>Viewer</option></select>
+              <span style="color: #3D4553">{{m.teams}}</span>
+              <span style="color: {{m.activeFg}}">{{m.active}}</span>
+              <button aria-label="More for {{m.name}}" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; color: #5B6474">⋯</button>
+            </div>
+          </sc-for>
+        </section>
+        <p style="margin: 0; font-size: 12px; color: #5B6474">SSO is enforced for @[company] — new members join through your identity provider. <a href="Members.dc.html">Security settings</a></p>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = 'height: 34px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; text-decoration: none; ';
+    const labels = ['Members', 'Teams', 'Security & SSO', 'Integrations', 'Policies', 'Audit log', 'Data & retention', 'Plan & billing'];
+    const muted = '#3D4553';
+    return {
+      no: false,
+      nav: labels.map((label) => ({ label, style: base + (label === 'Members' ? 'background: #EEF0FF; color: #4338CA; font-weight: 600' : 'color: #3D4553') })),
+      members: [
+        { name: '[Your name]', email: '[you@company.com]', role: 'Owner', teams: 'Payments, Platform', active: 'Now', activeFg: '#047857', initial: 'R', bg: '#E8EAFD', fg: '#4338CA' },
+        { name: '[Architect]', email: '[architect@company.com]', role: 'Admin', teams: 'Platform', active: '12 min ago', activeFg: muted, initial: 'A', bg: '#DCF3E6', fg: '#047857' },
+        { name: '[Engineer]', email: '[engineer@company.com]', role: 'Editor', teams: 'Payments', active: 'Today', activeFg: muted, initial: 'E', bg: '#FCE7F3', fg: '#BE185D' },
+        { name: '[Security lead]', email: '[security@company.com]', role: 'Commenter', teams: 'Security', active: 'Yesterday', activeFg: muted, initial: 'S', bg: '#FEF3E2', fg: '#92400E' },
+        { name: '[New hire]', email: '[newhire@company.com]', role: 'Viewer', teams: '—', active: 'Invite pending · resend', activeFg: '#92400E', initial: 'N', bg: '#F1F2F5', fg: '#3D4553' },
+        { name: '[Contractor]', email: '[contractor@partner.com]', role: 'Commenter', teams: 'Payments', active: 'Guest · expires 30 days', activeFg: '#92400E', initial: 'C', bg: '#F1F2F5', fg: '#3D4553' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

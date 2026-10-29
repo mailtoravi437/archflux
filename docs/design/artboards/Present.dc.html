@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Present mode</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#A5B4FC}a:hover{color:#C7D2FE}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background: #0F1219; color: #F4F5F7; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <div style="position: absolute; left: 120px; top: 60px; width: 1200px; height: 680px; background: #FFFFFF; border-radius: 12px; overflow: hidden; color: #1B1F27">
+    <div style="position: absolute; left: 40px; top: 32px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; font-weight: 600; color: #4338CA; text-transform: uppercase; letter-spacing: .06em">Frame 2 of 5</span>
+      <span style="font-size: 28px; font-weight: 700">Checkout: how an order becomes a payment</span>
+    </div>
+    <div style="position: absolute; left: 80px; top: 200px; width: 220px; height: 84px; box-sizing: border-box; padding: 14px; border: 2px solid #2563EB; border-radius: 10px; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Order Service</span><span style="color: #5B6474">publishes order-created</span></div>
+    <span style="position: absolute; left: 300px; top: 241px; width: 160px; height: 2px; background: #4F46E5"></span>
+    <span style="position: absolute; left: 340px; top: 222px; padding: 2px 10px; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-weight: 600">1 · event</span>
+    <div style="position: absolute; left: 460px; top: 200px; width: 220px; height: 84px; box-sizing: border-box; padding: 14px; border: 2px solid #7C3AED; border-radius: 10px; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Kafka</span><span style="color: #5B6474">order-created topic</span></div>
+    <span style="position: absolute; left: 680px; top: 241px; width: 160px; height: 2px; background: #4F46E5"></span>
+    <span style="position: absolute; left: 720px; top: 222px; padding: 2px 10px; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-weight: 600">2 · consume</span>
+    <div style="position: absolute; left: 840px; top: 200px; width: 240px; height: 84px; box-sizing: border-box; padding: 14px; border: 2px solid #2563EB; border-radius: 10px; box-shadow: 0 0 0 6px rgba(79,70,229,.15); display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Saga Orchestrator</span><span style="color: #5B6474">charges, reserves, settles</span></div>
+    <div style="position: absolute; left: 840px; top: 380px; width: 240px; height: 84px; box-sizing: border-box; padding: 14px; border: 2px dashed #C3C8D1; border-radius: 10px; color: #8A93A3; display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Payment Service</span><span>appears in step 3</span></div>
+    <span style="position: absolute; left: 1010px; top: 300px; width: 16px; height: 16px; border-radius: 8px; background: #EF4444; box-shadow: 0 0 0 6px rgba(239,68,68,.25)" aria-label="Laser pointer"></span>
+  </div>
+
+  <!-- Presenter controls -->
+  <div role="toolbar" aria-label="Presentation controls" style="position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); height: 48px; padding: 0 8px; display: flex; align-items: center; gap: 4px; background: #1B1F27; border: 1px solid #2B313C; border-radius: 12px">
+    <button aria-label="Previous frame" style="width: 40px; height: 40px; border: none; background: transparent; border-radius: 8px; color: #F4F5F7; font-size: 18px">‹</button>
+    <span style="padding: 0 10px; font-weight: 600">2 / 5 · step 2 of 3</span>
+    <button aria-label="Next step" style="width: 40px; height: 40px; border: none; background: transparent; border-radius: 8px; color: #F4F5F7; font-size: 18px">›</button>
+    <span style="width: 1px; height: 24px; background: #2B313C"></span>
+    <button aria-pressed="true" style="height: 36px; padding: 0 12px; border: none; background: #312E81; border-radius: 8px; color: #F4F5F7; font: inherit; font-weight: 500">Laser</button>
+    <button style="height: 36px; padding: 0 12px; border: none; background: transparent; border-radius: 8px; color: #F4F5F7; font: inherit">Notes</button>
+    <button style="height: 36px; padding: 0 12px; border: none; background: transparent; border-radius: 8px; color: #F4F5F7; font: inherit">Layers</button>
+    <span style="width: 1px; height: 24px; background: #2B313C"></span>
+    <a href="Main.dc.html" style="height: 36px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: #F4F5F7; text-decoration: none">Exit (Esc)</a>
+  </div>
+
+  <!-- Frame strip -->
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 80px; display: flex; align-items: center; justify-content: center; gap: 12px; background: #0B0E14; border-top: 1px solid #1B1F27">
+    <sc-for list="{{frames}}" as="f" hint-placeholder-count="5">
+      <span style="{{f.style}}">{{f.name}}</span>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = 'width: 150px; height: 52px; box-sizing: border-box; padding: 8px; border-radius: 8px; font-size: 12px; display: flex; align-items: flex-end; ';
+    const names = ['1 · Context', '2 · Order to payment', '3 · Failure handling', '4 · Data stores', '5 · Next quarter'];
+    return { frames: names.map((name, i) => ({ name, style: base + (i === 1 ? 'background: #FFFFFF; color: #1B1F27; font-weight: 600; box-shadow: 0 0 0 2px #818CF8' : 'background: #1B1F27; color: #C3C8D1') })) };
+  }
+}
+</script>
+</body>
+</html>

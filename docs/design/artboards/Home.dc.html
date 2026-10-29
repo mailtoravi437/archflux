@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+
+    <!-- Sidebar -->
+    <nav aria-label="Workspace" style="width: 232px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #E3E6EB; padding: 16px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px">
+      <button style="height: 36px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer; margin-bottom: 12px">New diagram</button>
+      <a href="Home.dc.html" aria-current="page" style="height: 32px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; background: #EEF0FF; color: #4338CA; font-weight: 600; text-decoration: none">Home</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none">All diagrams</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none">Shared with me</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none">Starred</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none">Templates</a>
+      <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em; margin: 16px 10px 4px">Team spaces</span>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none"><span style="width: 8px; height: 8px; border-radius: 2px; background: #2563EB"></span>Payments</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none"><span style="width: 8px; height: 8px; border-radius: 2px; background: #7C3AED"></span>Platform</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none"><span style="width: 8px; height: 8px; border-radius: 2px; background: #D97706"></span>Identity</a>
+      <div style="flex-grow: 1"></div>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; color: #3D4553; text-decoration: none">Trash</a>
+    </nav>
+
+    <main style="flex-grow: 1; overflow: hidden; padding: 28px 32px; display: flex; flex-direction: column; gap: 24px">
+      <div>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 700">Good morning, [Name]</h1>
+        <p style="margin: 4px 0 0; color: #5B6474">2 reviews waiting for you · 1 diagram has new drift</p>
+      </div>
+
+      <section aria-label="Start" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+        <sc-for list="{{starts}}" as="s" hint-placeholder-count="4">
+          <a href="NewDiagram.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; text-decoration: none; color: inherit">
+            <span style="width: 36px; height: 36px; border-radius: 8px; background: {{s.bg}}; display: flex; align-items: center; justify-content: center; color: {{s.fg}}; font-weight: 700; font-size: 16px">{{s.glyph}}</span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{s.title}}</span><span style="font-size: 12px; color: #5B6474">{{s.sub}}</span></span>
+          </a>
+        </sc-for>
+      </section>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+        <section style="grid-column: span 2; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Recent</h2><a href="Library.dc.html" style="font-size: 12px; font-weight: 500">View all</a></div>
+          <sc-for list="{{recent}}" as="d" hint-placeholder-count="5">
+            <a href="Main.dc.html" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 8px; text-decoration: none; color: inherit; border-bottom: 1px solid #F1F2F5">
+              <span style="font-weight: 600">{{d.title}}</span>
+              <span style="color: #5B6474">{{d.space}}</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: {{d.fg}}; font-weight: 500"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{d.dot}}"></span>{{d.state}}</span>
+              <span style="color: #5B6474; text-align: right">{{d.when}}</span>
+            </a>
+          </sc-for>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">For you</h2>
+          <a href="Review.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid #EEF0F3; border-radius: 8px; text-decoration: none; color: inherit"><span style="font-weight: 600">Review requested</span><span style="color: #5B6474">checkout-mesh.arch · v11 → v12</span></a>
+          <a href="Review.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid #EEF0F3; border-radius: 8px; text-decoration: none; color: inherit"><span style="font-weight: 600">You were mentioned</span><span style="color: #5B6474">payments-saga.arch · on Ledger DB</span></a>
+          <a href="Drift.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid #F3D9A4; background: #FFFBEB; border-radius: 8px; text-decoration: none; color: inherit"><span style="font-weight: 600; color: #92400E">New drift · 3 changes</span><span style="color: #5B6474">edge-routing.arch · from Kubernetes prod</span></a>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ok = { dot: '#15803D', fg: '#047857' };
+    const warn = { dot: '#D97706', fg: '#92400E' };
+    const local = { dot: '#8A93A3', fg: '#3D4553' };
+    return {
+      no: false,
+      starts: [
+        { title: 'Blank diagram', sub: 'Context, container or free', glyph: '+', bg: '#EEF0FF', fg: '#4338CA' },
+        { title: 'From template', sub: '40 architecture blueprints', glyph: '▦', bg: '#E8F0FE', fg: '#1D4ED8' },
+        { title: 'Import', sub: 'draw.io, Mermaid, Lucid CSV', glyph: '↥', bg: '#F1EBFE', fg: '#6D28D9' },
+        { title: 'Generate with AI', sub: 'From a prompt or a repo', glyph: '✦', bg: '#FEF3E2', fg: '#B45309' }
+      ],
+      recent: [
+        { title: 'checkout-mesh.arch', space: 'Payments', state: 'Saved v12', when: '2 min ago', ...ok },
+        { title: 'edge-routing.arch', space: 'Platform', state: '3 drift', when: '1 h ago', ...warn },
+        { title: 'payments-saga.arch', space: 'Payments', state: 'In review', when: 'Yesterday', ...ok },
+        { title: 'identity-platform.arch', space: 'Identity', state: 'Saved v2', when: 'Mon', ...ok },
+        { title: 'untitled.arch', space: 'This device', state: 'Local', when: 'Just now', ...local }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

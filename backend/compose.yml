@@ -1,0 +1,87 @@
+# archflux-api — standalone service stack (SERVICES_SPEC §5.2, separate topology).
+#   docker compose -f backend/compose.yml --env-file backend/.env up -d --build
+# db + redis + server. The SPA runs elsewhere (frontend/compose.yml or a CDN)
+# and calls this API cross-origin: set FRONTEND_URL / CORS_ALLOWED_ORIGINS.
+# Defaults below are DEV ONLY — prod values come from the secret manager.
+name: archflux-api
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-archflux}
+      POSTGRES_USER: ${POSTGRES_USER:-archflux}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+      # Consumed by docker/db-init/01-roles.sh on FIRST init only (fresh volume).
+      DB_APP_USER: ${DB_APP_USER:-archflux_app}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-archflux} -d $${POSTGRES_DB:-archflux}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    stop_grace_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  server:
+    build:
+      context: .
+    image: archflux-api:local
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    ports:
+      - "${SERVER_PORT:-3001}:3001"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      PORT: 3001
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://db:5432/${POSTGRES_DB:-archflux}}
+      SPRING_DATASOURCE_USERNAME: ${DB_APP_USER:-archflux_app}
+      SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:-K/aoUfN7OxZlq5x9AY43IdtruUYuOhjl}
+      APP_API_TOKEN: ${API_TOKEN:-f506189f13b9ff61e04350a8bd983008}
+      JWT_SECRET: ${JWT_SECRET:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+      REDIS_HOST: redis
+      # Flyway migrates at boot AS THE OWNER (extensions); app role is DML-only.
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_USER: ${POSTGRES_USER:-archflux}
+      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+      APP_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
+      SESSION_COOKIE_SECURE: ${APP_COOKIE_SECURE:-false}
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET:-}
+      # Public URLs + origin allow-list (SERVICES_SPEC §4.1/§4.2).
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:3001/api}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3001/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  pgdata:
+  redisdata:

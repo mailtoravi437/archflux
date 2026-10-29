@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Review overview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Review" status="Proposal #14" status-dot="#4F46E5" hint-size="1440px,48px"></dc-import>
+
+  <div style="background: #FFFFFF; border-bottom: 1px solid #E3E6EB; padding: 14px 24px 0; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="padding: 2px 10px; border-radius: 999px; background: #DCF3E6; color: #047857; font-size: 12px; font-weight: 600">Open</span>
+      <h1 style="margin: 0; font-size: 18px; font-weight: 700">#14 Introduce saga orchestration for payments</h1>
+      <span style="color: #5B6474"><strong style="color: #1B1F27">[Engineer]</strong> · 4 versions · base v11 → <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 1px 6px; background: #F1F2F5; border-radius: 4px">main</span></span>
+    </div>
+    <div role="tablist" aria-label="Review sections" style="display: flex; gap: 20px">
+      <span role="tab" aria-selected="true" style="height: 36px; display: flex; align-items: center; border-bottom: 2px solid #4F46E5; font-weight: 600">Overview</span>
+      <a href="ReviewChanges.dc.html" role="tab" aria-selected="false" style="height: 36px; display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent; color: #5B6474; text-decoration: none">Changes <span style="padding: 0 6px; border-radius: 999px; background: #F1F2F5; font-size: 11px">9</span></a>
+      <span role="tab" aria-selected="false" style="height: 36px; display: flex; align-items: center; border-bottom: 2px solid transparent; color: #5B6474">Checks</span>
+      <span role="tab" aria-selected="false" style="height: 36px; display: flex; align-items: center; border-bottom: 2px solid transparent; color: #5B6474">Activity</span>
+    </div>
+  </div>
+
+  <main style="flex-grow: 1; padding: 20px 24px; overflow: hidden">
+    <div style="max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">
+      <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Description</h2>
+          <p style="margin: 0; line-height: 20px">Replaces the Redis payment lock with a Temporal saga so payment, inventory and ledger steps can compensate on failure. Adds a "Failure handling" page.</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
+            <span style="padding: 4px 10px; border-radius: 999px; background: #DCF3E6; color: #047857; font-weight: 600">+3 added</span>
+            <span style="padding: 4px 10px; border-radius: 999px; background: #FDE8E8; color: #B91C1C; font-weight: 600">−1 removed</span>
+            <span style="padding: 4px 10px; border-radius: 999px; background: #FEF3C7; color: #92400E; font-weight: 600">3 changed</span>
+            <span style="padding: 4px 10px; border-radius: 999px; background: #F1F2F5; color: #3D4553; font-weight: 600">14 layout</span>
+            <a href="ReviewChanges.dc.html" style="padding: 4px 0; font-weight: 500">Open visual diff</a>
+          </div>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Activity</h2>
+          <sc-for list="{{activity}}" as="a" hint-placeholder-count="5">
+            <div style="display: flex; gap: 10px; align-items: flex-start">
+              <span style="width: 28px; height: 28px; border-radius: 14px; background: {{a.bg}}; color: {{a.fg}}; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">{{a.initial}}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px"><span><strong>{{a.who}}</strong> {{a.what}}</span><span style="font-size: 12px; color: #5B6474">{{a.when}}</span></span>
+            </div>
+          </sc-for>
+        </section>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+          <span style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Reviewers</h2><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Request</button></span>
+          <sc-for list="{{reviewers}}" as="r" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="width: 26px; height: 26px; border-radius: 13px; background: {{r.bg}}; color: {{r.fg}}; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center">{{r.initial}}</span>
+              <span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 600">{{r.name}}</span><span style="font-size: 11px; color: #5B6474">{{r.why}}</span></span>
+              <span style="padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: {{r.sbg}}; color: {{r.sfg}}">{{r.state}}</span>
+            </div>
+          </sc-for>
+        </section>
+
+        <section aria-label="Merge" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Ready to merge?</h2>
+          <sc-for list="{{gates}}" as="g" hint-placeholder-count="5">
+            <div style="display: flex; align-items: flex-start; gap: 8px">
+              <span style="width: 18px; height: 18px; border-radius: 9px; background: {{g.bg}}; color: {{g.fg}}; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0" aria-hidden="true">{{g.mark}}</span>
+              <span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 500">{{g.text}}</span><span style="font-size: 12px; color: #5B6474">{{g.sub}}</span></span>
+              <a href="{{g.href}}" style="font-size: 12px; font-weight: 500">{{g.fix}}</a>
+            </div>
+          </sc-for>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Name the result (optional)<input value="v13 · Saga orchestration" style="height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; color: #1B1F27"></label>
+          <div style="display: flex; gap: 6px">
+            <button disabled style="flex-grow: 1; height: 36px; border: none; border-radius: 6px; background: #E3E6EB; color: #5B6474; font: inherit; font-weight: 600">Merge — 2 blockers</button>
+            <select aria-label="Merge method" style="height: 36px; padding: 0 6px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>Merge</option><option>Squash</option></select>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ok = { mark: '✓', bg: '#DCF3E6', fg: '#047857' };
+    const bad = { mark: '!', bg: '#FDE8E8', fg: '#B91C1C' };
+    const warn = { mark: '!', bg: '#FEF3C7', fg: '#92400E' };
+    return {
+      reviewers: [
+        { name: '[Architect]', why: 'Requested', state: 'Approved', initial: 'A', bg: '#DCF3E6', fg: '#047857', sbg: '#DCF3E6', sfg: '#047857' },
+        { name: 'Payments team', why: 'Owner of Payment Service', state: 'Changes requested', initial: 'P', bg: '#E8F0FE', fg: '#1D4ED8', sbg: '#FDE8E8', sfg: '#B91C1C' },
+        { name: '[Security]', why: 'Owner of Card Vault', state: 'Pending', initial: 'S', bg: '#FEF3E2', fg: '#92400E', sbg: '#F1F2F5', sfg: '#3D4553' }
+      ],
+      gates: [
+        { text: '1 of 2 required approvals', sub: 'Owner review required for Payments', fix: 'Remind', href: 'ReviewChanges.dc.html', ...warn },
+        { text: 'Changes requested by Payments team', sub: '“Mark Payment Service tier-1”', fix: 'View', href: 'ReviewChanges.dc.html', ...bad },
+        { text: '2 unresolved threads', sub: 'Required by protection rules', fix: 'Open', href: 'ReviewChanges.dc.html', ...bad },
+        { text: 'Checks passed (1 warning)', sub: 'Policy: owner missing on Saga Ledger', fix: 'Details', href: 'ReviewChanges.dc.html', ...ok },
+        { text: 'No conflicts with main', sub: 'main is 2 ahead · auto-mergeable', fix: '', href: 'MergeConflict.dc.html', ...ok }
+      ],
+      activity: [
+        { who: '[Engineer]', what: 'opened this proposal from base v11', when: 'Mon 10:12', initial: 'E', bg: '#FCE7F3', fg: '#BE185D' },
+        { who: '[Architect]', what: 'approved', when: 'Mon 15:40', initial: 'A', bg: '#DCF3E6', fg: '#047857' },
+        { who: '[Engineer]', what: 'pushed v15 — approval by [Architect] kept (not stale-dismissed)', when: 'Tue 09:05', initial: 'E', bg: '#FCE7F3', fg: '#BE185D' },
+        { who: 'Payments team · [Lead]', what: 'requested changes with 3 comments and 1 suggestion', when: 'Tue 11:20', initial: 'P', bg: '#E8F0FE', fg: '#1D4ED8' },
+        { who: 'Policy check', what: 'warned: Saga Ledger has no owner', when: 'Tue 11:21', initial: '✓', bg: '#F1F2F5', fg: '#3D4553' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

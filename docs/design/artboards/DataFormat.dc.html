@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Data and conditional formatting</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v12" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+      <sc-for list="{{nodes}}" as="n" hint-placeholder-count="6">
+        <div style="position: absolute; left: {{n.x}}px; top: {{n.y}}px; width: 190px; height: 76px; box-sizing: border-box; padding: 10px 12px; background: {{n.fill}}; border: 1.5px solid {{n.stroke}}; border-radius: 8px; display: flex; flex-direction: column; gap: 3px">
+          <span style="display: flex; align-items: center; gap: 6px"><span style="font-weight: 600; flex-grow: 1">{{n.name}}</span><span style="padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; background: {{n.badgeBg}}; color: {{n.badgeFg}}">{{n.badge}}</span></span>
+          <span style="font-size: 11px; color: #3D4553">{{n.owner}}</span>
+          <span style="font-size: 11px; color: #5B6474; font-family: 'JetBrains Mono', monospace">SLO {{n.slo}} · ${{n.cost}}/mo</span>
+        </div>
+      </sc-for>
+      <span style="position: absolute; left: 290px; top: 178px; width: 100px; height: 1.5px; background: #8A93A3"></span>
+      <span style="position: absolute; left: 580px; top: 178px; width: 100px; height: 1.5px; background: #8A93A3"></span>
+      <span style="position: absolute; left: 485px; top: 216px; width: 1.5px; height: 104px; background: #8A93A3"></span>
+      <span style="position: absolute; left: 775px; top: 216px; width: 1.5px; height: 104px; background: #8A93A3"></span>
+
+      <!-- Legend -->
+      <section aria-label="Legend" style="position: absolute; left: 100px; bottom: 28px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 4px 12px rgba(16,24,40,.06); display: flex; flex-direction: column; gap: 6px">
+        <span style="font-weight: 600; font-size: 12px">Colour by owner team</span>
+        <span style="display: flex; gap: 14px">
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #DBE7FD; border: 1.5px solid #2563EB"></span>Payments</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #EDE4FD; border: 1.5px solid #7C3AED"></span>Platform</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 12px; height: 12px; border-radius: 3px; background: #FDEBD3; border: 1.5px solid #D97706"></span>Data</span>
+        </span>
+        <span style="font-weight: 600; font-size: 12px; margin-top: 4px">Badge</span>
+        <span style="display: flex; gap: 10px"><span style="padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; background: #FDE8E8; color: #B91C1C">SLO</span>below 99.9 %</span>
+      </section>
+    </div>
+
+    <aside aria-label="Right panel" style="width: 340px; flex-shrink: 0; background: #FFFFFF; border-left: 1px solid #E3E6EB; display: flex; flex-direction: column">
+      <div role="tablist" aria-label="Panel" style="display: flex; gap: 2px; padding: 8px 10px 0; border-bottom: 1px solid #E3E6EB">
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; color: #5B6474">Properties</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; color: #5B6474">Style</button>
+        <button role="tab" aria-selected="true" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid #4F46E5; background: transparent; font: inherit; font-weight: 600">Data</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; color: #5B6474">Comments</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; color: #5B6474">Rules</button>
+      </div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+        <section style="display: flex; flex-direction: column; gap: 8px">
+          <h2 style="margin: 0; font-size: 13px; font-weight: 600">Linked data</h2>
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #E3E6EB; border-radius: 8px">
+            <span style="width: 28px; height: 28px; border-radius: 6px; background: #DCF3E6; color: #047857; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-hidden="true">≡</span>
+            <span style="flex-grow: 1; display: flex; flex-direction: column"><span style="font-weight: 600">service-catalog.csv</span><span style="font-size: 12px; color: #5B6474">Matched 6 of 6 elements by name · updated 1 h ago</span></span>
+            <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Refresh</button>
+          </div>
+          <span style="font-size: 12px; color: #5B6474">Fields: owner, tier, slo, monthly_cost, data_class</span>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 13px; font-weight: 600; flex-grow: 1">Conditional formatting</h2><button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Add rule</button></div>
+          <div style="padding: 12px; border: 1px solid #E3E6EB; border-radius: 8px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-weight: 600">1 · Colour fill by</span>
+            <div style="display: flex; gap: 8px"><select aria-label="Field" style="flex-grow: 1; height: 32px; border: 1px solid #E3E6EB; border-radius: 6px; padding: 0 8px; font: inherit"><option>owner</option></select><select aria-label="Palette" style="width: 120px; height: 32px; border: 1px solid #E3E6EB; border-radius: 6px; padding: 0 8px; font: inherit"><option>Team colours</option></select></div>
+          </div>
+          <div style="padding: 12px; border: 1px solid #E3E6EB; border-radius: 8px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-weight: 600">2 · Show badge when</span>
+            <div style="display: flex; gap: 6px; align-items: center"><select aria-label="Field" style="width: 90px; height: 32px; border: 1px solid #E3E6EB; border-radius: 6px; padding: 0 8px; font: inherit"><option>slo</option></select><select aria-label="Operator" style="width: 70px; height: 32px; border: 1px solid #E3E6EB; border-radius: 6px; padding: 0 8px; font: inherit"><option>&lt;</option></select><input aria-label="Value" value="99.9" style="width: 64px; height: 32px; border: 1px solid #E3E6EB; border-radius: 6px; padding: 0 8px; font: inherit"><span style="padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; background: #FDE8E8; color: #B91C1C">SLO</span></div>
+          </div>
+          <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked>Show legend on canvas</label>
+        </section>
+
+        <section style="display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid #EEF0F3">
+          <h2 style="margin: 0; font-size: 13px; font-weight: 600">Overlays</h2>
+          <div role="radiogroup" aria-label="Overlay" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 2px; background: #F1F2F5; border-radius: 8px">
+            <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px">None</button>
+            <button role="radio" aria-checked="true" style="height: 28px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-size: 12px; font-weight: 600">Owners</button>
+            <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px">Cost</button>
+            <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px">Threats</button>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pay = { fill: '#DBE7FD', stroke: '#2563EB', owner: 'Owner · Payments' };
+    const plat = { fill: '#EDE4FD', stroke: '#7C3AED', owner: 'Owner · Platform' };
+    const data = { fill: '#FDEBD3', stroke: '#D97706', owner: 'Owner · Data' };
+    const ok = { badge: '', badgeBg: 'transparent', badgeFg: 'transparent' };
+    const bad = { badge: 'SLO', badgeBg: '#FDE8E8', badgeFg: '#B91C1C' };
+    return {
+      nodes: [
+        { name: 'API Gateway', x: 100, y: 140, slo: '99.99', cost: '420', ...plat, ...ok },
+        { name: 'Order Service', x: 390, y: 140, slo: '99.95', cost: '1,180', ...pay, ...ok },
+        { name: 'Kafka', x: 680, y: 140, slo: '99.9', cost: '2,050', ...plat, ...ok },
+        { name: 'Payment Service', x: 390, y: 320, slo: '99.5', cost: '960', ...pay, ...bad },
+        { name: 'Ledger DB', x: 680, y: 320, slo: '99.99', cost: '3,400', ...data, ...ok },
+        { name: 'Fraud Scorer', x: 390, y: 500, slo: '99.0', cost: '610', ...data, ...bad }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

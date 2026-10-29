@@ -1,0 +1,78 @@
+name: Deploy ArchFlux Backend
+
+# archflux-api → AWS (SERVICES_SPEC §6, §10): test → image to ECR → EC2.
+# Rollback: run manually with image_tag = a previously deployed commit sha.
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', 'compose.yml', 'deploy/aws/**', '.github/actions/aws-deploy/**', '.github/workflows/backend-deploy.yml']
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: Existing archflux-api tag to redeploy (skips build). Empty = build this commit.
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-aws
+  cancel-in-progress: false
+
+env:
+  IMAGE: archflux-api
+
+jobs:
+  test:
+    name: Backend tests
+    if: inputs.image_tag == ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - run: mvn -q -f backend/pom.xml test
+
+  image:
+    name: Build and push image
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push ${{ env.IMAGE }}:${{ github.sha }}
+        env:
+          REPO: ${{ steps.ecr.outputs.registry }}/${{ env.IMAGE }}
+        run: |
+          docker build -t "$REPO:$GITHUB_SHA" -t "$REPO:latest" backend
+          docker push "$REPO:$GITHUB_SHA"
+          docker push "$REPO:latest"
+
+  deploy:
+    name: Deploy to EC2
+    needs: [test, image]
+    # Runs after a fresh build, or alone for a manual redeploy of an existing tag.
+    if: always() && (needs.image.result == 'success' || (inputs.image_tag != '' && needs.image.result == 'skipped'))
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/aws-deploy
+        with:
+          service: server
+          image-tag: ${{ inputs.image_tag || github.sha }}
+          host: ${{ secrets.VM_HOST }}
+          user: ${{ vars.VM_USER || 'ec2-user' }}
+          ssh-key: ${{ secrets.VM_SSH_KEY }}
+          known-hosts: ${{ secrets.VM_KNOWN_HOSTS }}

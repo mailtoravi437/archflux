@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Element anatomy, sizes and states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 40px 48px; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; gap: 28px">
+  <h1 style="margin: 0; font-size: 22px; font-weight: 700">Element anatomy, sizes &amp; states</h1>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+    <!-- Anatomy -->
+    <section style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Anatomy (size M, 200 × 80)</h2>
+      <div style="position: relative; height: 200px; background: #F6F7F9; border-radius: 10px">
+        <div style="position: absolute; left: 160px; top: 56px; width: 220px; height: 84px; box-sizing: border-box; padding: 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; gap: 10px">
+          <img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 32px; height: 32px; border-radius: 4px">
+          <span style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">Service · ECS · Java</span><span style="font-size: 11px; color: #5B6474">Owner: Payments</span></span>
+          <span style="width: 10px; height: 10px; border-radius: 5px; background: #D97706" aria-label="Drift"></span>
+        </div>
+        <span style="position: absolute; left: 266px; top: 51px; width: 10px; height: 10px; border-radius: 5px; background: #FFFFFF; border: 1.5px solid #4F46E5"></span>
+        <span style="position: absolute; left: 375px; top: 93px; width: 10px; height: 10px; border-radius: 5px; background: #FFFFFF; border: 1.5px solid #4F46E5"></span>
+        <span style="position: absolute; left: 266px; top: 135px; width: 10px; height: 10px; border-radius: 5px; background: #FFFFFF; border: 1.5px solid #4F46E5"></span>
+        <span style="position: absolute; left: 155px; top: 93px; width: 10px; height: 10px; border-radius: 5px; background: #FFFFFF; border: 1.5px solid #4F46E5"></span>
+        <span style="position: absolute; left: 20px; top: 66px; font-size: 11px; color: #4338CA; font-weight: 600">1 · Provider icon 32</span>
+        <span style="position: absolute; left: 20px; top: 150px; font-size: 11px; color: #4338CA; font-weight: 600">4 · Ports N/E/S/W on hover</span>
+        <span style="position: absolute; left: 400px; top: 40px; font-size: 11px; color: #4338CA; font-weight: 600">2 · Name 13/600</span>
+        <span style="position: absolute; left: 400px; top: 112px; font-size: 11px; color: #4338CA; font-weight: 600">3 · Kind · tech · owner 11</span>
+        <span style="position: absolute; left: 400px; top: 64px; font-size: 11px; color: #4338CA; font-weight: 600">5 · Status slot</span>
+      </div>
+    </section>
+
+    <!-- Sizes -->
+    <section style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Sizes</h2>
+      <div style="height: 200px; background: #F6F7F9; border-radius: 10px; display: flex; align-items: center; justify-content: space-around; padding: 0 16px">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+          <div style="width: 64px; height: 64px; border: 1.5px solid #2563EB; border-radius: 10px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 40px; height: 40px; border-radius: 4px"></div>
+          <span style="font-weight: 600; font-size: 12px">Order Service</span>
+          <span style="font-size: 11px; color: #5B6474">S · 64 icon tile</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+          <div style="width: 200px; height: 80px; box-sizing: border-box; padding: 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; gap: 10px"><img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 32px; height: 32px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">Service · ECS</span></span></div>
+          <span style="font-size: 11px; color: #5B6474">M · 200 × 80 card (default)</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+          <div style="width: 240px; height: 120px; box-sizing: border-box; padding: 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 6px"><span style="display: flex; gap: 10px"><img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 32px; height: 32px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">Service · ECS · Java</span></span></span><span style="font-size: 11px; color: #3D4553">Accepts orders, reserves stock, emits order-created.</span></div>
+          <span style="font-size: 11px; color: #5B6474">L · 240 × 120 with description</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">States</h2>
+    <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px">
+      <sc-for list="{{states}}" as="s" hint-placeholder-count="12">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 96px; background: #F6F7F9; border-radius: 8px; display: flex; align-items: center; justify-content: center">
+            <div style="{{s.box}}">
+              <span style="display: flex; align-items: center; gap: 6px"><span style="{{s.nameStyle}}">Order Service</span><span style="{{s.markStyle}}">{{s.mark}}</span></span>
+              <span style="font-size: 11px; color: #5B6474">{{s.sub}}</span>
+            </div>
+          </div>
+          <span style="font-weight: 600; font-size: 12px">{{s.name}}</span>
+          <span style="font-size: 11px; color: #5B6474">{{s.rule}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- Added 2026-10-26 (R1-E14-T03 / T01 follow-up): Inspector with nothing selected, outline list rows. -->
+  <section aria-label="Inspector nothing selected, diagram outline" style="display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Inspector, nothing selected: diagram outline rows</h2>
+    <div style="display: flex; gap: 24px; align-items: flex-start">
+      <div style="width: 320px; box-sizing: border-box; padding: 16px; background: #FFFFFF; border: 1px solid #E3E6EB; display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: #1B1F27">
+        <div style="padding: 10px 12px; border-radius: 8px; background: #F6F7F9; font-size: 12px; color: #5B6474">Nothing selected — click a node or route to edit its properties here.</div>
+        <div style="font-size: 12px; font-weight: 600">Diagram outline (3)</div>
+        <div role="list" aria-label="Diagram outline, top to bottom" style="display: flex; flex-direction: column; gap: 2px; max-height: 180px; overflow-y: auto">
+          <!-- Default row: 36 high, padding 0 8, gap 10, radius 6, no border -->
+          <button role="listitem" aria-label="Client Gateway, Web / Mobile, 2 connections" title="Client Gateway" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px; border: none; border-radius: 6px; background: transparent; font: inherit; text-align: left; cursor: pointer; color: #1B1F27">
+            <span style="width: 28px; height: 28px; border-radius: 7px; background: #E8F0FE; flex-shrink: 0"></span>
+            <span style="flex: 1 1 auto; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Client Gateway</span>
+            <span style="flex-shrink: 0; margin-left: auto; font-size: 11px; color: #5B6474; font-variant-numeric: tabular-nums">2</span>
+          </button>
+          <!-- Hover row: background #F6F7F9 -->
+          <button role="listitem" aria-label="Order Service, Spring Boot, 4 connections" title="Order Service" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px; border: none; border-radius: 6px; background: #F6F7F9; font: inherit; text-align: left; cursor: pointer; color: #1B1F27">
+            <span style="width: 28px; height: 28px; border-radius: 7px; background: #E8F0FE; flex-shrink: 0"></span>
+            <span style="flex: 1 1 auto; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Order Service</span>
+            <span style="flex-shrink: 0; margin-left: auto; font-size: 11px; color: #5B6474; font-variant-numeric: tabular-nums">4</span>
+          </button>
+          <!-- Long name: single line, ellipsis, full name in title; keyboard focus: 2px #4F46E5 inset ring (offset -2) -->
+          <button role="listitem" aria-label="Multi-Region AWS VPC with Global Accelerator &amp; Failover, Network, 0 connections" title="Multi-Region AWS VPC with Global Accelerator &amp; Failover" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px; border: none; border-radius: 6px; background: transparent; font: inherit; text-align: left; cursor: pointer; color: #1B1F27; outline: 2px solid #4F46E5; outline-offset: -2px">
+            <span style="width: 28px; height: 28px; border-radius: 7px; background: #E8F0FE; flex-shrink: 0"></span>
+            <span style="flex: 1 1 auto; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Multi-Region AWS VPC with Global Accelerator &amp; Failover</span>
+            <span style="flex-shrink: 0; margin-left: auto; font-size: 11px; color: #5B6474; font-variant-numeric: tabular-nums">0</span>
+          </button>
+        </div>
+      </div>
+      <div style="font-size: 12px; color: #5B6474; line-height: 1.5; max-width: 420px">
+        Row spec: 36 high, padding 0 8, gap 10, radius 6, no border. Glyph tile 28 x 28, radius 7, kind tint (same glyph and tint as the canvas card).
+        Name 13/500, one line, ellipsis, full name in the title tooltip. Count 11/400 #5B6474, right aligned, tabular figures; the number alone is shown and the row's accessible name ends with "N connections".
+        Hover #F6F7F9; selected row #EEF0FF with name 600 #4338CA; keyboard focus a 2 px #4F46E5 ring inset by 2. List max-height 180, scrolls.
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const card = 'width: 168px; height: 60px; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; ';
+    const name = 'font-weight: 600; font-size: 12px; ';
+    const noMark = 'display: none';
+    const dot = (c) => 'width: 8px; height: 8px; border-radius: 4px; font-size: 0; background: ' + c;
+    const pill = (bg, fg) => 'padding: 0 6px; border-radius: 999px; font-size: 10px; font-weight: 700; background: ' + bg + '; color: ' + fg;
+    const s = (n, rule, box, extra) => Object.assign({ name: n, rule, box: card + box, nameStyle: name, mark: '', markStyle: noMark, sub: 'Service · ECS' }, extra || {});
+    return {
+      states: [
+        s('Default', 'Kind colour border 1.5', 'border: 1.5px solid #2563EB; background: #FFFFFF'),
+        s('Hover', 'Shadow + ports', 'border: 1.5px solid #2563EB; background: #FFFFFF; box-shadow: 0 4px 12px rgba(16,24,40,.12)'),
+        s('Selected', '2 px accent ring + handles', 'border: 1.5px solid #2563EB; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(79,70,229,.35)'),
+        s('Keyboard focus', 'Visible ring, offset 2', 'border: 1.5px solid #2563EB; background: #FFFFFF; outline: 2px solid #4F46E5; outline-offset: 3px'),
+        s('Locked', 'Lock mark, no drag', 'border: 1.5px solid #2563EB; background: #FFFFFF', { mark: 'Locked', markStyle: pill('#F1F2F5', '#3D4553') }),
+        s('Drift', 'Amber dot + label', 'border: 1.5px solid #2563EB; background: #FFFFFF', { mark: 'Drift', markStyle: pill('#FEF3C7', '#92400E') }),
+        s('Rule violation', 'Red dot, tooltip with rule', 'border: 1.5px solid #2563EB; background: #FFFFFF', { mark: '!', markStyle: pill('#FDE8E8', '#B91C1C') }),
+        s('Comments', 'Count pin', 'border: 1.5px solid #2563EB; background: #FFFFFF', { mark: '2', markStyle: pill('#4F46E5', '#FFFFFF') }),
+        s('Proposed (AI / review)', 'Green dashed', 'border: 1.5px dashed #15803D; background: #F0FDF4', { mark: 'Proposed', markStyle: pill('#DCF3E6', '#047857') }),
+        s('Changed in diff', 'Amber fill', 'border: 1.5px solid #D97706; background: #FEF3C7'),
+        s('Removed in diff', 'Red dashed, 60 %, struck', 'border: 1.5px dashed #B91C1C; background: #FEF2F2; opacity: .6', { nameStyle: name + 'text-decoration: line-through' }),
+        s('External', 'Grey dashed', 'border: 1.5px dashed #6B7280; background: #F3F4F6', { sub: 'External system' })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

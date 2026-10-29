@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Comment threads anatomy and states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v13" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+
+    <!-- Canvas with anchors -->
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+      <div style="position: absolute; left: 90px; top: 120px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">ECS · Java</span></div>
+      <span style="position: absolute; left: 268px; top: 108px; width: 24px; height: 24px; border-radius: 12px 12px 12px 2px; background: #4F46E5; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-label="Element thread, 3 comments">3</span>
+      <span style="position: absolute; left: 280px; top: 152px; width: 170px; border-top: 1.5px dashed #5B6474"></span>
+      <span style="position: absolute; left: 310px; top: 140px; padding: 1px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px">Publishes · order-created</span>
+      <span style="position: absolute; left: 356px; top: 168px; width: 24px; height: 24px; border-radius: 12px 12px 12px 2px; background: #4F46E5; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-label="Relationship thread">1</span>
+      <div style="position: absolute; left: 450px; top: 120px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #6D28D9; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">order-events</span><span style="font-size: 11px; color: #5B6474">Kafka</span></div>
+
+      <!-- Region comment -->
+      <span style="position: absolute; left: 80px; top: 270px; width: 580px; height: 190px; border: 1.5px dashed #4F46E5; border-radius: 8px; background: rgba(79,70,229,.04)"></span>
+      <span style="position: absolute; left: 646px; top: 258px; width: 24px; height: 24px; border-radius: 12px 12px 12px 2px; background: #4F46E5; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-label="Region thread">2</span>
+      <div style="position: absolute; left: 110px; top: 320px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Payment Service</span><span style="font-size: 11px; color: #5B6474">ECS · Go</span></div>
+      <div style="position: absolute; left: 400px; top: 320px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #B45309; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Ledger DB</span><span style="font-size: 11px; color: #5B6474">Aurora</span></div>
+
+      <!-- Detached ghost -->
+      <span style="position: absolute; left: 130px; top: 540px; width: 190px; height: 64px; border: 1.5px dashed #C3C8D1; border-radius: 8px; opacity: .7"></span>
+      <span style="position: absolute; left: 150px; top: 562px; font-size: 12px; color: #8A93A3; text-decoration: line-through">Payment Lock (Redis)</span>
+      <span style="position: absolute; left: 308px; top: 528px; width: 24px; height: 24px; border-radius: 12px 12px 12px 2px; background: #8A93A3; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-label="Detached thread">1</span>
+      <span style="position: absolute; left: 130px; top: 612px; font-size: 11px; color: #5B6474">Detached — element deleted in v12 · ghost shown from v11</span>
+
+      <section aria-label="Anchor types" style="position: absolute; left: 720px; top: 120px; width: 260px; padding: 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-weight: 600">Anchors</span>
+        <span>Element · follows rename/move</span>
+        <span>Relationship · follows endpoints</span>
+        <span>Property · review comments</span>
+        <span>Region · dashed area</span>
+        <span>Page · whole diagram · version</span>
+        <span style="font-size: 12px; color: #5B6474">Keyboard: C comment · N/P next/prev · R resolve</span>
+      </section>
+    </div>
+
+    <!-- Panel -->
+    <aside aria-label="Comments" style="width: 400px; flex-shrink: 0; background: #FFFFFF; border-left: 1px solid #E3E6EB; display: flex; flex-direction: column">
+      <div style="padding: 12px 14px; border-bottom: 1px solid #EEF0F3; display: flex; flex-direction: column; gap: 8px">
+        <span style="display: flex; align-items: center"><span style="font-weight: 600; flex-grow: 1">Comments</span><select aria-label="Sort" style="height: 28px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 12px"><option>By position</option><option>Newest</option><option>Due date</option></select></span>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap">
+          <button aria-pressed="true" style="height: 26px; padding: 0 8px; border: 1px solid #4F46E5; border-radius: 999px; background: #EEF0FF; color: #4338CA; font: inherit; font-size: 12px; font-weight: 600">Open 6</button>
+          <button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Mentions 2</button>
+          <button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Assigned 1</button>
+          <button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Detached 1</button>
+          <button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Resolved</button>
+        </div>
+      </div>
+      <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+
+        <!-- Full thread -->
+        <article style="border: 1px solid #C7CBF7; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap">
+            <span style="padding: 1px 8px; border-radius: 999px; background: #F1F2F5; font-size: 11px; font-weight: 600">Order Service</span>
+            <span style="padding: 1px 8px; border-radius: 999px; background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 600">Outdated · written on v11</span>
+            <span style="padding: 1px 8px; border-radius: 999px; background: #EDE9FE; color: #6D28D9; font-size: 11px; font-weight: 600">Risk</span>
+            <span style="padding: 1px 8px; border-radius: 999px; background: #F1F2F5; font-size: 11px">Internal</span>
+            <a href="History.dc.html" style="font-size: 11px; margin-left: auto">Show original</a>
+          </div>
+          <div style="display: flex; gap: 8px"><span style="width: 26px; height: 26px; border-radius: 13px; background: #FEF3E2; color: #92400E; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">S</span><span style="display: flex; flex-direction: column; gap: 3px"><span><strong>[Security]</strong> <span style="font-size: 12px; color: #5B6474">Mon · edited</span></span><span>Order data includes card BINs — <span style="color: #4338CA; font-weight: 600">@Payments</span> this must not reach analytics.</span><span style="display: flex; gap: 4px"><span style="padding: 0 6px; border: 1px solid #E3E6EB; border-radius: 999px; font-size: 12px">+1 · 3</span><span style="padding: 0 6px; border: 1px solid #E3E6EB; border-radius: 999px; font-size: 12px">Eyes · 1</span></span></span></div>
+          <div style="display: flex; gap: 8px"><span style="width: 26px; height: 26px; border-radius: 13px; background: #E8F0FE; color: #1D4ED8; font-weight: 700; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0">P</span><span style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1"><span><strong>[Payments lead]</strong> <span style="font-size: 12px; color: #5B6474">Tue</span></span><span>Agreed — suggesting a data class on the element.</span>
+            <span style="padding: 8px 10px; border: 1px dashed #A5B4FC; border-radius: 8px; background: #F7F7FF; display: flex; align-items: center; gap: 8px"><span style="flex-grow: 1; font-family: 'JetBrains Mono', monospace; font-size: 12px">data_class: — → <strong>PCI</strong></span><button style="height: 26px; padding: 0 8px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 600">Apply</button></span></span></div>
+          <div style="display: flex; gap: 8px; color: #8A93A3; font-style: italic"><span style="width: 26px; flex-shrink: 0"></span>Comment deleted by author</div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5B6474"><span>Assigned</span><strong style="color: #1B1F27">[Payments lead]</strong><span>· due Fri</span><span style="flex-grow: 1"></span><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Mark as decision</button><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Resolve</button></div>
+          <label style="display: flex; flex-direction: column; gap: 4px"><textarea aria-label="Reply" style="height: 44px; padding: 8px 10px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit; resize: none">/assign @</textarea><span style="font-size: 11px; color: #5B6474">@ mention · /suggest /assign /decision /due · ⌘↵ send</span></label>
+        </article>
+
+        <!-- Resolved decision -->
+        <article style="border: 1px solid #E3E6EB; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px; background: #FAFBFC">
+          <span style="display: flex; gap: 6px; align-items: center"><span style="padding: 1px 8px; border-radius: 999px; background: #F1F2F5; font-size: 11px; font-weight: 600">order-created route</span><span style="padding: 1px 8px; border-radius: 999px; background: #DCF3E6; color: #047857; font-size: 11px; font-weight: 600">Decision</span></span>
+          <span><strong>Use the outbox pattern</strong> for order-created — resolved by [Architect] Tue, logged to Decisions.</span>
+        </article>
+
+        <!-- Detached -->
+        <article style="border: 1px dashed #C3C8D1; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+          <span style="display: flex; gap: 6px; align-items: center"><span style="padding: 1px 8px; border-radius: 999px; background: #F1F2F5; color: #5B6474; font-size: 11px; font-weight: 600">Detached · Payment Lock (Redis)</span></span>
+          <span style="color: #3D4553">“TTL too short for retries?” — element was removed in v12.</span>
+          <span style="display: flex; gap: 6px"><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Re-attach…</button><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Resolve</button></span>
+        </article>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
