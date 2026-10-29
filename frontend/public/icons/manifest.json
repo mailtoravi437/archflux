@@ -1,0 +1,5701 @@
+{
+  "version": 1,
+  "sets": {
+    "aws": {
+      "label": "AWS",
+      "license": "AWS Architecture Icons terms",
+      "source": "npm:aws-icons@3.3.0"
+    },
+    "generic": {
+      "label": "Generic",
+      "license": "project",
+      "source": "repo"
+    },
+    "k8s": {
+      "label": "Kubernetes",
+      "license": "Apache-2.0",
+      "source": "github:kubernetes/community@a434040a/icons/svg (vendor/k8s-icons)"
+    }
+  },
+  "icons": [
+    {
+      "id": "aws/amazon-api-gateway",
+      "set": "aws",
+      "name": "Amazon API Gateway",
+      "keywords": [
+        "api",
+        "gateway",
+        "http",
+        "rest",
+        "websocket"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/aws/amazon-api-gateway.svg"
+    },
+    {
+      "id": "aws/amazon-appflow",
+      "set": "aws",
+      "name": "Amazon AppFlow",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-appflow.svg"
+    },
+    {
+      "id": "aws/amazon-application-recovery-controller",
+      "set": "aws",
+      "name": "Amazon Application Recovery Controller",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-application-recovery-controller.svg"
+    },
+    {
+      "id": "aws/amazon-athena",
+      "set": "aws",
+      "name": "Amazon Athena",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-athena.svg"
+    },
+    {
+      "id": "aws/amazon-augmented-ai-a2i",
+      "set": "aws",
+      "name": "Amazon Augmented AI A2I",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-augmented-ai-a2i.svg"
+    },
+    {
+      "id": "aws/amazon-aurora",
+      "set": "aws",
+      "name": "Amazon Aurora",
+      "keywords": [
+        "aurora",
+        "database",
+        "mysql",
+        "postgres",
+        "postgresql",
+        "sql"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/aws/amazon-aurora.svg"
+    },
+    {
+      "id": "aws/amazon-bedrock",
+      "set": "aws",
+      "name": "Amazon Bedrock",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-bedrock.svg"
+    },
+    {
+      "id": "aws/amazon-bedrock-agentcore",
+      "set": "aws",
+      "name": "Amazon Bedrock AgentCore",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-bedrock-agentcore.svg"
+    },
+    {
+      "id": "aws/amazon-braket",
+      "set": "aws",
+      "name": "Amazon Braket",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-braket.svg"
+    },
+    {
+      "id": "aws/amazon-chime",
+      "set": "aws",
+      "name": "Amazon Chime",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-chime.svg"
+    },
+    {
+      "id": "aws/amazon-chime-sdk",
+      "set": "aws",
+      "name": "Amazon Chime SDK",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-chime-sdk.svg"
+    },
+    {
+      "id": "aws/amazon-cloud-directory",
+      "set": "aws",
+      "name": "Amazon Cloud Directory",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-cloud-directory.svg"
+    },
+    {
+      "id": "aws/amazon-cloudfront",
+      "set": "aws",
+      "name": "Amazon CloudFront",
+      "keywords": [
+        "cache",
+        "cdn",
+        "cloudfront",
+        "edge"
+      ],
+      "kinds": [
+        "cdn"
+      ],
+      "src": "/icons/aws/amazon-cloudfront.svg"
+    },
+    {
+      "id": "aws/amazon-cloudsearch",
+      "set": "aws",
+      "name": "Amazon CloudSearch",
+      "keywords": [
+        "index",
+        "search"
+      ],
+      "kinds": [
+        "search"
+      ],
+      "src": "/icons/aws/amazon-cloudsearch.svg"
+    },
+    {
+      "id": "aws/amazon-cloudwatch",
+      "set": "aws",
+      "name": "Amazon CloudWatch",
+      "keywords": [
+        "alarms",
+        "logs",
+        "metrics",
+        "monitoring",
+        "observability"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/aws/amazon-cloudwatch.svg"
+    },
+    {
+      "id": "aws/amazon-codecatalyst",
+      "set": "aws",
+      "name": "Amazon CodeCatalyst",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-codecatalyst.svg"
+    },
+    {
+      "id": "aws/amazon-codeguru",
+      "set": "aws",
+      "name": "Amazon CodeGuru",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-codeguru.svg"
+    },
+    {
+      "id": "aws/amazon-codewhisperer",
+      "set": "aws",
+      "name": "Amazon CodeWhisperer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-codewhisperer.svg"
+    },
+    {
+      "id": "aws/amazon-cognito",
+      "set": "aws",
+      "name": "Amazon Cognito",
+      "keywords": [
+        "auth",
+        "identity",
+        "login",
+        "oauth"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/amazon-cognito.svg"
+    },
+    {
+      "id": "aws/amazon-comprehend",
+      "set": "aws",
+      "name": "Amazon Comprehend",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-comprehend.svg"
+    },
+    {
+      "id": "aws/amazon-comprehend-medical",
+      "set": "aws",
+      "name": "Amazon Comprehend Medical",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-comprehend-medical.svg"
+    },
+    {
+      "id": "aws/amazon-connect",
+      "set": "aws",
+      "name": "Amazon Connect",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-connect.svg"
+    },
+    {
+      "id": "aws/amazon-corretto",
+      "set": "aws",
+      "name": "Amazon Corretto",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-corretto.svg"
+    },
+    {
+      "id": "aws/amazon-data-firehose",
+      "set": "aws",
+      "name": "Amazon Data Firehose",
+      "keywords": [
+        "delivery",
+        "etl",
+        "firehose",
+        "stream"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/aws/amazon-data-firehose.svg"
+    },
+    {
+      "id": "aws/amazon-datazone",
+      "set": "aws",
+      "name": "Amazon DataZone",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-datazone.svg"
+    },
+    {
+      "id": "aws/amazon-dcv",
+      "set": "aws",
+      "name": "Amazon DCV",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-dcv.svg"
+    },
+    {
+      "id": "aws/amazon-detective",
+      "set": "aws",
+      "name": "Amazon Detective",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-detective.svg"
+    },
+    {
+      "id": "aws/amazon-devops-guru",
+      "set": "aws",
+      "name": "Amazon DevOps Guru",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-devops-guru.svg"
+    },
+    {
+      "id": "aws/amazon-documentdb",
+      "set": "aws",
+      "name": "Amazon DocumentDB",
+      "keywords": [
+        "document",
+        "mongo",
+        "mongodb",
+        "nosql"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/aws/amazon-documentdb.svg"
+    },
+    {
+      "id": "aws/amazon-dynamodb",
+      "set": "aws",
+      "name": "Amazon DynamoDB",
+      "keywords": [
+        "document",
+        "dynamo",
+        "key value",
+        "nosql"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/aws/amazon-dynamodb.svg"
+    },
+    {
+      "id": "aws/amazon-ec2",
+      "set": "aws",
+      "name": "Amazon EC2",
+      "keywords": [
+        "compute",
+        "ec2",
+        "instance",
+        "server",
+        "vm"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/amazon-ec2.svg"
+    },
+    {
+      "id": "aws/amazon-ec2-auto-scaling",
+      "set": "aws",
+      "name": "Amazon EC2 Auto Scaling",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-ec2-auto-scaling.svg"
+    },
+    {
+      "id": "aws/amazon-ec2-image-builder",
+      "set": "aws",
+      "name": "Amazon EC2 Image Builder",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-ec2-image-builder.svg"
+    },
+    {
+      "id": "aws/amazon-ecs-anywhere",
+      "set": "aws",
+      "name": "Amazon ECS Anywhere",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-ecs-anywhere.svg"
+    },
+    {
+      "id": "aws/amazon-efs",
+      "set": "aws",
+      "name": "Amazon EFS",
+      "keywords": [
+        "file",
+        "nfs",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/aws/amazon-efs.svg"
+    },
+    {
+      "id": "aws/amazon-eks-anywhere",
+      "set": "aws",
+      "name": "Amazon EKS Anywhere",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-eks-anywhere.svg"
+    },
+    {
+      "id": "aws/amazon-eks-distro",
+      "set": "aws",
+      "name": "Amazon EKS Distro",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-eks-distro.svg"
+    },
+    {
+      "id": "aws/amazon-elastic-block-store",
+      "set": "aws",
+      "name": "Amazon Elastic Block Store",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-elastic-block-store.svg"
+    },
+    {
+      "id": "aws/amazon-elastic-container-registry",
+      "set": "aws",
+      "name": "Amazon Elastic Container Registry",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-elastic-container-registry.svg"
+    },
+    {
+      "id": "aws/amazon-elastic-container-service",
+      "set": "aws",
+      "name": "Amazon ECS",
+      "keywords": [
+        "container",
+        "docker",
+        "ecs",
+        "service"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/amazon-elastic-container-service.svg"
+    },
+    {
+      "id": "aws/amazon-elastic-inference",
+      "set": "aws",
+      "name": "Amazon Elastic Inference",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-elastic-inference.svg"
+    },
+    {
+      "id": "aws/amazon-elastic-kubernetes-service",
+      "set": "aws",
+      "name": "Amazon EKS",
+      "keywords": [
+        "container",
+        "eks",
+        "k8s",
+        "kubernetes",
+        "service"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/amazon-elastic-kubernetes-service.svg"
+    },
+    {
+      "id": "aws/amazon-elastic-vmware-service",
+      "set": "aws",
+      "name": "Amazon Elastic VMware Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-elastic-vmware-service.svg"
+    },
+    {
+      "id": "aws/amazon-elasticache",
+      "set": "aws",
+      "name": "Amazon ElastiCache",
+      "keywords": [
+        "cache",
+        "memcached",
+        "redis",
+        "valkey"
+      ],
+      "kinds": [
+        "cache"
+      ],
+      "src": "/icons/aws/amazon-elasticache.svg"
+    },
+    {
+      "id": "aws/amazon-emr",
+      "set": "aws",
+      "name": "Amazon EMR",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-emr.svg"
+    },
+    {
+      "id": "aws/amazon-eventbridge",
+      "set": "aws",
+      "name": "Amazon EventBridge",
+      "keywords": [
+        "cron",
+        "event bus",
+        "events",
+        "scheduler"
+      ],
+      "kinds": [
+        "scheduler"
+      ],
+      "src": "/icons/aws/amazon-eventbridge.svg"
+    },
+    {
+      "id": "aws/amazon-file-cache",
+      "set": "aws",
+      "name": "Amazon File Cache",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-file-cache.svg"
+    },
+    {
+      "id": "aws/amazon-finspace",
+      "set": "aws",
+      "name": "Amazon FinSpace",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-finspace.svg"
+    },
+    {
+      "id": "aws/amazon-forecast",
+      "set": "aws",
+      "name": "Amazon Forecast",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-forecast.svg"
+    },
+    {
+      "id": "aws/amazon-fraud-detector",
+      "set": "aws",
+      "name": "Amazon Fraud Detector",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-fraud-detector.svg"
+    },
+    {
+      "id": "aws/amazon-fsx",
+      "set": "aws",
+      "name": "Amazon FSx",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-fsx.svg"
+    },
+    {
+      "id": "aws/amazon-fsx-for-lustre",
+      "set": "aws",
+      "name": "Amazon FSx for Lustre",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-fsx-for-lustre.svg"
+    },
+    {
+      "id": "aws/amazon-fsx-for-netapp-ontap",
+      "set": "aws",
+      "name": "Amazon FSx for NetApp ONTAP",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-fsx-for-netapp-ontap.svg"
+    },
+    {
+      "id": "aws/amazon-fsx-for-openzfs",
+      "set": "aws",
+      "name": "Amazon FSx for OpenZFS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-fsx-for-openzfs.svg"
+    },
+    {
+      "id": "aws/amazon-fsx-for-wfs",
+      "set": "aws",
+      "name": "Amazon FSx for WFS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-fsx-for-wfs.svg"
+    },
+    {
+      "id": "aws/amazon-gamelift-servers",
+      "set": "aws",
+      "name": "Amazon GameLift Servers",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-gamelift-servers.svg"
+    },
+    {
+      "id": "aws/amazon-gamelift-streams",
+      "set": "aws",
+      "name": "Amazon GameLift Streams",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-gamelift-streams.svg"
+    },
+    {
+      "id": "aws/amazon-guardduty",
+      "set": "aws",
+      "name": "Amazon GuardDuty",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-guardduty.svg"
+    },
+    {
+      "id": "aws/amazon-inspector",
+      "set": "aws",
+      "name": "Amazon Inspector",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-inspector.svg"
+    },
+    {
+      "id": "aws/amazon-interactive-video-service",
+      "set": "aws",
+      "name": "Amazon Interactive Video Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-interactive-video-service.svg"
+    },
+    {
+      "id": "aws/amazon-kendra",
+      "set": "aws",
+      "name": "Amazon Kendra",
+      "keywords": [
+        "enterprise search",
+        "search"
+      ],
+      "kinds": [
+        "search"
+      ],
+      "src": "/icons/aws/amazon-kendra.svg"
+    },
+    {
+      "id": "aws/amazon-keyspaces",
+      "set": "aws",
+      "name": "Amazon Keyspaces",
+      "keywords": [
+        "cassandra",
+        "nosql",
+        "wide column"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/aws/amazon-keyspaces.svg"
+    },
+    {
+      "id": "aws/amazon-kinesis",
+      "set": "aws",
+      "name": "Amazon Kinesis",
+      "keywords": [
+        "events",
+        "kinesis",
+        "stream",
+        "streaming"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/aws/amazon-kinesis.svg"
+    },
+    {
+      "id": "aws/amazon-kinesis-data-streams",
+      "set": "aws",
+      "name": "Amazon Kinesis Data Streams",
+      "keywords": [
+        "events",
+        "kinesis",
+        "stream",
+        "streaming"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/aws/amazon-kinesis-data-streams.svg"
+    },
+    {
+      "id": "aws/amazon-kinesis-video-streams",
+      "set": "aws",
+      "name": "Amazon Kinesis Video Streams",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-kinesis-video-streams.svg"
+    },
+    {
+      "id": "aws/amazon-lex",
+      "set": "aws",
+      "name": "Amazon Lex",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-lex.svg"
+    },
+    {
+      "id": "aws/amazon-lightsail",
+      "set": "aws",
+      "name": "Amazon Lightsail",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-lightsail.svg"
+    },
+    {
+      "id": "aws/amazon-lightsail-for-research",
+      "set": "aws",
+      "name": "Amazon Lightsail for Research",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-lightsail-for-research.svg"
+    },
+    {
+      "id": "aws/amazon-location-service",
+      "set": "aws",
+      "name": "Amazon Location Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-location-service.svg"
+    },
+    {
+      "id": "aws/amazon-lookout-for-equipment",
+      "set": "aws",
+      "name": "Amazon Lookout for Equipment",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-lookout-for-equipment.svg"
+    },
+    {
+      "id": "aws/amazon-lookout-for-vision",
+      "set": "aws",
+      "name": "Amazon Lookout for Vision",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-lookout-for-vision.svg"
+    },
+    {
+      "id": "aws/amazon-macie",
+      "set": "aws",
+      "name": "Amazon Macie",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-macie.svg"
+    },
+    {
+      "id": "aws/amazon-managed-blockchain",
+      "set": "aws",
+      "name": "Amazon Managed Blockchain",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-managed-blockchain.svg"
+    },
+    {
+      "id": "aws/amazon-managed-grafana",
+      "set": "aws",
+      "name": "Amazon Managed Grafana",
+      "keywords": [
+        "dashboards",
+        "grafana",
+        "observability"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/aws/amazon-managed-grafana.svg"
+    },
+    {
+      "id": "aws/amazon-managed-service-for-apache-flink",
+      "set": "aws",
+      "name": "Amazon Managed Service for Apache Flink",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-managed-service-for-apache-flink.svg"
+    },
+    {
+      "id": "aws/amazon-managed-service-for-prometheus",
+      "set": "aws",
+      "name": "Amazon Managed Service for Prometheus",
+      "keywords": [
+        "metrics",
+        "observability",
+        "prometheus"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/aws/amazon-managed-service-for-prometheus.svg"
+    },
+    {
+      "id": "aws/amazon-managed-streaming-for-apache-kafka",
+      "set": "aws",
+      "name": "Amazon MSK",
+      "keywords": [
+        "events",
+        "kafka",
+        "msk",
+        "stream"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/aws/amazon-managed-streaming-for-apache-kafka.svg"
+    },
+    {
+      "id": "aws/amazon-managed-workflows-for-apache-airflow",
+      "set": "aws",
+      "name": "Amazon Managed Workflows for Apache Airflow",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-managed-workflows-for-apache-airflow.svg"
+    },
+    {
+      "id": "aws/amazon-memorydb",
+      "set": "aws",
+      "name": "Amazon MemoryDB",
+      "keywords": [
+        "cache",
+        "in-memory",
+        "redis"
+      ],
+      "kinds": [
+        "cache"
+      ],
+      "src": "/icons/aws/amazon-memorydb.svg"
+    },
+    {
+      "id": "aws/amazon-monitron",
+      "set": "aws",
+      "name": "Amazon Monitron",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-monitron.svg"
+    },
+    {
+      "id": "aws/amazon-mq",
+      "set": "aws",
+      "name": "Amazon MQ",
+      "keywords": [
+        "activemq",
+        "broker",
+        "messaging",
+        "queue",
+        "rabbitmq"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/aws/amazon-mq.svg"
+    },
+    {
+      "id": "aws/amazon-neptune",
+      "set": "aws",
+      "name": "Amazon Neptune",
+      "keywords": [
+        "database",
+        "graph"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/aws/amazon-neptune.svg"
+    },
+    {
+      "id": "aws/amazon-nova",
+      "set": "aws",
+      "name": "Amazon Nova",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-nova.svg"
+    },
+    {
+      "id": "aws/amazon-opensearch-service",
+      "set": "aws",
+      "name": "Amazon OpenSearch Service",
+      "keywords": [
+        "elasticsearch",
+        "logs",
+        "opensearch",
+        "search"
+      ],
+      "kinds": [
+        "search"
+      ],
+      "src": "/icons/aws/amazon-opensearch-service.svg"
+    },
+    {
+      "id": "aws/amazon-personalize",
+      "set": "aws",
+      "name": "Amazon Personalize",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-personalize.svg"
+    },
+    {
+      "id": "aws/amazon-pinpoint",
+      "set": "aws",
+      "name": "Amazon Pinpoint",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-pinpoint.svg"
+    },
+    {
+      "id": "aws/amazon-pinpoint-ap-is",
+      "set": "aws",
+      "name": "Amazon Pinpoint AP Is",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-pinpoint-ap-is.svg"
+    },
+    {
+      "id": "aws/amazon-polly",
+      "set": "aws",
+      "name": "Amazon Polly",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-polly.svg"
+    },
+    {
+      "id": "aws/amazon-q",
+      "set": "aws",
+      "name": "Amazon Q",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-q.svg"
+    },
+    {
+      "id": "aws/amazon-quick-suite",
+      "set": "aws",
+      "name": "Amazon Quick Suite",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-quick-suite.svg"
+    },
+    {
+      "id": "aws/amazon-rds",
+      "set": "aws",
+      "name": "Amazon RDS",
+      "keywords": [
+        "database",
+        "mariadb",
+        "mysql",
+        "postgres",
+        "postgresql",
+        "rds",
+        "sql"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/aws/amazon-rds.svg"
+    },
+    {
+      "id": "aws/amazon-redshift",
+      "set": "aws",
+      "name": "Amazon Redshift",
+      "keywords": [
+        "analytics",
+        "database",
+        "sql",
+        "warehouse"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/aws/amazon-redshift.svg"
+    },
+    {
+      "id": "aws/amazon-rekognition",
+      "set": "aws",
+      "name": "Amazon Rekognition",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-rekognition.svg"
+    },
+    {
+      "id": "aws/amazon-route53",
+      "set": "aws",
+      "name": "Amazon Route53",
+      "keywords": [
+        "dns",
+        "domain",
+        "routing"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/aws/amazon-route53.svg"
+    },
+    {
+      "id": "aws/amazon-s3-on-outposts",
+      "set": "aws",
+      "name": "Amazon S3 on Outposts",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-s3-on-outposts.svg"
+    },
+    {
+      "id": "aws/amazon-sagemaker",
+      "set": "aws",
+      "name": "Amazon SageMaker",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-sagemaker.svg"
+    },
+    {
+      "id": "aws/amazon-sagemaker-ai",
+      "set": "aws",
+      "name": "Amazon SageMaker AI",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-sagemaker-ai.svg"
+    },
+    {
+      "id": "aws/amazon-sagemaker-ground-truth",
+      "set": "aws",
+      "name": "Amazon SageMaker Ground Truth",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-sagemaker-ground-truth.svg"
+    },
+    {
+      "id": "aws/amazon-sagemaker-studio-lab",
+      "set": "aws",
+      "name": "Amazon SageMaker Studio Lab",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-sagemaker-studio-lab.svg"
+    },
+    {
+      "id": "aws/amazon-security-lake",
+      "set": "aws",
+      "name": "Amazon Security Lake",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-security-lake.svg"
+    },
+    {
+      "id": "aws/amazon-simple-email-service",
+      "set": "aws",
+      "name": "Amazon Simple Email Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-simple-email-service.svg"
+    },
+    {
+      "id": "aws/amazon-simple-notification-service",
+      "set": "aws",
+      "name": "Amazon SNS",
+      "keywords": [
+        "fan-out",
+        "notification",
+        "pubsub",
+        "sns",
+        "topic"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/aws/amazon-simple-notification-service.svg"
+    },
+    {
+      "id": "aws/amazon-simple-queue-service",
+      "set": "aws",
+      "name": "Amazon SQS",
+      "keywords": [
+        "messaging",
+        "queue",
+        "sqs"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/aws/amazon-simple-queue-service.svg"
+    },
+    {
+      "id": "aws/amazon-simple-storage-service",
+      "set": "aws",
+      "name": "Amazon S3",
+      "keywords": [
+        "blob",
+        "bucket",
+        "object",
+        "s3",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/aws/amazon-simple-storage-service.svg"
+    },
+    {
+      "id": "aws/amazon-simple-storage-service-glacier",
+      "set": "aws",
+      "name": "Amazon Simple Storage Service Glacier",
+      "keywords": [
+        "archive",
+        "cold",
+        "glacier",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/aws/amazon-simple-storage-service-glacier.svg"
+    },
+    {
+      "id": "aws/amazon-textract",
+      "set": "aws",
+      "name": "Amazon Textract",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-textract.svg"
+    },
+    {
+      "id": "aws/amazon-timestream",
+      "set": "aws",
+      "name": "Amazon Timestream",
+      "keywords": [
+        "database",
+        "metrics",
+        "time series"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/aws/amazon-timestream.svg"
+    },
+    {
+      "id": "aws/amazon-transcribe",
+      "set": "aws",
+      "name": "Amazon Transcribe",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-transcribe.svg"
+    },
+    {
+      "id": "aws/amazon-translate",
+      "set": "aws",
+      "name": "Amazon Translate",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-translate.svg"
+    },
+    {
+      "id": "aws/amazon-verified-permissions",
+      "set": "aws",
+      "name": "Amazon Verified Permissions",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-verified-permissions.svg"
+    },
+    {
+      "id": "aws/amazon-virtual-private-cloud",
+      "set": "aws",
+      "name": "Amazon Virtual Private Cloud",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-virtual-private-cloud.svg"
+    },
+    {
+      "id": "aws/amazon-vpc-lattice",
+      "set": "aws",
+      "name": "Amazon VPC Lattice",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-vpc-lattice.svg"
+    },
+    {
+      "id": "aws/amazon-workdocs",
+      "set": "aws",
+      "name": "Amazon WorkDocs",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-workdocs.svg"
+    },
+    {
+      "id": "aws/amazon-workdocs-sdk",
+      "set": "aws",
+      "name": "Amazon WorkDocs SDK",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-workdocs-sdk.svg"
+    },
+    {
+      "id": "aws/amazon-workmail",
+      "set": "aws",
+      "name": "Amazon WorkMail",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-workmail.svg"
+    },
+    {
+      "id": "aws/amazon-workspaces",
+      "set": "aws",
+      "name": "Amazon WorkSpaces",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/amazon-workspaces.svg"
+    },
+    {
+      "id": "aws/apache-mxnet-on-aws",
+      "set": "aws",
+      "name": "Apache MXNet on AWS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/apache-mxnet-on-aws.svg"
+    },
+    {
+      "id": "aws/auto-scalinggroup",
+      "set": "aws",
+      "name": "Auto Scaling group",
+      "keywords": [
+        "asg",
+        "autoscaling",
+        "boundary",
+        "group"
+      ],
+      "kinds": [
+        "boundary"
+      ],
+      "src": "/icons/aws/auto-scalinggroup.svg"
+    },
+    {
+      "id": "aws/aws-account",
+      "set": "aws",
+      "name": "AWS Account",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/aws-account.svg"
+    },
+    {
+      "id": "aws/aws-activate",
+      "set": "aws",
+      "name": "AWS Activate",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-activate.svg"
+    },
+    {
+      "id": "aws/aws-amplify",
+      "set": "aws",
+      "name": "AWS Amplify",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-amplify.svg"
+    },
+    {
+      "id": "aws/aws-app-runner",
+      "set": "aws",
+      "name": "AWS App Runner",
+      "keywords": [
+        "container",
+        "service",
+        "web app"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/aws-app-runner.svg"
+    },
+    {
+      "id": "aws/aws-appconfig",
+      "set": "aws",
+      "name": "AWS AppConfig",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-appconfig.svg"
+    },
+    {
+      "id": "aws/aws-appfabric",
+      "set": "aws",
+      "name": "AWS AppFabric",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-appfabric.svg"
+    },
+    {
+      "id": "aws/aws-application-auto-scaling",
+      "set": "aws",
+      "name": "AWS Application Auto Scaling",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-application-auto-scaling.svg"
+    },
+    {
+      "id": "aws/aws-application-discovery-service",
+      "set": "aws",
+      "name": "AWS Application Discovery Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-application-discovery-service.svg"
+    },
+    {
+      "id": "aws/aws-application-migration-service",
+      "set": "aws",
+      "name": "AWS Application Migration Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-application-migration-service.svg"
+    },
+    {
+      "id": "aws/aws-appmesh",
+      "set": "aws",
+      "name": "AWS AppMesh",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-appmesh.svg"
+    },
+    {
+      "id": "aws/aws-appstudio",
+      "set": "aws",
+      "name": "AWS AppStudio",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-appstudio.svg"
+    },
+    {
+      "id": "aws/aws-appsync",
+      "set": "aws",
+      "name": "AWS AppSync",
+      "keywords": [
+        "api",
+        "gateway",
+        "graphql"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/aws/aws-appsync.svg"
+    },
+    {
+      "id": "aws/aws-artifact",
+      "set": "aws",
+      "name": "AWS Artifact",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-artifact.svg"
+    },
+    {
+      "id": "aws/aws-audit-manager",
+      "set": "aws",
+      "name": "AWS Audit Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-audit-manager.svg"
+    },
+    {
+      "id": "aws/aws-auto-scaling",
+      "set": "aws",
+      "name": "AWS Auto Scaling",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-auto-scaling.svg"
+    },
+    {
+      "id": "aws/aws-b2b-data-interchange",
+      "set": "aws",
+      "name": "AWS B2B Data Interchange",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-b2b-data-interchange.svg"
+    },
+    {
+      "id": "aws/aws-backint-agent",
+      "set": "aws",
+      "name": "AWS Backint Agent",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-backint-agent.svg"
+    },
+    {
+      "id": "aws/aws-backup",
+      "set": "aws",
+      "name": "AWS Backup",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-backup.svg"
+    },
+    {
+      "id": "aws/aws-batch",
+      "set": "aws",
+      "name": "AWS Batch",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-batch.svg"
+    },
+    {
+      "id": "aws/aws-billing-conductor",
+      "set": "aws",
+      "name": "AWS Billing Conductor",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-billing-conductor.svg"
+    },
+    {
+      "id": "aws/aws-budgets",
+      "set": "aws",
+      "name": "AWS Budgets",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-budgets.svg"
+    },
+    {
+      "id": "aws/aws-certificate-manager",
+      "set": "aws",
+      "name": "AWS Certificate Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-certificate-manager.svg"
+    },
+    {
+      "id": "aws/aws-chatbot",
+      "set": "aws",
+      "name": "AWS Chatbot",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-chatbot.svg"
+    },
+    {
+      "id": "aws/aws-clean-rooms",
+      "set": "aws",
+      "name": "AWS Clean Rooms",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-clean-rooms.svg"
+    },
+    {
+      "id": "aws/aws-client-vpn",
+      "set": "aws",
+      "name": "AWS Client VPN",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-client-vpn.svg"
+    },
+    {
+      "id": "aws/aws-cloud",
+      "set": "aws",
+      "name": "AWS Cloud",
+      "keywords": [
+        "boundary",
+        "cloud",
+        "group"
+      ],
+      "kinds": [
+        "boundary"
+      ],
+      "src": "/icons/aws/aws-cloud.svg"
+    },
+    {
+      "id": "aws/aws-cloud-control-api",
+      "set": "aws",
+      "name": "AWS Cloud Control API",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloud-control-api.svg"
+    },
+    {
+      "id": "aws/aws-cloud-dark",
+      "set": "aws",
+      "name": "AWS Cloud (dark)",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloud-dark.svg"
+    },
+    {
+      "id": "aws/aws-cloud-development-kit",
+      "set": "aws",
+      "name": "AWS Cloud Development Kit",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloud-development-kit.svg"
+    },
+    {
+      "id": "aws/aws-cloud-map",
+      "set": "aws",
+      "name": "AWS Cloud Map",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloud-map.svg"
+    },
+    {
+      "id": "aws/aws-cloud-wan",
+      "set": "aws",
+      "name": "AWS Cloud WAN",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloud-wan.svg"
+    },
+    {
+      "id": "aws/aws-cloud9",
+      "set": "aws",
+      "name": "AWS Cloud9",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloud9.svg"
+    },
+    {
+      "id": "aws/aws-cloudformation",
+      "set": "aws",
+      "name": "AWS CloudFormation",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloudformation.svg"
+    },
+    {
+      "id": "aws/aws-cloudhsm",
+      "set": "aws",
+      "name": "AWS CloudHSM",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloudhsm.svg"
+    },
+    {
+      "id": "aws/aws-cloudlogo",
+      "set": "aws",
+      "name": "AWS Cloud logo",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloudlogo.svg"
+    },
+    {
+      "id": "aws/aws-cloudlogo-dark",
+      "set": "aws",
+      "name": "AWS Cloud logo (dark)",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloudlogo-dark.svg"
+    },
+    {
+      "id": "aws/aws-cloudshell",
+      "set": "aws",
+      "name": "AWS CloudShell",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloudshell.svg"
+    },
+    {
+      "id": "aws/aws-cloudtrail",
+      "set": "aws",
+      "name": "AWS CloudTrail",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cloudtrail.svg"
+    },
+    {
+      "id": "aws/aws-codeartifact",
+      "set": "aws",
+      "name": "AWS CodeArtifact",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-codeartifact.svg"
+    },
+    {
+      "id": "aws/aws-codebuild",
+      "set": "aws",
+      "name": "AWS CodeBuild",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-codebuild.svg"
+    },
+    {
+      "id": "aws/aws-codecommit",
+      "set": "aws",
+      "name": "AWS CodeCommit",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-codecommit.svg"
+    },
+    {
+      "id": "aws/aws-codedeploy",
+      "set": "aws",
+      "name": "AWS CodeDeploy",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-codedeploy.svg"
+    },
+    {
+      "id": "aws/aws-codepipeline",
+      "set": "aws",
+      "name": "AWS CodePipeline",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-codepipeline.svg"
+    },
+    {
+      "id": "aws/aws-command-line-interface",
+      "set": "aws",
+      "name": "AWS Command Line Interface",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-command-line-interface.svg"
+    },
+    {
+      "id": "aws/aws-compute-optimizer",
+      "set": "aws",
+      "name": "AWS Compute Optimizer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-compute-optimizer.svg"
+    },
+    {
+      "id": "aws/aws-config",
+      "set": "aws",
+      "name": "AWS Config",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-config.svg"
+    },
+    {
+      "id": "aws/aws-console-mobile-application",
+      "set": "aws",
+      "name": "AWS Console Mobile Application",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-console-mobile-application.svg"
+    },
+    {
+      "id": "aws/aws-control-tower",
+      "set": "aws",
+      "name": "AWS Control Tower",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-control-tower.svg"
+    },
+    {
+      "id": "aws/aws-cost-and-usage-report",
+      "set": "aws",
+      "name": "AWS Cost and Usage Report",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cost-and-usage-report.svg"
+    },
+    {
+      "id": "aws/aws-cost-explorer",
+      "set": "aws",
+      "name": "AWS Cost Explorer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-cost-explorer.svg"
+    },
+    {
+      "id": "aws/aws-data-exchange",
+      "set": "aws",
+      "name": "AWS Data Exchange",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-data-exchange.svg"
+    },
+    {
+      "id": "aws/aws-data-transfer-terminal",
+      "set": "aws",
+      "name": "AWS Data Transfer Terminal",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-data-transfer-terminal.svg"
+    },
+    {
+      "id": "aws/aws-database-migration-service",
+      "set": "aws",
+      "name": "AWS Database Migration Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-database-migration-service.svg"
+    },
+    {
+      "id": "aws/aws-datasync",
+      "set": "aws",
+      "name": "AWS DataSync",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-datasync.svg"
+    },
+    {
+      "id": "aws/aws-deadline-cloud",
+      "set": "aws",
+      "name": "AWS Deadline Cloud",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-deadline-cloud.svg"
+    },
+    {
+      "id": "aws/aws-deep-learning-am-is",
+      "set": "aws",
+      "name": "AWS Deep Learning AM Is",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-deep-learning-am-is.svg"
+    },
+    {
+      "id": "aws/aws-deep-learning-containers",
+      "set": "aws",
+      "name": "AWS Deep Learning Containers",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-deep-learning-containers.svg"
+    },
+    {
+      "id": "aws/aws-deepracer",
+      "set": "aws",
+      "name": "AWS DeepRacer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-deepracer.svg"
+    },
+    {
+      "id": "aws/aws-device-farm",
+      "set": "aws",
+      "name": "AWS Device Farm",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-device-farm.svg"
+    },
+    {
+      "id": "aws/aws-devops-agent",
+      "set": "aws",
+      "name": "AWS DevOps Agent",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-devops-agent.svg"
+    },
+    {
+      "id": "aws/aws-direct-connect",
+      "set": "aws",
+      "name": "AWS Direct Connect",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-direct-connect.svg"
+    },
+    {
+      "id": "aws/aws-directory-service",
+      "set": "aws",
+      "name": "AWS Directory Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-directory-service.svg"
+    },
+    {
+      "id": "aws/aws-distrofor-opentelemetry",
+      "set": "aws",
+      "name": "AWS Distrofor OpenTelemetry",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-distrofor-opentelemetry.svg"
+    },
+    {
+      "id": "aws/aws-elastic-beanstalk",
+      "set": "aws",
+      "name": "AWS Elastic Beanstalk",
+      "keywords": [
+        "paas",
+        "service",
+        "web app"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/aws-elastic-beanstalk.svg"
+    },
+    {
+      "id": "aws/aws-elastic-disaster-recovery",
+      "set": "aws",
+      "name": "AWS Elastic Disaster Recovery",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elastic-disaster-recovery.svg"
+    },
+    {
+      "id": "aws/aws-elemental-appliances-software",
+      "set": "aws",
+      "name": "AWS Elemental Appliances Software",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-appliances-software.svg"
+    },
+    {
+      "id": "aws/aws-elemental-conductor",
+      "set": "aws",
+      "name": "AWS Elemental Conductor",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-conductor.svg"
+    },
+    {
+      "id": "aws/aws-elemental-delta",
+      "set": "aws",
+      "name": "AWS Elemental Delta",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-delta.svg"
+    },
+    {
+      "id": "aws/aws-elemental-link",
+      "set": "aws",
+      "name": "AWS Elemental Link",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-link.svg"
+    },
+    {
+      "id": "aws/aws-elemental-live",
+      "set": "aws",
+      "name": "AWS Elemental Live",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-live.svg"
+    },
+    {
+      "id": "aws/aws-elemental-media-connect",
+      "set": "aws",
+      "name": "AWS Elemental Media Connect",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-media-connect.svg"
+    },
+    {
+      "id": "aws/aws-elemental-media-convert",
+      "set": "aws",
+      "name": "AWS Elemental Media Convert",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-media-convert.svg"
+    },
+    {
+      "id": "aws/aws-elemental-media-live",
+      "set": "aws",
+      "name": "AWS Elemental Media Live",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-media-live.svg"
+    },
+    {
+      "id": "aws/aws-elemental-media-package",
+      "set": "aws",
+      "name": "AWS Elemental Media Package",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-media-package.svg"
+    },
+    {
+      "id": "aws/aws-elemental-media-store",
+      "set": "aws",
+      "name": "AWS Elemental Media Store",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-media-store.svg"
+    },
+    {
+      "id": "aws/aws-elemental-media-tailor",
+      "set": "aws",
+      "name": "AWS Elemental Media Tailor",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-media-tailor.svg"
+    },
+    {
+      "id": "aws/aws-elemental-server",
+      "set": "aws",
+      "name": "AWS Elemental Server",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-elemental-server.svg"
+    },
+    {
+      "id": "aws/aws-end-user-messaging",
+      "set": "aws",
+      "name": "AWS End User Messaging",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-end-user-messaging.svg"
+    },
+    {
+      "id": "aws/aws-entity-resolution",
+      "set": "aws",
+      "name": "AWS Entity Resolution",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-entity-resolution.svg"
+    },
+    {
+      "id": "aws/aws-express-workflows",
+      "set": "aws",
+      "name": "AWS Express Workflows",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-express-workflows.svg"
+    },
+    {
+      "id": "aws/aws-fargate",
+      "set": "aws",
+      "name": "AWS Fargate",
+      "keywords": [
+        "container",
+        "fargate",
+        "serverless",
+        "service"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/aws/aws-fargate.svg"
+    },
+    {
+      "id": "aws/aws-fault-injection-service",
+      "set": "aws",
+      "name": "AWS Fault Injection Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-fault-injection-service.svg"
+    },
+    {
+      "id": "aws/aws-firewall-manager",
+      "set": "aws",
+      "name": "AWS Firewall Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-firewall-manager.svg"
+    },
+    {
+      "id": "aws/aws-global-accelerator",
+      "set": "aws",
+      "name": "AWS Global Accelerator",
+      "keywords": [
+        "anycast",
+        "edge",
+        "network"
+      ],
+      "kinds": [
+        "cdn"
+      ],
+      "src": "/icons/aws/aws-global-accelerator.svg"
+    },
+    {
+      "id": "aws/aws-glue",
+      "set": "aws",
+      "name": "AWS Glue",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-glue.svg"
+    },
+    {
+      "id": "aws/aws-glue-databrew",
+      "set": "aws",
+      "name": "AWS Glue DataBrew",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-glue-databrew.svg"
+    },
+    {
+      "id": "aws/aws-ground-station",
+      "set": "aws",
+      "name": "AWS Ground Station",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-ground-station.svg"
+    },
+    {
+      "id": "aws/aws-health-dashboard",
+      "set": "aws",
+      "name": "AWS Health Dashboard",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-health-dashboard.svg"
+    },
+    {
+      "id": "aws/aws-health-imaging",
+      "set": "aws",
+      "name": "AWS Health Imaging",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-health-imaging.svg"
+    },
+    {
+      "id": "aws/aws-healthlake",
+      "set": "aws",
+      "name": "AWS HealthLake",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-healthlake.svg"
+    },
+    {
+      "id": "aws/aws-healthomics",
+      "set": "aws",
+      "name": "AWS HealthOmics",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-healthomics.svg"
+    },
+    {
+      "id": "aws/aws-healthscribe",
+      "set": "aws",
+      "name": "AWS HealthScribe",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-healthscribe.svg"
+    },
+    {
+      "id": "aws/aws-iam-identity-center",
+      "set": "aws",
+      "name": "AWS IAM Identity Center",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iam-identity-center.svg"
+    },
+    {
+      "id": "aws/aws-identity-and-access-management",
+      "set": "aws",
+      "name": "AWS Identity and Access Management",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-identity-and-access-management.svg"
+    },
+    {
+      "id": "aws/aws-infrastructure-composer",
+      "set": "aws",
+      "name": "AWS Infrastructure Composer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-infrastructure-composer.svg"
+    },
+    {
+      "id": "aws/aws-iot-core",
+      "set": "aws",
+      "name": "AWS IoT Core",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-core.svg"
+    },
+    {
+      "id": "aws/aws-iot-device-defender",
+      "set": "aws",
+      "name": "AWS IoT Device Defender",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-device-defender.svg"
+    },
+    {
+      "id": "aws/aws-iot-device-management",
+      "set": "aws",
+      "name": "AWS IoT Device Management",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-device-management.svg"
+    },
+    {
+      "id": "aws/aws-iot-events",
+      "set": "aws",
+      "name": "AWS IoT Events",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-events.svg"
+    },
+    {
+      "id": "aws/aws-iot-expresslink",
+      "set": "aws",
+      "name": "AWS IoT ExpressLink",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-expresslink.svg"
+    },
+    {
+      "id": "aws/aws-iot-fleetwise",
+      "set": "aws",
+      "name": "AWS IoT FleetWise",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-fleetwise.svg"
+    },
+    {
+      "id": "aws/aws-iot-greengrass",
+      "set": "aws",
+      "name": "AWS IoT Greengrass",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-greengrass.svg"
+    },
+    {
+      "id": "aws/aws-iot-greengrass-deployment",
+      "set": "aws",
+      "name": "AWS IoT Greengrass deployment",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-greengrass-deployment.svg"
+    },
+    {
+      "id": "aws/aws-iot-sitewise",
+      "set": "aws",
+      "name": "AWS IoT SiteWise",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-sitewise.svg"
+    },
+    {
+      "id": "aws/aws-iot-twinmaker",
+      "set": "aws",
+      "name": "AWS IoT TwinMaker",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iot-twinmaker.svg"
+    },
+    {
+      "id": "aws/aws-iq",
+      "set": "aws",
+      "name": "AWS IQ",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-iq.svg"
+    },
+    {
+      "id": "aws/aws-key-management-service",
+      "set": "aws",
+      "name": "AWS Key Management Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-key-management-service.svg"
+    },
+    {
+      "id": "aws/aws-lake-formation",
+      "set": "aws",
+      "name": "AWS Lake Formation",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-lake-formation.svg"
+    },
+    {
+      "id": "aws/aws-lambda",
+      "set": "aws",
+      "name": "AWS Lambda",
+      "keywords": [
+        "faas",
+        "function",
+        "lambda",
+        "serverless"
+      ],
+      "kinds": [
+        "function"
+      ],
+      "src": "/icons/aws/aws-lambda.svg"
+    },
+    {
+      "id": "aws/aws-launch-wizard",
+      "set": "aws",
+      "name": "AWS Launch Wizard",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-launch-wizard.svg"
+    },
+    {
+      "id": "aws/aws-license-manager",
+      "set": "aws",
+      "name": "AWS License Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-license-manager.svg"
+    },
+    {
+      "id": "aws/aws-local-zones",
+      "set": "aws",
+      "name": "AWS Local Zones",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-local-zones.svg"
+    },
+    {
+      "id": "aws/aws-mainframe-modernization",
+      "set": "aws",
+      "name": "AWS Mainframe Modernization",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-mainframe-modernization.svg"
+    },
+    {
+      "id": "aws/aws-managed-services",
+      "set": "aws",
+      "name": "AWS Managed Services",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-managed-services.svg"
+    },
+    {
+      "id": "aws/aws-management-console",
+      "set": "aws",
+      "name": "AWS Management Console",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-management-console.svg"
+    },
+    {
+      "id": "aws/aws-marketplace",
+      "set": "aws",
+      "name": "AWS Marketplace",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-marketplace.svg"
+    },
+    {
+      "id": "aws/aws-marketplace-dark",
+      "set": "aws",
+      "name": "AWS Marketplace (dark)",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-marketplace-dark.svg"
+    },
+    {
+      "id": "aws/aws-migration-evaluator",
+      "set": "aws",
+      "name": "AWS Migration Evaluator",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-migration-evaluator.svg"
+    },
+    {
+      "id": "aws/aws-migration-hub",
+      "set": "aws",
+      "name": "AWS Migration Hub",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-migration-hub.svg"
+    },
+    {
+      "id": "aws/aws-network-firewall",
+      "set": "aws",
+      "name": "AWS Network Firewall",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-network-firewall.svg"
+    },
+    {
+      "id": "aws/aws-neuron",
+      "set": "aws",
+      "name": "AWS Neuron",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-neuron.svg"
+    },
+    {
+      "id": "aws/aws-nitro-enclaves",
+      "set": "aws",
+      "name": "AWS Nitro Enclaves",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-nitro-enclaves.svg"
+    },
+    {
+      "id": "aws/aws-organizations",
+      "set": "aws",
+      "name": "AWS Organizations",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-organizations.svg"
+    },
+    {
+      "id": "aws/aws-outpostsfamily",
+      "set": "aws",
+      "name": "AWS Outpostsfamily",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-outpostsfamily.svg"
+    },
+    {
+      "id": "aws/aws-outpostsrack",
+      "set": "aws",
+      "name": "AWS Outpostsrack",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-outpostsrack.svg"
+    },
+    {
+      "id": "aws/aws-outpostsservers",
+      "set": "aws",
+      "name": "AWS Outpostsservers",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-outpostsservers.svg"
+    },
+    {
+      "id": "aws/aws-panorama",
+      "set": "aws",
+      "name": "AWS Panorama",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-panorama.svg"
+    },
+    {
+      "id": "aws/aws-parallel-cluster",
+      "set": "aws",
+      "name": "AWS Parallel Cluster",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-parallel-cluster.svg"
+    },
+    {
+      "id": "aws/aws-parallel-computing-service",
+      "set": "aws",
+      "name": "AWS Parallel Computing Service",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-parallel-computing-service.svg"
+    },
+    {
+      "id": "aws/aws-partner-central",
+      "set": "aws",
+      "name": "AWS Partner Central",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-partner-central.svg"
+    },
+    {
+      "id": "aws/aws-payment-cryptography",
+      "set": "aws",
+      "name": "AWS Payment Cryptography",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-payment-cryptography.svg"
+    },
+    {
+      "id": "aws/aws-private-certificate-authority",
+      "set": "aws",
+      "name": "AWS Private Certificate Authority",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-private-certificate-authority.svg"
+    },
+    {
+      "id": "aws/aws-private-link",
+      "set": "aws",
+      "name": "AWS Private Link",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-private-link.svg"
+    },
+    {
+      "id": "aws/aws-professional-services",
+      "set": "aws",
+      "name": "AWS Professional Services",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-professional-services.svg"
+    },
+    {
+      "id": "aws/aws-proton",
+      "set": "aws",
+      "name": "AWS Proton",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-proton.svg"
+    },
+    {
+      "id": "aws/aws-repost",
+      "set": "aws",
+      "name": "AWS re:Post",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-repost.svg"
+    },
+    {
+      "id": "aws/aws-repost-private",
+      "set": "aws",
+      "name": "AWS re:Post Private",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-repost-private.svg"
+    },
+    {
+      "id": "aws/aws-resilience-hub",
+      "set": "aws",
+      "name": "AWS Resilience Hub",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-resilience-hub.svg"
+    },
+    {
+      "id": "aws/aws-resource-access-manager",
+      "set": "aws",
+      "name": "AWS Resource Access Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-resource-access-manager.svg"
+    },
+    {
+      "id": "aws/aws-resource-explorer",
+      "set": "aws",
+      "name": "AWS Resource Explorer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-resource-explorer.svg"
+    },
+    {
+      "id": "aws/aws-rtb-fabric",
+      "set": "aws",
+      "name": "AWS RTB Fabric",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-rtb-fabric.svg"
+    },
+    {
+      "id": "aws/aws-secrets-manager",
+      "set": "aws",
+      "name": "AWS Secrets Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-secrets-manager.svg"
+    },
+    {
+      "id": "aws/aws-security-agent",
+      "set": "aws",
+      "name": "AWS Security Agent",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-security-agent.svg"
+    },
+    {
+      "id": "aws/aws-security-hub",
+      "set": "aws",
+      "name": "AWS Security Hub",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-security-hub.svg"
+    },
+    {
+      "id": "aws/aws-security-incident-response",
+      "set": "aws",
+      "name": "AWS Security Incident Response",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-security-incident-response.svg"
+    },
+    {
+      "id": "aws/aws-serverless-application-repository",
+      "set": "aws",
+      "name": "AWS Serverless Application Repository",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-serverless-application-repository.svg"
+    },
+    {
+      "id": "aws/aws-service-catalog",
+      "set": "aws",
+      "name": "AWS Service Catalog",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-service-catalog.svg"
+    },
+    {
+      "id": "aws/aws-service-management-connector",
+      "set": "aws",
+      "name": "AWS Service Management Connector",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-service-management-connector.svg"
+    },
+    {
+      "id": "aws/aws-shield",
+      "set": "aws",
+      "name": "AWS Shield",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-shield.svg"
+    },
+    {
+      "id": "aws/aws-signer",
+      "set": "aws",
+      "name": "AWS Signer",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-signer.svg"
+    },
+    {
+      "id": "aws/aws-simspace-weaver",
+      "set": "aws",
+      "name": "AWS SimSpace Weaver",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-simspace-weaver.svg"
+    },
+    {
+      "id": "aws/aws-site-to-site-vpn",
+      "set": "aws",
+      "name": "AWS Site to Site VPN",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-site-to-site-vpn.svg"
+    },
+    {
+      "id": "aws/aws-snowball",
+      "set": "aws",
+      "name": "AWS Snowball",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-snowball.svg"
+    },
+    {
+      "id": "aws/aws-snowball-edge",
+      "set": "aws",
+      "name": "AWS Snowball Edge",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-snowball-edge.svg"
+    },
+    {
+      "id": "aws/aws-step-functions",
+      "set": "aws",
+      "name": "AWS Step Functions",
+      "keywords": [
+        "orchestration",
+        "state machine",
+        "workflow"
+      ],
+      "kinds": [
+        "scheduler"
+      ],
+      "src": "/icons/aws/aws-step-functions.svg"
+    },
+    {
+      "id": "aws/aws-storage-gateway",
+      "set": "aws",
+      "name": "AWS Storage Gateway",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-storage-gateway.svg"
+    },
+    {
+      "id": "aws/aws-supply-chain",
+      "set": "aws",
+      "name": "AWS Supply Chain",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-supply-chain.svg"
+    },
+    {
+      "id": "aws/aws-support",
+      "set": "aws",
+      "name": "AWS Support",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-support.svg"
+    },
+    {
+      "id": "aws/aws-systems-manager",
+      "set": "aws",
+      "name": "AWS Systems Manager",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-systems-manager.svg"
+    },
+    {
+      "id": "aws/aws-telco-network-builder",
+      "set": "aws",
+      "name": "AWS Telco Network Builder",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-telco-network-builder.svg"
+    },
+    {
+      "id": "aws/aws-thinkbox-deadline",
+      "set": "aws",
+      "name": "AWS Thinkbox Deadline",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-thinkbox-deadline.svg"
+    },
+    {
+      "id": "aws/aws-thinkbox-frost",
+      "set": "aws",
+      "name": "AWS Thinkbox Frost",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-thinkbox-frost.svg"
+    },
+    {
+      "id": "aws/aws-thinkbox-krakatoa",
+      "set": "aws",
+      "name": "AWS Thinkbox Krakatoa",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-thinkbox-krakatoa.svg"
+    },
+    {
+      "id": "aws/aws-thinkbox-stoke",
+      "set": "aws",
+      "name": "AWS Thinkbox Stoke",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-thinkbox-stoke.svg"
+    },
+    {
+      "id": "aws/aws-thinkbox-x-mesh",
+      "set": "aws",
+      "name": "AWS Thinkbox X Mesh",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-thinkbox-x-mesh.svg"
+    },
+    {
+      "id": "aws/aws-toolsand-sdks",
+      "set": "aws",
+      "name": "AWS Toolsand SDKs",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-toolsand-sdks.svg"
+    },
+    {
+      "id": "aws/aws-training-certification",
+      "set": "aws",
+      "name": "AWS Training Certification",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-training-certification.svg"
+    },
+    {
+      "id": "aws/aws-transfer-family",
+      "set": "aws",
+      "name": "AWS Transfer Family",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-transfer-family.svg"
+    },
+    {
+      "id": "aws/aws-transform",
+      "set": "aws",
+      "name": "AWS Transform",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-transform.svg"
+    },
+    {
+      "id": "aws/aws-transit-gateway",
+      "set": "aws",
+      "name": "AWS Transit Gateway",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-transit-gateway.svg"
+    },
+    {
+      "id": "aws/aws-trusted-advisor",
+      "set": "aws",
+      "name": "AWS Trusted Advisor",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-trusted-advisor.svg"
+    },
+    {
+      "id": "aws/aws-user-notifications",
+      "set": "aws",
+      "name": "AWS User Notifications",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-user-notifications.svg"
+    },
+    {
+      "id": "aws/aws-verified-access",
+      "set": "aws",
+      "name": "AWS Verified Access",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-verified-access.svg"
+    },
+    {
+      "id": "aws/aws-waf",
+      "set": "aws",
+      "name": "AWS WAF",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-waf.svg"
+    },
+    {
+      "id": "aws/aws-wavelength",
+      "set": "aws",
+      "name": "AWS Wavelength",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-wavelength.svg"
+    },
+    {
+      "id": "aws/aws-well-architected-tool",
+      "set": "aws",
+      "name": "AWS Well Architected Tool",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-well-architected-tool.svg"
+    },
+    {
+      "id": "aws/aws-wickr",
+      "set": "aws",
+      "name": "AWS Wickr",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/aws-wickr.svg"
+    },
+    {
+      "id": "aws/aws-xray",
+      "set": "aws",
+      "name": "AWS X-Ray",
+      "keywords": [
+        "apm",
+        "observability",
+        "tracing"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/aws/aws-xray.svg"
+    },
+    {
+      "id": "aws/bottlerocket",
+      "set": "aws",
+      "name": "Bottlerocket",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/bottlerocket.svg"
+    },
+    {
+      "id": "aws/corporatedatacenter",
+      "set": "aws",
+      "name": "Corporate data center",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/corporatedatacenter.svg"
+    },
+    {
+      "id": "aws/ec2instancecontents",
+      "set": "aws",
+      "name": "EC2 instance contents",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/ec2instancecontents.svg"
+    },
+    {
+      "id": "aws/elastic-fabric-adapter",
+      "set": "aws",
+      "name": "Elastic Fabric Adapter",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/elastic-fabric-adapter.svg"
+    },
+    {
+      "id": "aws/elastic-load-balancing",
+      "set": "aws",
+      "name": "Elastic Load Balancing",
+      "keywords": [
+        "alb",
+        "elb",
+        "gateway",
+        "load balancer",
+        "nlb"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/aws/elastic-load-balancing.svg"
+    },
+    {
+      "id": "aws/freertos",
+      "set": "aws",
+      "name": "FreeRTOS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/freertos.svg"
+    },
+    {
+      "id": "aws/open-3d-engine",
+      "set": "aws",
+      "name": "Open 3D Engine",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/open-3d-engine.svg"
+    },
+    {
+      "id": "aws/oracle-database-at-aws",
+      "set": "aws",
+      "name": "Oracle Database at AWS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/oracle-database-at-aws.svg"
+    },
+    {
+      "id": "aws/privatesubnet",
+      "set": "aws",
+      "name": "Private subnet",
+      "keywords": [
+        "boundary",
+        "group",
+        "network",
+        "private",
+        "subnet"
+      ],
+      "kinds": [
+        "boundary"
+      ],
+      "src": "/icons/aws/privatesubnet.svg"
+    },
+    {
+      "id": "aws/publicsubnet",
+      "set": "aws",
+      "name": "Public subnet",
+      "keywords": [
+        "boundary",
+        "group",
+        "network",
+        "public",
+        "subnet"
+      ],
+      "kinds": [
+        "boundary"
+      ],
+      "src": "/icons/aws/publicsubnet.svg"
+    },
+    {
+      "id": "aws/pytorch-on-aws",
+      "set": "aws",
+      "name": "PyTorch on AWS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/pytorch-on-aws.svg"
+    },
+    {
+      "id": "aws/red-hat-openshift-service-on-aws",
+      "set": "aws",
+      "name": "Red Hat OpenShift Service on AWS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/red-hat-openshift-service-on-aws.svg"
+    },
+    {
+      "id": "aws/region",
+      "set": "aws",
+      "name": "Region",
+      "keywords": [
+        "boundary",
+        "group",
+        "region"
+      ],
+      "kinds": [
+        "boundary"
+      ],
+      "src": "/icons/aws/region.svg"
+    },
+    {
+      "id": "aws/reserved-instance-reporting",
+      "set": "aws",
+      "name": "Reserved Instance Reporting",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/reserved-instance-reporting.svg"
+    },
+    {
+      "id": "aws/savings-plans",
+      "set": "aws",
+      "name": "Savings Plans",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/savings-plans.svg"
+    },
+    {
+      "id": "aws/servercontents",
+      "set": "aws",
+      "name": "Server contents",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/servercontents.svg"
+    },
+    {
+      "id": "aws/spot-fleet",
+      "set": "aws",
+      "name": "Spot Fleet",
+      "keywords": [
+        "group"
+      ],
+      "kinds": [],
+      "src": "/icons/aws/spot-fleet.svg"
+    },
+    {
+      "id": "aws/tensorflow-on-aws",
+      "set": "aws",
+      "name": "TensorFlow on AWS",
+      "keywords": [],
+      "kinds": [],
+      "src": "/icons/aws/tensorflow-on-aws.svg"
+    },
+    {
+      "id": "aws/virtualprivatecloud-vpc",
+      "set": "aws",
+      "name": "Virtual private cloud (VPC)",
+      "keywords": [
+        "boundary",
+        "group",
+        "network",
+        "vpc"
+      ],
+      "kinds": [
+        "boundary"
+      ],
+      "src": "/icons/aws/virtualprivatecloud-vpc.svg"
+    },
+    {
+      "id": "generic/access-token",
+      "set": "generic",
+      "name": "Access Token",
+      "keywords": [
+        "access token",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/access-token.svg"
+    },
+    {
+      "id": "generic/adapter",
+      "set": "generic",
+      "name": "Adapter",
+      "keywords": [
+        "adapter",
+        "architecture"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/adapter.svg"
+    },
+    {
+      "id": "generic/alert",
+      "set": "generic",
+      "name": "Alert",
+      "keywords": [
+        "alert",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/alert.svg"
+    },
+    {
+      "id": "generic/analytics",
+      "set": "generic",
+      "name": "Analytics",
+      "keywords": [
+        "analytics",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/analytics.svg"
+    },
+    {
+      "id": "generic/api-gateway",
+      "set": "generic",
+      "name": "Api Gateway",
+      "keywords": [
+        "api gateway",
+        "network"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/generic/api-gateway.svg"
+    },
+    {
+      "id": "generic/api-key",
+      "set": "generic",
+      "name": "Api Key",
+      "keywords": [
+        "api key",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/api-key.svg"
+    },
+    {
+      "id": "generic/application-runtime",
+      "set": "generic",
+      "name": "Application Runtime",
+      "keywords": [
+        "application runtime",
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/application-runtime.svg"
+    },
+    {
+      "id": "generic/archive",
+      "set": "generic",
+      "name": "Archive",
+      "keywords": [
+        "archive",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/archive.svg"
+    },
+    {
+      "id": "generic/audit-log",
+      "set": "generic",
+      "name": "Audit Log",
+      "keywords": [
+        "audit log",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/audit-log.svg"
+    },
+    {
+      "id": "generic/autoscaling-group",
+      "set": "generic",
+      "name": "Autoscaling Group",
+      "keywords": [
+        "autoscaling group",
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/autoscaling-group.svg"
+    },
+    {
+      "id": "generic/backend-service",
+      "set": "generic",
+      "name": "Backend Service",
+      "keywords": [
+        "architecture",
+        "backend service"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/generic/backend-service.svg"
+    },
+    {
+      "id": "generic/backup",
+      "set": "generic",
+      "name": "Backup",
+      "keywords": [
+        "backup",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/backup.svg"
+    },
+    {
+      "id": "generic/bare-metal",
+      "set": "generic",
+      "name": "Bare Metal",
+      "keywords": [
+        "bare metal",
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/bare-metal.svg"
+    },
+    {
+      "id": "generic/batch-job",
+      "set": "generic",
+      "name": "Batch Job",
+      "keywords": [
+        "batch job",
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/batch-job.svg"
+    },
+    {
+      "id": "generic/bff",
+      "set": "generic",
+      "name": "Bff",
+      "keywords": [
+        "architecture",
+        "bff"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/bff.svg"
+    },
+    {
+      "id": "generic/blob",
+      "set": "generic",
+      "name": "Blob",
+      "keywords": [
+        "blob",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/generic/blob.svg"
+    },
+    {
+      "id": "generic/block-storage",
+      "set": "generic",
+      "name": "Block Storage",
+      "keywords": [
+        "block storage",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/block-storage.svg"
+    },
+    {
+      "id": "generic/build-agent",
+      "set": "generic",
+      "name": "Build Agent",
+      "keywords": [
+        "build agent",
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/build-agent.svg"
+    },
+    {
+      "id": "generic/business-intelligence",
+      "set": "generic",
+      "name": "Business Intelligence",
+      "keywords": [
+        "business intelligence",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/business-intelligence.svg"
+    },
+    {
+      "id": "generic/cdn",
+      "set": "generic",
+      "name": "Cdn",
+      "keywords": [
+        "cdn",
+        "network"
+      ],
+      "kinds": [
+        "cdn"
+      ],
+      "src": "/icons/generic/cdn.svg"
+    },
+    {
+      "id": "generic/certificate",
+      "set": "generic",
+      "name": "Certificate",
+      "keywords": [
+        "certificate",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/certificate.svg"
+    },
+    {
+      "id": "generic/change-data-capture",
+      "set": "generic",
+      "name": "Change Data Capture",
+      "keywords": [
+        "change data capture",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/change-data-capture.svg"
+    },
+    {
+      "id": "generic/circuit-breaker",
+      "set": "generic",
+      "name": "Circuit Breaker",
+      "keywords": [
+        "architecture",
+        "circuit breaker"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/circuit-breaker.svg"
+    },
+    {
+      "id": "generic/client",
+      "set": "generic",
+      "name": "Client",
+      "keywords": [
+        "architecture",
+        "client"
+      ],
+      "kinds": [
+        "client"
+      ],
+      "src": "/icons/generic/client.svg"
+    },
+    {
+      "id": "generic/cluster",
+      "set": "generic",
+      "name": "Cluster",
+      "keywords": [
+        "cluster",
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/cluster.svg"
+    },
+    {
+      "id": "generic/cold-storage",
+      "set": "generic",
+      "name": "Cold Storage",
+      "keywords": [
+        "cold storage",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/cold-storage.svg"
+    },
+    {
+      "id": "generic/compliance",
+      "set": "generic",
+      "name": "Compliance",
+      "keywords": [
+        "compliance",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/compliance.svg"
+    },
+    {
+      "id": "generic/compute",
+      "set": "generic",
+      "name": "Compute",
+      "keywords": [
+        "compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/compute.svg"
+    },
+    {
+      "id": "generic/consumer",
+      "set": "generic",
+      "name": "Consumer",
+      "keywords": [
+        "consumer",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/consumer.svg"
+    },
+    {
+      "id": "generic/consumer-group",
+      "set": "generic",
+      "name": "Consumer Group",
+      "keywords": [
+        "consumer group",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/consumer-group.svg"
+    },
+    {
+      "id": "generic/container",
+      "set": "generic",
+      "name": "Container",
+      "keywords": [
+        "compute",
+        "container"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/container.svg"
+    },
+    {
+      "id": "generic/container-image",
+      "set": "generic",
+      "name": "Container Image",
+      "keywords": [
+        "compute",
+        "container image"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/container-image.svg"
+    },
+    {
+      "id": "generic/content-delivery",
+      "set": "generic",
+      "name": "Content Delivery",
+      "keywords": [
+        "content delivery",
+        "storage"
+      ],
+      "kinds": [
+        "cdn"
+      ],
+      "src": "/icons/generic/content-delivery.svg"
+    },
+    {
+      "id": "generic/cron-job",
+      "set": "generic",
+      "name": "Cron Job",
+      "keywords": [
+        "compute",
+        "cron job"
+      ],
+      "kinds": [
+        "scheduler"
+      ],
+      "src": "/icons/generic/cron-job.svg"
+    },
+    {
+      "id": "generic/dashboard",
+      "set": "generic",
+      "name": "Dashboard",
+      "keywords": [
+        "dashboard",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/dashboard.svg"
+    },
+    {
+      "id": "generic/data-catalog",
+      "set": "generic",
+      "name": "Data Catalog",
+      "keywords": [
+        "data catalog",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-catalog.svg"
+    },
+    {
+      "id": "generic/data-lake",
+      "set": "generic",
+      "name": "Data Lake",
+      "keywords": [
+        "data lake",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-lake.svg"
+    },
+    {
+      "id": "generic/data-lineage",
+      "set": "generic",
+      "name": "Data Lineage",
+      "keywords": [
+        "data lineage",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-lineage.svg"
+    },
+    {
+      "id": "generic/data-mart",
+      "set": "generic",
+      "name": "Data Mart",
+      "keywords": [
+        "data mart",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-mart.svg"
+    },
+    {
+      "id": "generic/data-migration",
+      "set": "generic",
+      "name": "Data Migration",
+      "keywords": [
+        "data migration",
+        "database"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-migration.svg"
+    },
+    {
+      "id": "generic/data-pipeline",
+      "set": "generic",
+      "name": "Data Pipeline",
+      "keywords": [
+        "data pipeline",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-pipeline.svg"
+    },
+    {
+      "id": "generic/data-quality",
+      "set": "generic",
+      "name": "Data Quality",
+      "keywords": [
+        "data quality",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-quality.svg"
+    },
+    {
+      "id": "generic/data-transform",
+      "set": "generic",
+      "name": "Data Transform",
+      "keywords": [
+        "data transform",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-transform.svg"
+    },
+    {
+      "id": "generic/data-validation",
+      "set": "generic",
+      "name": "Data Validation",
+      "keywords": [
+        "data validation",
+        "data-flow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-validation.svg"
+    },
+    {
+      "id": "generic/data-warehouse",
+      "set": "generic",
+      "name": "Data Warehouse",
+      "keywords": [
+        "data warehouse",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/data-warehouse.svg"
+    },
+    {
+      "id": "generic/database",
+      "set": "generic",
+      "name": "Database",
+      "keywords": [
+        "database"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/database.svg"
+    },
+    {
+      "id": "generic/dead-letter-queue",
+      "set": "generic",
+      "name": "Dead Letter Queue",
+      "keywords": [
+        "dead letter queue",
+        "messaging"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/generic/dead-letter-queue.svg"
+    },
+    {
+      "id": "generic/decryption",
+      "set": "generic",
+      "name": "Decryption",
+      "keywords": [
+        "decryption",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/decryption.svg"
+    },
+    {
+      "id": "generic/distributed-tracing",
+      "set": "generic",
+      "name": "Distributed Tracing",
+      "keywords": [
+        "distributed tracing",
+        "observability"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/generic/distributed-tracing.svg"
+    },
+    {
+      "id": "generic/dns",
+      "set": "generic",
+      "name": "Dns",
+      "keywords": [
+        "dns",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/dns.svg"
+    },
+    {
+      "id": "generic/document-database",
+      "set": "generic",
+      "name": "Document Database",
+      "keywords": [
+        "database",
+        "document database"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/generic/document-database.svg"
+    },
+    {
+      "id": "generic/document-store",
+      "set": "generic",
+      "name": "Document Store",
+      "keywords": [
+        "document store",
+        "storage"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/generic/document-store.svg"
+    },
+    {
+      "id": "generic/edge-function",
+      "set": "generic",
+      "name": "Edge Function",
+      "keywords": [
+        "compute",
+        "edge function"
+      ],
+      "kinds": [
+        "function"
+      ],
+      "src": "/icons/generic/edge-function.svg"
+    },
+    {
+      "id": "generic/egress",
+      "set": "generic",
+      "name": "Egress",
+      "keywords": [
+        "egress",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/egress.svg"
+    },
+    {
+      "id": "generic/elt-pipeline",
+      "set": "generic",
+      "name": "Elt Pipeline",
+      "keywords": [
+        "data-flow",
+        "elt pipeline"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/elt-pipeline.svg"
+    },
+    {
+      "id": "generic/embedding-service",
+      "set": "generic",
+      "name": "Embedding Service",
+      "keywords": [
+        "data-flow",
+        "embedding service"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/embedding-service.svg"
+    },
+    {
+      "id": "generic/encryption",
+      "set": "generic",
+      "name": "Encryption",
+      "keywords": [
+        "encryption",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/encryption.svg"
+    },
+    {
+      "id": "generic/error-budget",
+      "set": "generic",
+      "name": "Error Budget",
+      "keywords": [
+        "error budget",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/error-budget.svg"
+    },
+    {
+      "id": "generic/error-rate",
+      "set": "generic",
+      "name": "Error Rate",
+      "keywords": [
+        "error rate",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/error-rate.svg"
+    },
+    {
+      "id": "generic/etl-pipeline",
+      "set": "generic",
+      "name": "Etl Pipeline",
+      "keywords": [
+        "data-flow",
+        "etl pipeline"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/etl-pipeline.svg"
+    },
+    {
+      "id": "generic/event-bus",
+      "set": "generic",
+      "name": "Event Bus",
+      "keywords": [
+        "event bus",
+        "messaging"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/generic/event-bus.svg"
+    },
+    {
+      "id": "generic/event-source",
+      "set": "generic",
+      "name": "Event Source",
+      "keywords": [
+        "event source",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/event-source.svg"
+    },
+    {
+      "id": "generic/event-stream",
+      "set": "generic",
+      "name": "Event Stream",
+      "keywords": [
+        "event stream",
+        "messaging"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/generic/event-stream.svg"
+    },
+    {
+      "id": "generic/external-system",
+      "set": "generic",
+      "name": "External System",
+      "keywords": [
+        "architecture",
+        "external system"
+      ],
+      "kinds": [
+        "external"
+      ],
+      "src": "/icons/generic/external-system.svg"
+    },
+    {
+      "id": "generic/facade",
+      "set": "generic",
+      "name": "Facade",
+      "keywords": [
+        "architecture",
+        "facade"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/facade.svg"
+    },
+    {
+      "id": "generic/fanout",
+      "set": "generic",
+      "name": "Fanout",
+      "keywords": [
+        "fanout",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/fanout.svg"
+    },
+    {
+      "id": "generic/feature-store",
+      "set": "generic",
+      "name": "Feature Store",
+      "keywords": [
+        "data-flow",
+        "feature store"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/feature-store.svg"
+    },
+    {
+      "id": "generic/file-storage",
+      "set": "generic",
+      "name": "File Storage",
+      "keywords": [
+        "file storage",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/generic/file-storage.svg"
+    },
+    {
+      "id": "generic/filesystem",
+      "set": "generic",
+      "name": "Filesystem",
+      "keywords": [
+        "filesystem",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/filesystem.svg"
+    },
+    {
+      "id": "generic/firewall",
+      "set": "generic",
+      "name": "Firewall",
+      "keywords": [
+        "firewall",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/firewall.svg"
+    },
+    {
+      "id": "generic/forward-proxy",
+      "set": "generic",
+      "name": "Forward Proxy",
+      "keywords": [
+        "forward proxy",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/forward-proxy.svg"
+    },
+    {
+      "id": "generic/fraud-detection",
+      "set": "generic",
+      "name": "Fraud Detection",
+      "keywords": [
+        "data-flow",
+        "fraud detection"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/fraud-detection.svg"
+    },
+    {
+      "id": "generic/frontend-app",
+      "set": "generic",
+      "name": "Frontend App",
+      "keywords": [
+        "architecture",
+        "frontend app"
+      ],
+      "kinds": [
+        "client"
+      ],
+      "src": "/icons/generic/frontend-app.svg"
+    },
+    {
+      "id": "generic/gpu-compute",
+      "set": "generic",
+      "name": "Gpu Compute",
+      "keywords": [
+        "compute",
+        "gpu compute"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/gpu-compute.svg"
+    },
+    {
+      "id": "generic/graph-database",
+      "set": "generic",
+      "name": "Graph Database",
+      "keywords": [
+        "database",
+        "graph database"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/graph-database.svg"
+    },
+    {
+      "id": "generic/graphql",
+      "set": "generic",
+      "name": "Graphql",
+      "keywords": [
+        "architecture",
+        "graphql"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/graphql.svg"
+    },
+    {
+      "id": "generic/grpc",
+      "set": "generic",
+      "name": "Grpc",
+      "keywords": [
+        "architecture",
+        "grpc"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/grpc.svg"
+    },
+    {
+      "id": "generic/health-check",
+      "set": "generic",
+      "name": "Health Check",
+      "keywords": [
+        "health check",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/health-check.svg"
+    },
+    {
+      "id": "generic/heatmap",
+      "set": "generic",
+      "name": "Heatmap",
+      "keywords": [
+        "heatmap",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/heatmap.svg"
+    },
+    {
+      "id": "generic/hot-storage",
+      "set": "generic",
+      "name": "Hot Storage",
+      "keywords": [
+        "hot storage",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/hot-storage.svg"
+    },
+    {
+      "id": "generic/http-request",
+      "set": "generic",
+      "name": "Http Request",
+      "keywords": [
+        "architecture",
+        "http request"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/http-request.svg"
+    },
+    {
+      "id": "generic/identity-provider",
+      "set": "generic",
+      "name": "Identity Provider",
+      "keywords": [
+        "identity provider",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/identity-provider.svg"
+    },
+    {
+      "id": "generic/identity-user",
+      "set": "generic",
+      "name": "Identity User",
+      "keywords": [
+        "identity user",
+        "security"
+      ],
+      "kinds": [
+        "person"
+      ],
+      "src": "/icons/generic/identity-user.svg"
+    },
+    {
+      "id": "generic/in-memory-database",
+      "set": "generic",
+      "name": "In Memory Database",
+      "keywords": [
+        "database",
+        "in memory database"
+      ],
+      "kinds": [
+        "cache"
+      ],
+      "src": "/icons/generic/in-memory-database.svg"
+    },
+    {
+      "id": "generic/inbox-pattern",
+      "set": "generic",
+      "name": "Inbox Pattern",
+      "keywords": [
+        "inbox pattern",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/inbox-pattern.svg"
+    },
+    {
+      "id": "generic/incident",
+      "set": "generic",
+      "name": "Incident",
+      "keywords": [
+        "incident",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/incident.svg"
+    },
+    {
+      "id": "generic/inference-endpoint",
+      "set": "generic",
+      "name": "Inference Endpoint",
+      "keywords": [
+        "data-flow",
+        "inference endpoint"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/inference-endpoint.svg"
+    },
+    {
+      "id": "generic/ingress",
+      "set": "generic",
+      "name": "Ingress",
+      "keywords": [
+        "ingress",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/ingress.svg"
+    },
+    {
+      "id": "generic/init-container",
+      "set": "generic",
+      "name": "Init Container",
+      "keywords": [
+        "compute",
+        "init container"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/init-container.svg"
+    },
+    {
+      "id": "generic/integration",
+      "set": "generic",
+      "name": "Integration",
+      "keywords": [
+        "architecture",
+        "integration"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/integration.svg"
+    },
+    {
+      "id": "generic/internet-gateway",
+      "set": "generic",
+      "name": "Internet Gateway",
+      "keywords": [
+        "internet gateway",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/internet-gateway.svg"
+    },
+    {
+      "id": "generic/ip-address",
+      "set": "generic",
+      "name": "Ip Address",
+      "keywords": [
+        "ip address",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/ip-address.svg"
+    },
+    {
+      "id": "generic/job-runner",
+      "set": "generic",
+      "name": "Job Runner",
+      "keywords": [
+        "compute",
+        "job runner"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/job-runner.svg"
+    },
+    {
+      "id": "generic/kafka",
+      "set": "generic",
+      "name": "Kafka",
+      "keywords": [
+        "kafka",
+        "messaging"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/generic/kafka.svg"
+    },
+    {
+      "id": "generic/key-management",
+      "set": "generic",
+      "name": "Key Management",
+      "keywords": [
+        "key management",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/key-management.svg"
+    },
+    {
+      "id": "generic/key-value-store",
+      "set": "generic",
+      "name": "Key Value Store",
+      "keywords": [
+        "database",
+        "key value store"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/generic/key-value-store.svg"
+    },
+    {
+      "id": "generic/kubernetes-deployment",
+      "set": "generic",
+      "name": "Kubernetes Deployment",
+      "keywords": [
+        "compute",
+        "kubernetes deployment"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/kubernetes-deployment.svg"
+    },
+    {
+      "id": "generic/kubernetes-pod",
+      "set": "generic",
+      "name": "Kubernetes Pod",
+      "keywords": [
+        "compute",
+        "kubernetes pod"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/kubernetes-pod.svg"
+    },
+    {
+      "id": "generic/latency",
+      "set": "generic",
+      "name": "Latency",
+      "keywords": [
+        "latency",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/latency.svg"
+    },
+    {
+      "id": "generic/llm-service",
+      "set": "generic",
+      "name": "Llm Service",
+      "keywords": [
+        "data-flow",
+        "llm service"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/llm-service.svg"
+    },
+    {
+      "id": "generic/load-balancer",
+      "set": "generic",
+      "name": "Load Balancer",
+      "keywords": [
+        "load balancer",
+        "network"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/generic/load-balancer.svg"
+    },
+    {
+      "id": "generic/log-file",
+      "set": "generic",
+      "name": "Log File",
+      "keywords": [
+        "log file",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/log-file.svg"
+    },
+    {
+      "id": "generic/media-storage",
+      "set": "generic",
+      "name": "Media Storage",
+      "keywords": [
+        "media storage",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/media-storage.svg"
+    },
+    {
+      "id": "generic/message-broker",
+      "set": "generic",
+      "name": "Message Broker",
+      "keywords": [
+        "message broker",
+        "messaging"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/generic/message-broker.svg"
+    },
+    {
+      "id": "generic/message-filter",
+      "set": "generic",
+      "name": "Message Filter",
+      "keywords": [
+        "message filter",
+        "messaging"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/message-filter.svg"
+    },
+    {
+      "id": "generic/metrics-chart",
+      "set": "generic",
+      "name": "Metrics Chart",
+      "keywords": [
+        "metrics chart",
+        "observability"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/metrics-chart.svg"
+    },
+    {
+      "id": "generic/mfa",
+      "set": "generic",
+      "name": "Mfa",
+      "keywords": [
+        "mfa",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/mfa.svg"
+    },
+    {
+      "id": "generic/microservice",
+      "set": "generic",
+      "name": "Microservice",
+      "keywords": [
+        "architecture",
+        "microservice"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/generic/microservice.svg"
+    },
+    {
+      "id": "generic/ml-model",
+      "set": "generic",
+      "name": "Ml Model",
+      "keywords": [
+        "data-flow",
+        "ml model"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/ml-model.svg"
+    },
+    {
+      "id": "generic/mobile-app",
+      "set": "generic",
+      "name": "Mobile App",
+      "keywords": [
+        "architecture",
+        "mobile app"
+      ],
+      "kinds": [
+        "client"
+      ],
+      "src": "/icons/generic/mobile-app.svg"
+    },
+    {
+      "id": "generic/model-training",
+      "set": "generic",
+      "name": "Model Training",
+      "keywords": [
+        "data-flow",
+        "model training"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/model-training.svg"
+    },
+    {
+      "id": "generic/modular-monolith",
+      "set": "generic",
+      "name": "Modular Monolith",
+      "keywords": [
+        "architecture",
+        "modular monolith"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/modular-monolith.svg"
+    },
+    {
+      "id": "generic/monitoring",
+      "set": "generic",
+      "name": "Monitoring",
+      "keywords": [
+        "monitoring",
+        "observability"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/generic/monitoring.svg"
+    },
+    {
+      "id": "generic/monolith",
+      "set": "generic",
+      "name": "Monolith",
+      "keywords": [
+        "architecture",
+        "monolith"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/monolith.svg"
+    },
+    {
+      "id": "generic/mysql",
+      "set": "generic",
+      "name": "Mysql",
+      "keywords": [
+        "database",
+        "mysql"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/mysql.svg"
+    },
+    {
+      "id": "generic/nat-gateway",
+      "set": "generic",
+      "name": "Nat Gateway",
+      "keywords": [
+        "nat gateway",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/nat-gateway.svg"
+    },
+    {
+      "id": "generic/network-interface",
+      "set": "generic",
+      "name": "Network Interface",
+      "keywords": [
+        "network",
+        "network interface"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/network-interface.svg"
+    },
+    {
+      "id": "generic/node-pool",
+      "set": "generic",
+      "name": "Node Pool",
+      "keywords": [
+        "compute",
+        "node pool"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/node-pool.svg"
+    },
+    {
+      "id": "generic/nosql-database",
+      "set": "generic",
+      "name": "Nosql Database",
+      "keywords": [
+        "database",
+        "nosql database"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/generic/nosql-database.svg"
+    },
+    {
+      "id": "generic/oauth",
+      "set": "generic",
+      "name": "Oauth",
+      "keywords": [
+        "oauth",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/oauth.svg"
+    },
+    {
+      "id": "generic/object-storage",
+      "set": "generic",
+      "name": "Object Storage",
+      "keywords": [
+        "object storage",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/generic/object-storage.svg"
+    },
+    {
+      "id": "generic/openid-connect",
+      "set": "generic",
+      "name": "Openid Connect",
+      "keywords": [
+        "openid connect",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/openid-connect.svg"
+    },
+    {
+      "id": "generic/orchestrator",
+      "set": "generic",
+      "name": "Orchestrator",
+      "keywords": [
+        "architecture",
+        "orchestrator"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/orchestrator.svg"
+    },
+    {
+      "id": "generic/outbox-pattern",
+      "set": "generic",
+      "name": "Outbox Pattern",
+      "keywords": [
+        "messaging",
+        "outbox pattern"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/outbox-pattern.svg"
+    },
+    {
+      "id": "generic/partitioned-table",
+      "set": "generic",
+      "name": "Partitioned Table",
+      "keywords": [
+        "database",
+        "partitioned table"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/partitioned-table.svg"
+    },
+    {
+      "id": "generic/peering",
+      "set": "generic",
+      "name": "Peering",
+      "keywords": [
+        "network",
+        "peering"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/peering.svg"
+    },
+    {
+      "id": "generic/permission",
+      "set": "generic",
+      "name": "Permission",
+      "keywords": [
+        "permission",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/permission.svg"
+    },
+    {
+      "id": "generic/persistent-volume",
+      "set": "generic",
+      "name": "Persistent Volume",
+      "keywords": [
+        "persistent volume",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/persistent-volume.svg"
+    },
+    {
+      "id": "generic/policy-engine",
+      "set": "generic",
+      "name": "Policy Engine",
+      "keywords": [
+        "policy engine",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/policy-engine.svg"
+    },
+    {
+      "id": "generic/postgresql",
+      "set": "generic",
+      "name": "Postgresql",
+      "keywords": [
+        "database",
+        "postgresql"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/postgresql.svg"
+    },
+    {
+      "id": "generic/primary-replica",
+      "set": "generic",
+      "name": "Primary Replica",
+      "keywords": [
+        "database",
+        "primary replica"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/primary-replica.svg"
+    },
+    {
+      "id": "generic/private-link",
+      "set": "generic",
+      "name": "Private Link",
+      "keywords": [
+        "network",
+        "private link"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/private-link.svg"
+    },
+    {
+      "id": "generic/private-subnet",
+      "set": "generic",
+      "name": "Private Subnet",
+      "keywords": [
+        "network",
+        "private subnet"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/private-subnet.svg"
+    },
+    {
+      "id": "generic/process",
+      "set": "generic",
+      "name": "Process",
+      "keywords": [
+        "compute",
+        "process"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/process.svg"
+    },
+    {
+      "id": "generic/producer",
+      "set": "generic",
+      "name": "Producer",
+      "keywords": [
+        "messaging",
+        "producer"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/producer.svg"
+    },
+    {
+      "id": "generic/profiler",
+      "set": "generic",
+      "name": "Profiler",
+      "keywords": [
+        "observability",
+        "profiler"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/profiler.svg"
+    },
+    {
+      "id": "generic/public-subnet",
+      "set": "generic",
+      "name": "Public Subnet",
+      "keywords": [
+        "network",
+        "public subnet"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/public-subnet.svg"
+    },
+    {
+      "id": "generic/queue",
+      "set": "generic",
+      "name": "Queue",
+      "keywords": [
+        "messaging",
+        "queue"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/generic/queue.svg"
+    },
+    {
+      "id": "generic/rabbitmq",
+      "set": "generic",
+      "name": "Rabbitmq",
+      "keywords": [
+        "messaging",
+        "rabbitmq"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/generic/rabbitmq.svg"
+    },
+    {
+      "id": "generic/read-replica",
+      "set": "generic",
+      "name": "Read Replica",
+      "keywords": [
+        "database",
+        "read replica"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/read-replica.svg"
+    },
+    {
+      "id": "generic/recommendation-engine",
+      "set": "generic",
+      "name": "Recommendation Engine",
+      "keywords": [
+        "data-flow",
+        "recommendation engine"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/recommendation-engine.svg"
+    },
+    {
+      "id": "generic/relational-database",
+      "set": "generic",
+      "name": "Relational Database",
+      "keywords": [
+        "database",
+        "relational database"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/relational-database.svg"
+    },
+    {
+      "id": "generic/replication-storage",
+      "set": "generic",
+      "name": "Replication Storage",
+      "keywords": [
+        "replication storage",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/replication-storage.svg"
+    },
+    {
+      "id": "generic/rest-api",
+      "set": "generic",
+      "name": "Rest Api",
+      "keywords": [
+        "architecture",
+        "rest api"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/rest-api.svg"
+    },
+    {
+      "id": "generic/retry-queue",
+      "set": "generic",
+      "name": "Retry Queue",
+      "keywords": [
+        "messaging",
+        "retry queue"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/generic/retry-queue.svg"
+    },
+    {
+      "id": "generic/reverse-proxy",
+      "set": "generic",
+      "name": "Reverse Proxy",
+      "keywords": [
+        "network",
+        "reverse proxy"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/generic/reverse-proxy.svg"
+    },
+    {
+      "id": "generic/role-based-access",
+      "set": "generic",
+      "name": "Role Based Access",
+      "keywords": [
+        "role based access",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/role-based-access.svg"
+    },
+    {
+      "id": "generic/router",
+      "set": "generic",
+      "name": "Router",
+      "keywords": [
+        "network",
+        "router"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/router.svg"
+    },
+    {
+      "id": "generic/rules-engine",
+      "set": "generic",
+      "name": "Rules Engine",
+      "keywords": [
+        "data-flow",
+        "rules engine"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/rules-engine.svg"
+    },
+    {
+      "id": "generic/saga",
+      "set": "generic",
+      "name": "Saga",
+      "keywords": [
+        "architecture",
+        "saga"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/saga.svg"
+    },
+    {
+      "id": "generic/scheduler",
+      "set": "generic",
+      "name": "Scheduler",
+      "keywords": [
+        "compute",
+        "scheduler"
+      ],
+      "kinds": [
+        "scheduler"
+      ],
+      "src": "/icons/generic/scheduler.svg"
+    },
+    {
+      "id": "generic/schema-registry",
+      "set": "generic",
+      "name": "Schema Registry",
+      "keywords": [
+        "database",
+        "schema registry"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/schema-registry.svg"
+    },
+    {
+      "id": "generic/search-index",
+      "set": "generic",
+      "name": "Search Index",
+      "keywords": [
+        "database",
+        "search index"
+      ],
+      "kinds": [
+        "search"
+      ],
+      "src": "/icons/generic/search-index.svg"
+    },
+    {
+      "id": "generic/secrets-manager",
+      "set": "generic",
+      "name": "Secrets Manager",
+      "keywords": [
+        "secrets manager",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/secrets-manager.svg"
+    },
+    {
+      "id": "generic/security-key",
+      "set": "generic",
+      "name": "Security Key",
+      "keywords": [
+        "security",
+        "security key"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/security-key.svg"
+    },
+    {
+      "id": "generic/server",
+      "set": "generic",
+      "name": "Server",
+      "keywords": [
+        "compute",
+        "server"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/server.svg"
+    },
+    {
+      "id": "generic/serverless-function",
+      "set": "generic",
+      "name": "Serverless Function",
+      "keywords": [
+        "compute",
+        "serverless function"
+      ],
+      "kinds": [
+        "function"
+      ],
+      "src": "/icons/generic/serverless-function.svg"
+    },
+    {
+      "id": "generic/service-account",
+      "set": "generic",
+      "name": "Service Account",
+      "keywords": [
+        "security",
+        "service account"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/service-account.svg"
+    },
+    {
+      "id": "generic/service-discovery",
+      "set": "generic",
+      "name": "Service Discovery",
+      "keywords": [
+        "network",
+        "service discovery"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/service-discovery.svg"
+    },
+    {
+      "id": "generic/service-mesh",
+      "set": "generic",
+      "name": "Service Mesh",
+      "keywords": [
+        "network",
+        "service mesh"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/service-mesh.svg"
+    },
+    {
+      "id": "generic/session",
+      "set": "generic",
+      "name": "Session",
+      "keywords": [
+        "security",
+        "session"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/session.svg"
+    },
+    {
+      "id": "generic/sharded-database",
+      "set": "generic",
+      "name": "Sharded Database",
+      "keywords": [
+        "database",
+        "sharded database"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/sharded-database.svg"
+    },
+    {
+      "id": "generic/shared-volume",
+      "set": "generic",
+      "name": "Shared Volume",
+      "keywords": [
+        "shared volume",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/shared-volume.svg"
+    },
+    {
+      "id": "generic/sidecar",
+      "set": "generic",
+      "name": "Sidecar",
+      "keywords": [
+        "compute",
+        "sidecar"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/sidecar.svg"
+    },
+    {
+      "id": "generic/single-sign-on",
+      "set": "generic",
+      "name": "Single Sign On",
+      "keywords": [
+        "security",
+        "single sign on"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/single-sign-on.svg"
+    },
+    {
+      "id": "generic/sla",
+      "set": "generic",
+      "name": "Sla",
+      "keywords": [
+        "observability",
+        "sla"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/sla.svg"
+    },
+    {
+      "id": "generic/slo",
+      "set": "generic",
+      "name": "Slo",
+      "keywords": [
+        "observability",
+        "slo"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/slo.svg"
+    },
+    {
+      "id": "generic/snapshot",
+      "set": "generic",
+      "name": "Snapshot",
+      "keywords": [
+        "snapshot",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/snapshot.svg"
+    },
+    {
+      "id": "generic/sql-server",
+      "set": "generic",
+      "name": "Sql Server",
+      "keywords": [
+        "database",
+        "sql server"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/sql-server.svg"
+    },
+    {
+      "id": "generic/state-machine",
+      "set": "generic",
+      "name": "State Machine",
+      "keywords": [
+        "architecture",
+        "state machine"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/state-machine.svg"
+    },
+    {
+      "id": "generic/static-assets",
+      "set": "generic",
+      "name": "Static Assets",
+      "keywords": [
+        "static assets",
+        "storage"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/static-assets.svg"
+    },
+    {
+      "id": "generic/stream-processor",
+      "set": "generic",
+      "name": "Stream Processor",
+      "keywords": [
+        "messaging",
+        "stream processor"
+      ],
+      "kinds": [
+        "stream"
+      ],
+      "src": "/icons/generic/stream-processor.svg"
+    },
+    {
+      "id": "generic/subnet",
+      "set": "generic",
+      "name": "Subnet",
+      "keywords": [
+        "network",
+        "subnet"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/subnet.svg"
+    },
+    {
+      "id": "generic/switch",
+      "set": "generic",
+      "name": "Switch",
+      "keywords": [
+        "network",
+        "switch"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/switch.svg"
+    },
+    {
+      "id": "generic/synthetic-monitor",
+      "set": "generic",
+      "name": "Synthetic Monitor",
+      "keywords": [
+        "observability",
+        "synthetic monitor"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/synthetic-monitor.svg"
+    },
+    {
+      "id": "generic/tcp-connection",
+      "set": "generic",
+      "name": "Tcp Connection",
+      "keywords": [
+        "architecture",
+        "tcp connection"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/tcp-connection.svg"
+    },
+    {
+      "id": "generic/telemetry",
+      "set": "generic",
+      "name": "Telemetry",
+      "keywords": [
+        "observability",
+        "telemetry"
+      ],
+      "kinds": [
+        "observability"
+      ],
+      "src": "/icons/generic/telemetry.svg"
+    },
+    {
+      "id": "generic/third-party-service",
+      "set": "generic",
+      "name": "Third Party Service",
+      "keywords": [
+        "architecture",
+        "third party service"
+      ],
+      "kinds": [
+        "external"
+      ],
+      "src": "/icons/generic/third-party-service.svg"
+    },
+    {
+      "id": "generic/thread-pool",
+      "set": "generic",
+      "name": "Thread Pool",
+      "keywords": [
+        "compute",
+        "thread pool"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/thread-pool.svg"
+    },
+    {
+      "id": "generic/throughput",
+      "set": "generic",
+      "name": "Throughput",
+      "keywords": [
+        "observability",
+        "throughput"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/throughput.svg"
+    },
+    {
+      "id": "generic/time-series-database",
+      "set": "generic",
+      "name": "Time Series Database",
+      "keywords": [
+        "database",
+        "time series database"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/generic/time-series-database.svg"
+    },
+    {
+      "id": "generic/tls",
+      "set": "generic",
+      "name": "Tls",
+      "keywords": [
+        "security",
+        "tls"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/tls.svg"
+    },
+    {
+      "id": "generic/topic-pubsub",
+      "set": "generic",
+      "name": "Topic Pubsub",
+      "keywords": [
+        "messaging",
+        "topic pubsub"
+      ],
+      "kinds": [
+        "queue"
+      ],
+      "src": "/icons/generic/topic-pubsub.svg"
+    },
+    {
+      "id": "generic/trace-span",
+      "set": "generic",
+      "name": "Trace Span",
+      "keywords": [
+        "observability",
+        "trace span"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/trace-span.svg"
+    },
+    {
+      "id": "generic/trust-boundary",
+      "set": "generic",
+      "name": "Trust Boundary",
+      "keywords": [
+        "security",
+        "trust boundary"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/trust-boundary.svg"
+    },
+    {
+      "id": "generic/uptime",
+      "set": "generic",
+      "name": "Uptime",
+      "keywords": [
+        "observability",
+        "uptime"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/uptime.svg"
+    },
+    {
+      "id": "generic/vault",
+      "set": "generic",
+      "name": "Vault",
+      "keywords": [
+        "security",
+        "vault"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/vault.svg"
+    },
+    {
+      "id": "generic/vector-database",
+      "set": "generic",
+      "name": "Vector Database",
+      "keywords": [
+        "database",
+        "vector database"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/vector-database.svg"
+    },
+    {
+      "id": "generic/vector-search",
+      "set": "generic",
+      "name": "Vector Search",
+      "keywords": [
+        "data-flow",
+        "vector search"
+      ],
+      "kinds": [
+        "search"
+      ],
+      "src": "/icons/generic/vector-search.svg"
+    },
+    {
+      "id": "generic/virtual-machine",
+      "set": "generic",
+      "name": "Virtual Machine",
+      "keywords": [
+        "compute",
+        "virtual machine"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/virtual-machine.svg"
+    },
+    {
+      "id": "generic/vpc-network",
+      "set": "generic",
+      "name": "Vpc Network",
+      "keywords": [
+        "network",
+        "vpc network"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/vpc-network.svg"
+    },
+    {
+      "id": "generic/vpn",
+      "set": "generic",
+      "name": "Vpn",
+      "keywords": [
+        "network",
+        "vpn"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/vpn.svg"
+    },
+    {
+      "id": "generic/web-app",
+      "set": "generic",
+      "name": "Web App",
+      "keywords": [
+        "architecture",
+        "web app"
+      ],
+      "kinds": [
+        "client"
+      ],
+      "src": "/icons/generic/web-app.svg"
+    },
+    {
+      "id": "generic/web-application-firewall",
+      "set": "generic",
+      "name": "Web Application Firewall",
+      "keywords": [
+        "network",
+        "web application firewall"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/web-application-firewall.svg"
+    },
+    {
+      "id": "generic/webhook",
+      "set": "generic",
+      "name": "Webhook",
+      "keywords": [
+        "messaging",
+        "webhook"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/webhook.svg"
+    },
+    {
+      "id": "generic/websocket",
+      "set": "generic",
+      "name": "Websocket",
+      "keywords": [
+        "architecture",
+        "websocket"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/websocket.svg"
+    },
+    {
+      "id": "generic/wide-column-store",
+      "set": "generic",
+      "name": "Wide Column Store",
+      "keywords": [
+        "database",
+        "wide column store"
+      ],
+      "kinds": [
+        "document-db"
+      ],
+      "src": "/icons/generic/wide-column-store.svg"
+    },
+    {
+      "id": "generic/worker",
+      "set": "generic",
+      "name": "Worker",
+      "keywords": [
+        "compute",
+        "worker"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/generic/worker.svg"
+    },
+    {
+      "id": "generic/workflow",
+      "set": "generic",
+      "name": "Workflow",
+      "keywords": [
+        "architecture",
+        "workflow"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/workflow.svg"
+    },
+    {
+      "id": "generic/zero-trust",
+      "set": "generic",
+      "name": "Zero Trust",
+      "keywords": [
+        "security",
+        "zero trust"
+      ],
+      "kinds": [],
+      "src": "/icons/generic/zero-trust.svg"
+    },
+    {
+      "id": "k8s/api",
+      "set": "k8s",
+      "name": "Kubernetes API Server",
+      "keywords": [
+        "k8s",
+        "kube-apiserver",
+        "kubernetes"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/k8s/api.svg"
+    },
+    {
+      "id": "k8s/c-c-m",
+      "set": "k8s",
+      "name": "Kubernetes Cloud Controller Manager",
+      "keywords": [
+        "ccm",
+        "k8s",
+        "kubernetes"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/c-c-m.svg"
+    },
+    {
+      "id": "k8s/c-m",
+      "set": "k8s",
+      "name": "Kubernetes Controller Manager",
+      "keywords": [
+        "k8s",
+        "kube-controller-manager",
+        "kubernetes"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/c-m.svg"
+    },
+    {
+      "id": "k8s/c-role",
+      "set": "k8s",
+      "name": "Kubernetes ClusterRole",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/c-role.svg"
+    },
+    {
+      "id": "k8s/cm",
+      "set": "k8s",
+      "name": "Kubernetes ConfigMap",
+      "keywords": [
+        "config",
+        "k8s",
+        "kubernetes"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/cm.svg"
+    },
+    {
+      "id": "k8s/control-plane",
+      "set": "k8s",
+      "name": "Kubernetes Control Plane",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "master"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/control-plane.svg"
+    },
+    {
+      "id": "k8s/crb",
+      "set": "k8s",
+      "name": "Kubernetes ClusterRoleBinding",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/crb.svg"
+    },
+    {
+      "id": "k8s/crd",
+      "set": "k8s",
+      "name": "Kubernetes CustomResourceDefinition",
+      "keywords": [
+        "crd",
+        "k8s",
+        "kubernetes",
+        "operator"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/crd.svg"
+    },
+    {
+      "id": "k8s/cronjob",
+      "set": "k8s",
+      "name": "Kubernetes CronJob",
+      "keywords": [
+        "batch",
+        "k8s",
+        "kubernetes",
+        "schedule"
+      ],
+      "kinds": [
+        "scheduler"
+      ],
+      "src": "/icons/k8s/cronjob.svg"
+    },
+    {
+      "id": "k8s/deploy",
+      "set": "k8s",
+      "name": "Kubernetes Deployment",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "workload"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/k8s/deploy.svg"
+    },
+    {
+      "id": "k8s/ds",
+      "set": "k8s",
+      "name": "Kubernetes DaemonSet",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "workload"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/k8s/ds.svg"
+    },
+    {
+      "id": "k8s/ep",
+      "set": "k8s",
+      "name": "Kubernetes Endpoints",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "network"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/ep.svg"
+    },
+    {
+      "id": "k8s/etcd",
+      "set": "k8s",
+      "name": "Kubernetes etcd",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "store"
+      ],
+      "kinds": [
+        "database"
+      ],
+      "src": "/icons/k8s/etcd.svg"
+    },
+    {
+      "id": "k8s/group",
+      "set": "k8s",
+      "name": "Kubernetes Group",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/group.svg"
+    },
+    {
+      "id": "k8s/hpa",
+      "set": "k8s",
+      "name": "Kubernetes HorizontalPodAutoscaler",
+      "keywords": [
+        "autoscaling",
+        "hpa",
+        "k8s",
+        "kubernetes"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/hpa.svg"
+    },
+    {
+      "id": "k8s/ing",
+      "set": "k8s",
+      "name": "Kubernetes Ingress",
+      "keywords": [
+        "ingress",
+        "k8s",
+        "kubernetes",
+        "network"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/k8s/ing.svg"
+    },
+    {
+      "id": "k8s/job",
+      "set": "k8s",
+      "name": "Kubernetes Job",
+      "keywords": [
+        "batch",
+        "k8s",
+        "kubernetes"
+      ],
+      "kinds": [
+        "function"
+      ],
+      "src": "/icons/k8s/job.svg"
+    },
+    {
+      "id": "k8s/k-proxy",
+      "set": "k8s",
+      "name": "Kubernetes Kube Proxy",
+      "keywords": [
+        "k8s",
+        "kube-proxy",
+        "kubernetes"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/k-proxy.svg"
+    },
+    {
+      "id": "k8s/kubelet",
+      "set": "k8s",
+      "name": "Kubernetes Kubelet",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "node agent"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/k8s/kubelet.svg"
+    },
+    {
+      "id": "k8s/limits",
+      "set": "k8s",
+      "name": "Kubernetes LimitRange",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "quota"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/limits.svg"
+    },
+    {
+      "id": "k8s/netpol",
+      "set": "k8s",
+      "name": "Kubernetes NetworkPolicy",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "network",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/netpol.svg"
+    },
+    {
+      "id": "k8s/node",
+      "set": "k8s",
+      "name": "Kubernetes Node",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "worker"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/node.svg"
+    },
+    {
+      "id": "k8s/ns",
+      "set": "k8s",
+      "name": "Kubernetes Namespace",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "namespace"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/ns.svg"
+    },
+    {
+      "id": "k8s/pod",
+      "set": "k8s",
+      "name": "Kubernetes Pod",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "workload"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/k8s/pod.svg"
+    },
+    {
+      "id": "k8s/psp",
+      "set": "k8s",
+      "name": "Kubernetes PodSecurityPolicy",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/psp.svg"
+    },
+    {
+      "id": "k8s/pv",
+      "set": "k8s",
+      "name": "Kubernetes PersistentVolume",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/k8s/pv.svg"
+    },
+    {
+      "id": "k8s/pvc",
+      "set": "k8s",
+      "name": "Kubernetes PersistentVolumeClaim",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/k8s/pvc.svg"
+    },
+    {
+      "id": "k8s/quota",
+      "set": "k8s",
+      "name": "Kubernetes ResourceQuota",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "quota"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/quota.svg"
+    },
+    {
+      "id": "k8s/rb",
+      "set": "k8s",
+      "name": "Kubernetes RoleBinding",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/rb.svg"
+    },
+    {
+      "id": "k8s/role",
+      "set": "k8s",
+      "name": "Kubernetes Role",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/role.svg"
+    },
+    {
+      "id": "k8s/rs",
+      "set": "k8s",
+      "name": "Kubernetes ReplicaSet",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "workload"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/k8s/rs.svg"
+    },
+    {
+      "id": "k8s/sa",
+      "set": "k8s",
+      "name": "Kubernetes ServiceAccount",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/sa.svg"
+    },
+    {
+      "id": "k8s/sc",
+      "set": "k8s",
+      "name": "Kubernetes StorageClass",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/k8s/sc.svg"
+    },
+    {
+      "id": "k8s/sched",
+      "set": "k8s",
+      "name": "Kubernetes Scheduler",
+      "keywords": [
+        "k8s",
+        "kube-scheduler",
+        "kubernetes"
+      ],
+      "kinds": [
+        "scheduler"
+      ],
+      "src": "/icons/k8s/sched.svg"
+    },
+    {
+      "id": "k8s/secret",
+      "set": "k8s",
+      "name": "Kubernetes Secret",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "security"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/secret.svg"
+    },
+    {
+      "id": "k8s/sts",
+      "set": "k8s",
+      "name": "Kubernetes StatefulSet",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "workload"
+      ],
+      "kinds": [
+        "service"
+      ],
+      "src": "/icons/k8s/sts.svg"
+    },
+    {
+      "id": "k8s/svc",
+      "set": "k8s",
+      "name": "Kubernetes Service",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "network"
+      ],
+      "kinds": [
+        "gateway"
+      ],
+      "src": "/icons/k8s/svc.svg"
+    },
+    {
+      "id": "k8s/user",
+      "set": "k8s",
+      "name": "Kubernetes User",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "rbac"
+      ],
+      "kinds": [],
+      "src": "/icons/k8s/user.svg"
+    },
+    {
+      "id": "k8s/vol",
+      "set": "k8s",
+      "name": "Kubernetes Volume",
+      "keywords": [
+        "k8s",
+        "kubernetes",
+        "storage"
+      ],
+      "kinds": [
+        "object-storage"
+      ],
+      "src": "/icons/k8s/vol.svg"
+    }
+  ]
+}

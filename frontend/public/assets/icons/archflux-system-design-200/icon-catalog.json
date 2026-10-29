@@ -1,0 +1,3002 @@
+[
+  {
+    "id": "archflux.compute",
+    "name": "Compute",
+    "file": "compute.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "compute",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "compute.svg"
+  },
+  {
+    "id": "archflux.server",
+    "name": "Server",
+    "file": "server.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "server",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "server.svg"
+  },
+  {
+    "id": "archflux.virtual-machine",
+    "name": "Virtual Machine",
+    "file": "virtual-machine.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "virtual machine",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "virtual-machine.svg"
+  },
+  {
+    "id": "archflux.container",
+    "name": "Container",
+    "file": "container.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "container",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "container.svg"
+  },
+  {
+    "id": "archflux.container-image",
+    "name": "Container Image",
+    "file": "container-image.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "container image",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "container-image.svg"
+  },
+  {
+    "id": "archflux.kubernetes-pod",
+    "name": "Kubernetes Pod",
+    "file": "kubernetes-pod.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "kubernetes pod",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "kubernetes-pod.svg"
+  },
+  {
+    "id": "archflux.kubernetes-deployment",
+    "name": "Kubernetes Deployment",
+    "file": "kubernetes-deployment.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "kubernetes deployment",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "kubernetes-deployment.svg"
+  },
+  {
+    "id": "archflux.cluster",
+    "name": "Cluster",
+    "file": "cluster.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "cluster",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "cluster.svg"
+  },
+  {
+    "id": "archflux.node-pool",
+    "name": "Node Pool",
+    "file": "node-pool.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "node pool",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "node-pool.svg"
+  },
+  {
+    "id": "archflux.serverless-function",
+    "name": "Serverless Function",
+    "file": "serverless-function.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "serverless function",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "serverless-function.svg"
+  },
+  {
+    "id": "archflux.edge-function",
+    "name": "Edge Function",
+    "file": "edge-function.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "edge function",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "edge-function.svg"
+  },
+  {
+    "id": "archflux.batch-job",
+    "name": "Batch Job",
+    "file": "batch-job.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "batch job",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "batch-job.svg"
+  },
+  {
+    "id": "archflux.worker",
+    "name": "Worker",
+    "file": "worker.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "worker",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "worker.svg"
+  },
+  {
+    "id": "archflux.scheduler",
+    "name": "Scheduler",
+    "file": "scheduler.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "scheduler",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "scheduler.svg"
+  },
+  {
+    "id": "archflux.cron-job",
+    "name": "Cron Job",
+    "file": "cron-job.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "cron job",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "cron-job.svg"
+  },
+  {
+    "id": "archflux.autoscaling-group",
+    "name": "Autoscaling Group",
+    "file": "autoscaling-group.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "autoscaling group",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "autoscaling-group.svg"
+  },
+  {
+    "id": "archflux.gpu-compute",
+    "name": "Gpu Compute",
+    "file": "gpu-compute.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "gpu compute",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "gpu-compute.svg"
+  },
+  {
+    "id": "archflux.bare-metal",
+    "name": "Bare Metal",
+    "file": "bare-metal.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "bare metal",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "bare-metal.svg"
+  },
+  {
+    "id": "archflux.application-runtime",
+    "name": "Application Runtime",
+    "file": "application-runtime.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "application runtime",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "application-runtime.svg"
+  },
+  {
+    "id": "archflux.process",
+    "name": "Process",
+    "file": "process.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "process",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "process.svg"
+  },
+  {
+    "id": "archflux.thread-pool",
+    "name": "Thread Pool",
+    "file": "thread-pool.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "thread pool",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "thread-pool.svg"
+  },
+  {
+    "id": "archflux.sidecar",
+    "name": "Sidecar",
+    "file": "sidecar.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "sidecar",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "sidecar.svg"
+  },
+  {
+    "id": "archflux.init-container",
+    "name": "Init Container",
+    "file": "init-container.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "init container",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "init-container.svg"
+  },
+  {
+    "id": "archflux.job-runner",
+    "name": "Job Runner",
+    "file": "job-runner.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "job runner",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "job-runner.svg"
+  },
+  {
+    "id": "archflux.build-agent",
+    "name": "Build Agent",
+    "file": "build-agent.svg",
+    "category": "compute",
+    "provider": "neutral",
+    "tags": [
+      "compute",
+      "build agent",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "build-agent.svg"
+  },
+  {
+    "id": "archflux.object-storage",
+    "name": "Object Storage",
+    "file": "object-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "object storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "object-storage.svg"
+  },
+  {
+    "id": "archflux.block-storage",
+    "name": "Block Storage",
+    "file": "block-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "block storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "block-storage.svg"
+  },
+  {
+    "id": "archflux.file-storage",
+    "name": "File Storage",
+    "file": "file-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "file storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "file-storage.svg"
+  },
+  {
+    "id": "archflux.shared-volume",
+    "name": "Shared Volume",
+    "file": "shared-volume.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "shared volume",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "shared-volume.svg"
+  },
+  {
+    "id": "archflux.backup",
+    "name": "Backup",
+    "file": "backup.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "backup",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "backup.svg"
+  },
+  {
+    "id": "archflux.archive",
+    "name": "Archive",
+    "file": "archive.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "archive",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "archive.svg"
+  },
+  {
+    "id": "archflux.data-lake",
+    "name": "Data Lake",
+    "file": "data-lake.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "data lake",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-lake.svg"
+  },
+  {
+    "id": "archflux.data-warehouse",
+    "name": "Data Warehouse",
+    "file": "data-warehouse.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "data warehouse",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-warehouse.svg"
+  },
+  {
+    "id": "archflux.data-mart",
+    "name": "Data Mart",
+    "file": "data-mart.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "data mart",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-mart.svg"
+  },
+  {
+    "id": "archflux.cold-storage",
+    "name": "Cold Storage",
+    "file": "cold-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "cold storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "cold-storage.svg"
+  },
+  {
+    "id": "archflux.hot-storage",
+    "name": "Hot Storage",
+    "file": "hot-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "hot storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "hot-storage.svg"
+  },
+  {
+    "id": "archflux.blob",
+    "name": "Blob",
+    "file": "blob.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "blob",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "blob.svg"
+  },
+  {
+    "id": "archflux.filesystem",
+    "name": "Filesystem",
+    "file": "filesystem.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "filesystem",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "filesystem.svg"
+  },
+  {
+    "id": "archflux.persistent-volume",
+    "name": "Persistent Volume",
+    "file": "persistent-volume.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "persistent volume",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "persistent-volume.svg"
+  },
+  {
+    "id": "archflux.snapshot",
+    "name": "Snapshot",
+    "file": "snapshot.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "snapshot",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "snapshot.svg"
+  },
+  {
+    "id": "archflux.replication-storage",
+    "name": "Replication Storage",
+    "file": "replication-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "replication storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "replication-storage.svg"
+  },
+  {
+    "id": "archflux.content-delivery",
+    "name": "Content Delivery",
+    "file": "content-delivery.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "content delivery",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "content-delivery.svg"
+  },
+  {
+    "id": "archflux.static-assets",
+    "name": "Static Assets",
+    "file": "static-assets.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "static assets",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "static-assets.svg"
+  },
+  {
+    "id": "archflux.media-storage",
+    "name": "Media Storage",
+    "file": "media-storage.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "media storage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "media-storage.svg"
+  },
+  {
+    "id": "archflux.document-store",
+    "name": "Document Store",
+    "file": "document-store.svg",
+    "category": "storage",
+    "provider": "neutral",
+    "tags": [
+      "storage",
+      "document store",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "document-store.svg"
+  },
+  {
+    "id": "archflux.database",
+    "name": "Database",
+    "file": "database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "database.svg"
+  },
+  {
+    "id": "archflux.relational-database",
+    "name": "Relational Database",
+    "file": "relational-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "relational database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "relational-database.svg"
+  },
+  {
+    "id": "archflux.postgresql",
+    "name": "Postgresql",
+    "file": "postgresql.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "postgresql",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "postgresql.svg"
+  },
+  {
+    "id": "archflux.mysql",
+    "name": "Mysql",
+    "file": "mysql.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "mysql",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "mysql.svg"
+  },
+  {
+    "id": "archflux.sql-server",
+    "name": "Sql Server",
+    "file": "sql-server.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "sql server",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "sql-server.svg"
+  },
+  {
+    "id": "archflux.nosql-database",
+    "name": "Nosql Database",
+    "file": "nosql-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "nosql database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "nosql-database.svg"
+  },
+  {
+    "id": "archflux.document-database",
+    "name": "Document Database",
+    "file": "document-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "document database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "document-database.svg"
+  },
+  {
+    "id": "archflux.key-value-store",
+    "name": "Key Value Store",
+    "file": "key-value-store.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "key value store",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "key-value-store.svg"
+  },
+  {
+    "id": "archflux.wide-column-store",
+    "name": "Wide Column Store",
+    "file": "wide-column-store.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "wide column store",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "wide-column-store.svg"
+  },
+  {
+    "id": "archflux.graph-database",
+    "name": "Graph Database",
+    "file": "graph-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "graph database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "graph-database.svg"
+  },
+  {
+    "id": "archflux.time-series-database",
+    "name": "Time Series Database",
+    "file": "time-series-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "time series database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "time-series-database.svg"
+  },
+  {
+    "id": "archflux.vector-database",
+    "name": "Vector Database",
+    "file": "vector-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "vector database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "vector-database.svg"
+  },
+  {
+    "id": "archflux.search-index",
+    "name": "Search Index",
+    "file": "search-index.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "search index",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "search-index.svg"
+  },
+  {
+    "id": "archflux.in-memory-database",
+    "name": "In Memory Database",
+    "file": "in-memory-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "in memory database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "in-memory-database.svg"
+  },
+  {
+    "id": "archflux.read-replica",
+    "name": "Read Replica",
+    "file": "read-replica.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "read replica",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "read-replica.svg"
+  },
+  {
+    "id": "archflux.primary-replica",
+    "name": "Primary Replica",
+    "file": "primary-replica.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "primary replica",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "primary-replica.svg"
+  },
+  {
+    "id": "archflux.sharded-database",
+    "name": "Sharded Database",
+    "file": "sharded-database.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "sharded database",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "sharded-database.svg"
+  },
+  {
+    "id": "archflux.partitioned-table",
+    "name": "Partitioned Table",
+    "file": "partitioned-table.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "partitioned table",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "partitioned-table.svg"
+  },
+  {
+    "id": "archflux.data-migration",
+    "name": "Data Migration",
+    "file": "data-migration.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "data migration",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-migration.svg"
+  },
+  {
+    "id": "archflux.schema-registry",
+    "name": "Schema Registry",
+    "file": "schema-registry.svg",
+    "category": "database",
+    "provider": "neutral",
+    "tags": [
+      "database",
+      "schema registry",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "schema-registry.svg"
+  },
+  {
+    "id": "archflux.api-gateway",
+    "name": "Api Gateway",
+    "file": "api-gateway.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "api gateway",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "api-gateway.svg"
+  },
+  {
+    "id": "archflux.load-balancer",
+    "name": "Load Balancer",
+    "file": "load-balancer.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "load balancer",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "load-balancer.svg"
+  },
+  {
+    "id": "archflux.reverse-proxy",
+    "name": "Reverse Proxy",
+    "file": "reverse-proxy.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "reverse proxy",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "reverse-proxy.svg"
+  },
+  {
+    "id": "archflux.forward-proxy",
+    "name": "Forward Proxy",
+    "file": "forward-proxy.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "forward proxy",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "forward-proxy.svg"
+  },
+  {
+    "id": "archflux.service-mesh",
+    "name": "Service Mesh",
+    "file": "service-mesh.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "service mesh",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "service-mesh.svg"
+  },
+  {
+    "id": "archflux.service-discovery",
+    "name": "Service Discovery",
+    "file": "service-discovery.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "service discovery",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "service-discovery.svg"
+  },
+  {
+    "id": "archflux.dns",
+    "name": "Dns",
+    "file": "dns.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "dns",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "dns.svg"
+  },
+  {
+    "id": "archflux.cdn",
+    "name": "Cdn",
+    "file": "cdn.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "cdn",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "cdn.svg"
+  },
+  {
+    "id": "archflux.vpc-network",
+    "name": "Vpc Network",
+    "file": "vpc-network.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "vpc network",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "vpc-network.svg"
+  },
+  {
+    "id": "archflux.subnet",
+    "name": "Subnet",
+    "file": "subnet.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "subnet",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "subnet.svg"
+  },
+  {
+    "id": "archflux.public-subnet",
+    "name": "Public Subnet",
+    "file": "public-subnet.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "public subnet",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "public-subnet.svg"
+  },
+  {
+    "id": "archflux.private-subnet",
+    "name": "Private Subnet",
+    "file": "private-subnet.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "private subnet",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "private-subnet.svg"
+  },
+  {
+    "id": "archflux.internet-gateway",
+    "name": "Internet Gateway",
+    "file": "internet-gateway.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "internet gateway",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "internet-gateway.svg"
+  },
+  {
+    "id": "archflux.nat-gateway",
+    "name": "Nat Gateway",
+    "file": "nat-gateway.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "nat gateway",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "nat-gateway.svg"
+  },
+  {
+    "id": "archflux.firewall",
+    "name": "Firewall",
+    "file": "firewall.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "firewall",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "firewall.svg"
+  },
+  {
+    "id": "archflux.web-application-firewall",
+    "name": "Web Application Firewall",
+    "file": "web-application-firewall.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "web application firewall",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "web-application-firewall.svg"
+  },
+  {
+    "id": "archflux.vpn",
+    "name": "Vpn",
+    "file": "vpn.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "vpn",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "vpn.svg"
+  },
+  {
+    "id": "archflux.private-link",
+    "name": "Private Link",
+    "file": "private-link.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "private link",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "private-link.svg"
+  },
+  {
+    "id": "archflux.peering",
+    "name": "Peering",
+    "file": "peering.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "peering",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "peering.svg"
+  },
+  {
+    "id": "archflux.router",
+    "name": "Router",
+    "file": "router.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "router",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "router.svg"
+  },
+  {
+    "id": "archflux.switch",
+    "name": "Switch",
+    "file": "switch.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "switch",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "switch.svg"
+  },
+  {
+    "id": "archflux.network-interface",
+    "name": "Network Interface",
+    "file": "network-interface.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "network interface",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "network-interface.svg"
+  },
+  {
+    "id": "archflux.ip-address",
+    "name": "Ip Address",
+    "file": "ip-address.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "ip address",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "ip-address.svg"
+  },
+  {
+    "id": "archflux.ingress",
+    "name": "Ingress",
+    "file": "ingress.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "ingress",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "ingress.svg"
+  },
+  {
+    "id": "archflux.egress",
+    "name": "Egress",
+    "file": "egress.svg",
+    "category": "network",
+    "provider": "neutral",
+    "tags": [
+      "network",
+      "egress",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "egress.svg"
+  },
+  {
+    "id": "archflux.queue",
+    "name": "Queue",
+    "file": "queue.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "queue",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "queue.svg"
+  },
+  {
+    "id": "archflux.message-broker",
+    "name": "Message Broker",
+    "file": "message-broker.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "message broker",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "message-broker.svg"
+  },
+  {
+    "id": "archflux.event-stream",
+    "name": "Event Stream",
+    "file": "event-stream.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "event stream",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "event-stream.svg"
+  },
+  {
+    "id": "archflux.topic-pubsub",
+    "name": "Topic Pubsub",
+    "file": "topic-pubsub.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "topic pubsub",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "topic-pubsub.svg"
+  },
+  {
+    "id": "archflux.rabbitmq",
+    "name": "Rabbitmq",
+    "file": "rabbitmq.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "rabbitmq",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "rabbitmq.svg"
+  },
+  {
+    "id": "archflux.kafka",
+    "name": "Kafka",
+    "file": "kafka.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "kafka",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "kafka.svg"
+  },
+  {
+    "id": "archflux.dead-letter-queue",
+    "name": "Dead Letter Queue",
+    "file": "dead-letter-queue.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "dead letter queue",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "dead-letter-queue.svg"
+  },
+  {
+    "id": "archflux.retry-queue",
+    "name": "Retry Queue",
+    "file": "retry-queue.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "retry queue",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "retry-queue.svg"
+  },
+  {
+    "id": "archflux.event-bus",
+    "name": "Event Bus",
+    "file": "event-bus.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "event bus",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "event-bus.svg"
+  },
+  {
+    "id": "archflux.webhook",
+    "name": "Webhook",
+    "file": "webhook.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "webhook",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "webhook.svg"
+  },
+  {
+    "id": "archflux.event-source",
+    "name": "Event Source",
+    "file": "event-source.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "event source",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "event-source.svg"
+  },
+  {
+    "id": "archflux.consumer-group",
+    "name": "Consumer Group",
+    "file": "consumer-group.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "consumer group",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "consumer-group.svg"
+  },
+  {
+    "id": "archflux.producer",
+    "name": "Producer",
+    "file": "producer.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "producer",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "producer.svg"
+  },
+  {
+    "id": "archflux.consumer",
+    "name": "Consumer",
+    "file": "consumer.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "consumer",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "consumer.svg"
+  },
+  {
+    "id": "archflux.stream-processor",
+    "name": "Stream Processor",
+    "file": "stream-processor.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "stream processor",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "stream-processor.svg"
+  },
+  {
+    "id": "archflux.change-data-capture",
+    "name": "Change Data Capture",
+    "file": "change-data-capture.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "change data capture",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "change-data-capture.svg"
+  },
+  {
+    "id": "archflux.outbox-pattern",
+    "name": "Outbox Pattern",
+    "file": "outbox-pattern.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "outbox pattern",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "outbox-pattern.svg"
+  },
+  {
+    "id": "archflux.inbox-pattern",
+    "name": "Inbox Pattern",
+    "file": "inbox-pattern.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "inbox pattern",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "inbox-pattern.svg"
+  },
+  {
+    "id": "archflux.message-filter",
+    "name": "Message Filter",
+    "file": "message-filter.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "message filter",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "message-filter.svg"
+  },
+  {
+    "id": "archflux.fanout",
+    "name": "Fanout",
+    "file": "fanout.svg",
+    "category": "messaging",
+    "provider": "neutral",
+    "tags": [
+      "messaging",
+      "fanout",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "fanout.svg"
+  },
+  {
+    "id": "archflux.identity-user",
+    "name": "Identity User",
+    "file": "identity-user.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "identity user",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "identity-user.svg"
+  },
+  {
+    "id": "archflux.identity-provider",
+    "name": "Identity Provider",
+    "file": "identity-provider.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "identity provider",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "identity-provider.svg"
+  },
+  {
+    "id": "archflux.single-sign-on",
+    "name": "Single Sign On",
+    "file": "single-sign-on.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "single sign on",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "single-sign-on.svg"
+  },
+  {
+    "id": "archflux.oauth",
+    "name": "Oauth",
+    "file": "oauth.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "oauth",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "oauth.svg"
+  },
+  {
+    "id": "archflux.openid-connect",
+    "name": "Openid Connect",
+    "file": "openid-connect.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "openid connect",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "openid-connect.svg"
+  },
+  {
+    "id": "archflux.access-token",
+    "name": "Access Token",
+    "file": "access-token.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "access token",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "access-token.svg"
+  },
+  {
+    "id": "archflux.api-key",
+    "name": "Api Key",
+    "file": "api-key.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "api key",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "api-key.svg"
+  },
+  {
+    "id": "archflux.security-key",
+    "name": "Security Key",
+    "file": "security-key.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "security key",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "security-key.svg"
+  },
+  {
+    "id": "archflux.secrets-manager",
+    "name": "Secrets Manager",
+    "file": "secrets-manager.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "secrets manager",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "secrets-manager.svg"
+  },
+  {
+    "id": "archflux.key-management",
+    "name": "Key Management",
+    "file": "key-management.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "key management",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "key-management.svg"
+  },
+  {
+    "id": "archflux.certificate",
+    "name": "Certificate",
+    "file": "certificate.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "certificate",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "certificate.svg"
+  },
+  {
+    "id": "archflux.tls",
+    "name": "Tls",
+    "file": "tls.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "tls",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "tls.svg"
+  },
+  {
+    "id": "archflux.encryption",
+    "name": "Encryption",
+    "file": "encryption.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "encryption",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "encryption.svg"
+  },
+  {
+    "id": "archflux.decryption",
+    "name": "Decryption",
+    "file": "decryption.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "decryption",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "decryption.svg"
+  },
+  {
+    "id": "archflux.policy-engine",
+    "name": "Policy Engine",
+    "file": "policy-engine.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "policy engine",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "policy-engine.svg"
+  },
+  {
+    "id": "archflux.role-based-access",
+    "name": "Role Based Access",
+    "file": "role-based-access.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "role based access",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "role-based-access.svg"
+  },
+  {
+    "id": "archflux.permission",
+    "name": "Permission",
+    "file": "permission.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "permission",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "permission.svg"
+  },
+  {
+    "id": "archflux.zero-trust",
+    "name": "Zero Trust",
+    "file": "zero-trust.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "zero trust",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "zero-trust.svg"
+  },
+  {
+    "id": "archflux.audit-log",
+    "name": "Audit Log",
+    "file": "audit-log.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "audit log",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "audit-log.svg"
+  },
+  {
+    "id": "archflux.compliance",
+    "name": "Compliance",
+    "file": "compliance.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "compliance",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "compliance.svg"
+  },
+  {
+    "id": "archflux.vault",
+    "name": "Vault",
+    "file": "vault.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "vault",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "vault.svg"
+  },
+  {
+    "id": "archflux.mfa",
+    "name": "Mfa",
+    "file": "mfa.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "mfa",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "mfa.svg"
+  },
+  {
+    "id": "archflux.session",
+    "name": "Session",
+    "file": "session.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "session",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "session.svg"
+  },
+  {
+    "id": "archflux.service-account",
+    "name": "Service Account",
+    "file": "service-account.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "service account",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "service-account.svg"
+  },
+  {
+    "id": "archflux.trust-boundary",
+    "name": "Trust Boundary",
+    "file": "trust-boundary.svg",
+    "category": "security",
+    "provider": "neutral",
+    "tags": [
+      "security",
+      "trust boundary",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "trust-boundary.svg"
+  },
+  {
+    "id": "archflux.monitoring",
+    "name": "Monitoring",
+    "file": "monitoring.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "monitoring",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "monitoring.svg"
+  },
+  {
+    "id": "archflux.metrics-chart",
+    "name": "Metrics Chart",
+    "file": "metrics-chart.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "metrics chart",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "metrics-chart.svg"
+  },
+  {
+    "id": "archflux.log-file",
+    "name": "Log File",
+    "file": "log-file.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "log file",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "log-file.svg"
+  },
+  {
+    "id": "archflux.distributed-tracing",
+    "name": "Distributed Tracing",
+    "file": "distributed-tracing.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "distributed tracing",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "distributed-tracing.svg"
+  },
+  {
+    "id": "archflux.trace-span",
+    "name": "Trace Span",
+    "file": "trace-span.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "trace span",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "trace-span.svg"
+  },
+  {
+    "id": "archflux.alert",
+    "name": "Alert",
+    "file": "alert.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "alert",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "alert.svg"
+  },
+  {
+    "id": "archflux.incident",
+    "name": "Incident",
+    "file": "incident.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "incident",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "incident.svg"
+  },
+  {
+    "id": "archflux.dashboard",
+    "name": "Dashboard",
+    "file": "dashboard.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "dashboard",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "dashboard.svg"
+  },
+  {
+    "id": "archflux.health-check",
+    "name": "Health Check",
+    "file": "health-check.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "health check",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "health-check.svg"
+  },
+  {
+    "id": "archflux.synthetic-monitor",
+    "name": "Synthetic Monitor",
+    "file": "synthetic-monitor.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "synthetic monitor",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "synthetic-monitor.svg"
+  },
+  {
+    "id": "archflux.profiler",
+    "name": "Profiler",
+    "file": "profiler.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "profiler",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "profiler.svg"
+  },
+  {
+    "id": "archflux.telemetry",
+    "name": "Telemetry",
+    "file": "telemetry.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "telemetry",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "telemetry.svg"
+  },
+  {
+    "id": "archflux.sla",
+    "name": "Sla",
+    "file": "sla.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "sla",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "sla.svg"
+  },
+  {
+    "id": "archflux.slo",
+    "name": "Slo",
+    "file": "slo.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "slo",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "slo.svg"
+  },
+  {
+    "id": "archflux.error-budget",
+    "name": "Error Budget",
+    "file": "error-budget.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "error budget",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "error-budget.svg"
+  },
+  {
+    "id": "archflux.uptime",
+    "name": "Uptime",
+    "file": "uptime.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "uptime",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "uptime.svg"
+  },
+  {
+    "id": "archflux.latency",
+    "name": "Latency",
+    "file": "latency.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "latency",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "latency.svg"
+  },
+  {
+    "id": "archflux.throughput",
+    "name": "Throughput",
+    "file": "throughput.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "throughput",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "throughput.svg"
+  },
+  {
+    "id": "archflux.error-rate",
+    "name": "Error Rate",
+    "file": "error-rate.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "error rate",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "error-rate.svg"
+  },
+  {
+    "id": "archflux.heatmap",
+    "name": "Heatmap",
+    "file": "heatmap.svg",
+    "category": "observability",
+    "provider": "neutral",
+    "tags": [
+      "observability",
+      "heatmap",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "heatmap.svg"
+  },
+  {
+    "id": "archflux.microservice",
+    "name": "Microservice",
+    "file": "microservice.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "microservice",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "microservice.svg"
+  },
+  {
+    "id": "archflux.monolith",
+    "name": "Monolith",
+    "file": "monolith.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "monolith",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "monolith.svg"
+  },
+  {
+    "id": "archflux.modular-monolith",
+    "name": "Modular Monolith",
+    "file": "modular-monolith.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "modular monolith",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "modular-monolith.svg"
+  },
+  {
+    "id": "archflux.frontend-app",
+    "name": "Frontend App",
+    "file": "frontend-app.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "frontend app",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "frontend-app.svg"
+  },
+  {
+    "id": "archflux.mobile-app",
+    "name": "Mobile App",
+    "file": "mobile-app.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "mobile app",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "mobile-app.svg"
+  },
+  {
+    "id": "archflux.web-app",
+    "name": "Web App",
+    "file": "web-app.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "web app",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "web-app.svg"
+  },
+  {
+    "id": "archflux.backend-service",
+    "name": "Backend Service",
+    "file": "backend-service.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "backend service",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "backend-service.svg"
+  },
+  {
+    "id": "archflux.bff",
+    "name": "Bff",
+    "file": "bff.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "bff",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "bff.svg"
+  },
+  {
+    "id": "archflux.graphql",
+    "name": "Graphql",
+    "file": "graphql.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "graphql",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "graphql.svg"
+  },
+  {
+    "id": "archflux.rest-api",
+    "name": "Rest Api",
+    "file": "rest-api.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "rest api",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "rest-api.svg"
+  },
+  {
+    "id": "archflux.grpc",
+    "name": "Grpc",
+    "file": "grpc.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "grpc",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "grpc.svg"
+  },
+  {
+    "id": "archflux.websocket",
+    "name": "Websocket",
+    "file": "websocket.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "websocket",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "websocket.svg"
+  },
+  {
+    "id": "archflux.tcp-connection",
+    "name": "Tcp Connection",
+    "file": "tcp-connection.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "tcp connection",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "tcp-connection.svg"
+  },
+  {
+    "id": "archflux.http-request",
+    "name": "Http Request",
+    "file": "http-request.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "http request",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "http-request.svg"
+  },
+  {
+    "id": "archflux.client",
+    "name": "Client",
+    "file": "client.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "client",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "client.svg"
+  },
+  {
+    "id": "archflux.external-system",
+    "name": "External System",
+    "file": "external-system.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "external system",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "external-system.svg"
+  },
+  {
+    "id": "archflux.third-party-service",
+    "name": "Third Party Service",
+    "file": "third-party-service.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "third party service",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "third-party-service.svg"
+  },
+  {
+    "id": "archflux.integration",
+    "name": "Integration",
+    "file": "integration.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "integration",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "integration.svg"
+  },
+  {
+    "id": "archflux.adapter",
+    "name": "Adapter",
+    "file": "adapter.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "adapter",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "adapter.svg"
+  },
+  {
+    "id": "archflux.facade",
+    "name": "Facade",
+    "file": "facade.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "facade",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "facade.svg"
+  },
+  {
+    "id": "archflux.orchestrator",
+    "name": "Orchestrator",
+    "file": "orchestrator.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "orchestrator",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "orchestrator.svg"
+  },
+  {
+    "id": "archflux.workflow",
+    "name": "Workflow",
+    "file": "workflow.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "workflow",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "workflow.svg"
+  },
+  {
+    "id": "archflux.state-machine",
+    "name": "State Machine",
+    "file": "state-machine.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "state machine",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "state-machine.svg"
+  },
+  {
+    "id": "archflux.saga",
+    "name": "Saga",
+    "file": "saga.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "saga",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "saga.svg"
+  },
+  {
+    "id": "archflux.circuit-breaker",
+    "name": "Circuit Breaker",
+    "file": "circuit-breaker.svg",
+    "category": "architecture",
+    "provider": "neutral",
+    "tags": [
+      "architecture",
+      "circuit breaker",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "circuit-breaker.svg"
+  },
+  {
+    "id": "archflux.etl-pipeline",
+    "name": "Etl Pipeline",
+    "file": "etl-pipeline.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "etl pipeline",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "etl-pipeline.svg"
+  },
+  {
+    "id": "archflux.elt-pipeline",
+    "name": "Elt Pipeline",
+    "file": "elt-pipeline.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "elt pipeline",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "elt-pipeline.svg"
+  },
+  {
+    "id": "archflux.data-pipeline",
+    "name": "Data Pipeline",
+    "file": "data-pipeline.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "data pipeline",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-pipeline.svg"
+  },
+  {
+    "id": "archflux.data-transform",
+    "name": "Data Transform",
+    "file": "data-transform.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "data transform",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-transform.svg"
+  },
+  {
+    "id": "archflux.data-validation",
+    "name": "Data Validation",
+    "file": "data-validation.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "data validation",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-validation.svg"
+  },
+  {
+    "id": "archflux.data-quality",
+    "name": "Data Quality",
+    "file": "data-quality.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "data quality",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-quality.svg"
+  },
+  {
+    "id": "archflux.data-catalog",
+    "name": "Data Catalog",
+    "file": "data-catalog.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "data catalog",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-catalog.svg"
+  },
+  {
+    "id": "archflux.data-lineage",
+    "name": "Data Lineage",
+    "file": "data-lineage.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "data lineage",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "data-lineage.svg"
+  },
+  {
+    "id": "archflux.feature-store",
+    "name": "Feature Store",
+    "file": "feature-store.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "feature store",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "feature-store.svg"
+  },
+  {
+    "id": "archflux.ml-model",
+    "name": "Ml Model",
+    "file": "ml-model.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "ml model",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "ml-model.svg"
+  },
+  {
+    "id": "archflux.llm-service",
+    "name": "Llm Service",
+    "file": "llm-service.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "llm service",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "llm-service.svg"
+  },
+  {
+    "id": "archflux.embedding-service",
+    "name": "Embedding Service",
+    "file": "embedding-service.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "embedding service",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "embedding-service.svg"
+  },
+  {
+    "id": "archflux.vector-search",
+    "name": "Vector Search",
+    "file": "vector-search.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "vector search",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "vector-search.svg"
+  },
+  {
+    "id": "archflux.inference-endpoint",
+    "name": "Inference Endpoint",
+    "file": "inference-endpoint.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "inference endpoint",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "inference-endpoint.svg"
+  },
+  {
+    "id": "archflux.model-training",
+    "name": "Model Training",
+    "file": "model-training.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "model training",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "model-training.svg"
+  },
+  {
+    "id": "archflux.recommendation-engine",
+    "name": "Recommendation Engine",
+    "file": "recommendation-engine.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "recommendation engine",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "recommendation-engine.svg"
+  },
+  {
+    "id": "archflux.fraud-detection",
+    "name": "Fraud Detection",
+    "file": "fraud-detection.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "fraud detection",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "fraud-detection.svg"
+  },
+  {
+    "id": "archflux.rules-engine",
+    "name": "Rules Engine",
+    "file": "rules-engine.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "rules engine",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "rules-engine.svg"
+  },
+  {
+    "id": "archflux.analytics",
+    "name": "Analytics",
+    "file": "analytics.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "analytics",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "analytics.svg"
+  },
+  {
+    "id": "archflux.business-intelligence",
+    "name": "Business Intelligence",
+    "file": "business-intelligence.svg",
+    "category": "data-flow",
+    "provider": "neutral",
+    "tags": [
+      "data-flow",
+      "business intelligence",
+      "system design",
+      "architecture"
+    ],
+    "version": "1.0.0",
+    "icon": "business-intelligence.svg"
+  }
+]

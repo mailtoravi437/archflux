@@ -1,0 +1,936 @@
+{
+  "AmazonRDS": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": [
+      "database",
+      "sql",
+      "postgres",
+      "postgresql",
+      "mysql",
+      "mariadb",
+      "rds"
+    ]
+  },
+  "AmazonAurora": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": [
+      "database",
+      "sql",
+      "postgres",
+      "postgresql",
+      "mysql",
+      "aurora"
+    ]
+  },
+  "AmazonRedshift": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": [
+      "database",
+      "warehouse",
+      "analytics",
+      "sql"
+    ]
+  },
+  "AmazonNeptune": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": [
+      "database",
+      "graph"
+    ]
+  },
+  "AmazonTimestream": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": [
+      "database",
+      "time series",
+      "metrics"
+    ]
+  },
+  "AmazonKeyspaces": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": [
+      "nosql",
+      "cassandra",
+      "wide column"
+    ]
+  },
+  "AmazonDynamoDB": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": [
+      "nosql",
+      "key value",
+      "dynamo",
+      "document"
+    ]
+  },
+  "AmazonDocumentDB": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": [
+      "nosql",
+      "document",
+      "mongodb",
+      "mongo"
+    ]
+  },
+  "AmazonElastiCache": {
+    "kinds": [
+      "cache"
+    ],
+    "keywords": [
+      "cache",
+      "redis",
+      "memcached",
+      "valkey"
+    ]
+  },
+  "AmazonMemoryDB": {
+    "kinds": [
+      "cache"
+    ],
+    "keywords": [
+      "cache",
+      "redis",
+      "in-memory"
+    ]
+  },
+  "AmazonSimpleQueueService": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": [
+      "queue",
+      "sqs",
+      "messaging"
+    ]
+  },
+  "AmazonMQ": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": [
+      "queue",
+      "broker",
+      "rabbitmq",
+      "activemq",
+      "messaging"
+    ]
+  },
+  "AmazonSimpleNotificationService": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": [
+      "pubsub",
+      "topic",
+      "sns",
+      "notification",
+      "fan-out"
+    ]
+  },
+  "AmazonKinesis": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": [
+      "stream",
+      "streaming",
+      "events",
+      "kinesis"
+    ]
+  },
+  "AmazonKinesisDataStreams": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": [
+      "stream",
+      "streaming",
+      "events",
+      "kinesis"
+    ]
+  },
+  "AmazonDataFirehose": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": [
+      "stream",
+      "delivery",
+      "firehose",
+      "etl"
+    ]
+  },
+  "AmazonManagedStreamingforApacheKafka": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": [
+      "stream",
+      "kafka",
+      "msk",
+      "events"
+    ]
+  },
+  "AmazonSimpleStorageService": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": [
+      "storage",
+      "bucket",
+      "blob",
+      "s3",
+      "object"
+    ]
+  },
+  "AmazonSimpleStorageServiceGlacier": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": [
+      "storage",
+      "archive",
+      "glacier",
+      "cold"
+    ]
+  },
+  "AmazonEFS": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": [
+      "storage",
+      "file",
+      "nfs"
+    ]
+  },
+  "AmazonCloudFront": {
+    "kinds": [
+      "cdn"
+    ],
+    "keywords": [
+      "cdn",
+      "edge",
+      "cache",
+      "cloudfront"
+    ]
+  },
+  "AWSGlobalAccelerator": {
+    "kinds": [
+      "cdn"
+    ],
+    "keywords": [
+      "edge",
+      "anycast",
+      "network"
+    ]
+  },
+  "AWSLambda": {
+    "kinds": [
+      "function"
+    ],
+    "keywords": [
+      "function",
+      "serverless",
+      "faas",
+      "lambda"
+    ]
+  },
+  "AmazonElasticContainerService": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "container",
+      "docker",
+      "ecs",
+      "service"
+    ]
+  },
+  "AmazonElasticKubernetesService": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "container",
+      "kubernetes",
+      "k8s",
+      "eks",
+      "service"
+    ]
+  },
+  "AWSFargate": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "container",
+      "serverless",
+      "fargate",
+      "service"
+    ]
+  },
+  "AmazonEC2": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "vm",
+      "compute",
+      "server",
+      "instance",
+      "ec2"
+    ]
+  },
+  "AWSAppRunner": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "container",
+      "web app",
+      "service"
+    ]
+  },
+  "AWSElasticBeanstalk": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "paas",
+      "web app",
+      "service"
+    ]
+  },
+  "AmazonAPIGateway": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": [
+      "api",
+      "gateway",
+      "rest",
+      "http",
+      "websocket"
+    ]
+  },
+  "ElasticLoadBalancing": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": [
+      "load balancer",
+      "alb",
+      "nlb",
+      "elb",
+      "gateway"
+    ]
+  },
+  "AWSAppSync": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": [
+      "graphql",
+      "api",
+      "gateway"
+    ]
+  },
+  "AmazonRoute53": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": [
+      "dns",
+      "routing",
+      "domain"
+    ]
+  },
+  "AmazonCloudWatch": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": [
+      "monitoring",
+      "metrics",
+      "logs",
+      "alarms",
+      "observability"
+    ]
+  },
+  "AWSXRay": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": [
+      "tracing",
+      "observability",
+      "apm"
+    ]
+  },
+  "AmazonManagedGrafana": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": [
+      "dashboards",
+      "grafana",
+      "observability"
+    ]
+  },
+  "AmazonManagedServiceforPrometheus": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": [
+      "metrics",
+      "prometheus",
+      "observability"
+    ]
+  },
+  "AmazonEventBridge": {
+    "kinds": [
+      "scheduler"
+    ],
+    "keywords": [
+      "events",
+      "scheduler",
+      "cron",
+      "event bus"
+    ]
+  },
+  "AWSStepFunctions": {
+    "kinds": [
+      "scheduler"
+    ],
+    "keywords": [
+      "workflow",
+      "orchestration",
+      "state machine"
+    ]
+  },
+  "AmazonOpenSearchService": {
+    "kinds": [
+      "search"
+    ],
+    "keywords": [
+      "search",
+      "elasticsearch",
+      "opensearch",
+      "logs"
+    ]
+  },
+  "AmazonCloudSearch": {
+    "kinds": [
+      "search"
+    ],
+    "keywords": [
+      "search",
+      "index"
+    ]
+  },
+  "AmazonKendra": {
+    "kinds": [
+      "search"
+    ],
+    "keywords": [
+      "search",
+      "enterprise search"
+    ]
+  },
+  "AmazonCognito": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": [
+      "auth",
+      "identity",
+      "login",
+      "oauth"
+    ]
+  },
+  "AWSCloud": {
+    "kinds": [
+      "boundary"
+    ],
+    "keywords": [
+      "cloud",
+      "boundary",
+      "group"
+    ]
+  },
+  "Region": {
+    "kinds": [
+      "boundary"
+    ],
+    "keywords": [
+      "region",
+      "boundary",
+      "group"
+    ]
+  },
+  "VirtualprivatecloudVPC": {
+    "kinds": [
+      "boundary"
+    ],
+    "keywords": [
+      "vpc",
+      "network",
+      "boundary",
+      "group"
+    ]
+  },
+  "Publicsubnet": {
+    "kinds": [
+      "boundary"
+    ],
+    "keywords": [
+      "subnet",
+      "public",
+      "network",
+      "boundary",
+      "group"
+    ]
+  },
+  "Privatesubnet": {
+    "kinds": [
+      "boundary"
+    ],
+    "keywords": [
+      "subnet",
+      "private",
+      "network",
+      "boundary",
+      "group"
+    ]
+  },
+  "AutoScalinggroup": {
+    "kinds": [
+      "boundary"
+    ],
+    "keywords": [
+      "autoscaling",
+      "asg",
+      "group",
+      "boundary"
+    ]
+  },
+  "generic/relational-database": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/database": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/postgresql": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/mysql": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/sql-server": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/graph-database": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/time-series-database": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "generic/document-database": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": []
+  },
+  "generic/document-store": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": []
+  },
+  "generic/nosql-database": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": []
+  },
+  "generic/key-value-store": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": []
+  },
+  "generic/wide-column-store": {
+    "kinds": [
+      "document-db"
+    ],
+    "keywords": []
+  },
+  "generic/in-memory-database": {
+    "kinds": [
+      "cache"
+    ],
+    "keywords": []
+  },
+  "generic/queue": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": []
+  },
+  "generic/dead-letter-queue": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": []
+  },
+  "generic/retry-queue": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": []
+  },
+  "generic/message-broker": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": []
+  },
+  "generic/rabbitmq": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": []
+  },
+  "generic/topic-pubsub": {
+    "kinds": [
+      "queue"
+    ],
+    "keywords": []
+  },
+  "generic/event-stream": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": []
+  },
+  "generic/kafka": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": []
+  },
+  "generic/stream-processor": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": []
+  },
+  "generic/event-bus": {
+    "kinds": [
+      "stream"
+    ],
+    "keywords": []
+  },
+  "generic/object-storage": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "generic/blob": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "generic/file-storage": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "generic/cdn": {
+    "kinds": [
+      "cdn"
+    ],
+    "keywords": []
+  },
+  "generic/content-delivery": {
+    "kinds": [
+      "cdn"
+    ],
+    "keywords": []
+  },
+  "generic/serverless-function": {
+    "kinds": [
+      "function"
+    ],
+    "keywords": []
+  },
+  "generic/edge-function": {
+    "kinds": [
+      "function"
+    ],
+    "keywords": []
+  },
+  "generic/microservice": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "generic/backend-service": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "generic/worker": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "generic/api-gateway": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": []
+  },
+  "generic/load-balancer": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": []
+  },
+  "generic/reverse-proxy": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": []
+  },
+  "generic/monitoring": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": []
+  },
+  "generic/telemetry": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": []
+  },
+  "generic/distributed-tracing": {
+    "kinds": [
+      "observability"
+    ],
+    "keywords": []
+  },
+  "generic/scheduler": {
+    "kinds": [
+      "scheduler"
+    ],
+    "keywords": []
+  },
+  "generic/cron-job": {
+    "kinds": [
+      "scheduler"
+    ],
+    "keywords": []
+  },
+  "generic/search-index": {
+    "kinds": [
+      "search"
+    ],
+    "keywords": []
+  },
+  "generic/vector-search": {
+    "kinds": [
+      "search"
+    ],
+    "keywords": []
+  },
+  "generic/client": {
+    "kinds": [
+      "client"
+    ],
+    "keywords": []
+  },
+  "generic/web-app": {
+    "kinds": [
+      "client"
+    ],
+    "keywords": []
+  },
+  "generic/mobile-app": {
+    "kinds": [
+      "client"
+    ],
+    "keywords": []
+  },
+  "generic/frontend-app": {
+    "kinds": [
+      "client"
+    ],
+    "keywords": []
+  },
+  "generic/identity-user": {
+    "kinds": [
+      "person"
+    ],
+    "keywords": []
+  },
+  "generic/external-system": {
+    "kinds": [
+      "external"
+    ],
+    "keywords": []
+  },
+  "generic/third-party-service": {
+    "kinds": [
+      "external"
+    ],
+    "keywords": []
+  },
+  "k8s/pod": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "k8s/deploy": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "k8s/sts": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "k8s/ds": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "k8s/rs": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "k8s/job": {
+    "kinds": [
+      "function"
+    ],
+    "keywords": []
+  },
+  "k8s/cronjob": {
+    "kinds": [
+      "scheduler"
+    ],
+    "keywords": []
+  },
+  "k8s/svc": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": []
+  },
+  "k8s/ing": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": []
+  },
+  "k8s/pv": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "k8s/pvc": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "k8s/sc": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "k8s/vol": {
+    "kinds": [
+      "object-storage"
+    ],
+    "keywords": []
+  },
+  "k8s/api": {
+    "kinds": [
+      "gateway"
+    ],
+    "keywords": []
+  },
+  "k8s/etcd": {
+    "kinds": [
+      "database"
+    ],
+    "keywords": []
+  },
+  "k8s/kubelet": {
+    "kinds": [
+      "service"
+    ],
+    "keywords": []
+  },
+  "k8s/sched": {
+    "kinds": [
+      "scheduler"
+    ],
+    "keywords": []
+  }
+}

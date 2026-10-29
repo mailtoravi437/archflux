@@ -1,0 +1,800 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="archflux.compute" viewBox="0 0 24 24">Compute</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.server" viewBox="0 0 24 24">Server</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.virtual-machine" viewBox="0 0 24 24">Virtual Machine</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.container" viewBox="0 0 24 24">Container</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.container-image" viewBox="0 0 24 24">Container Image</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.kubernetes-pod" viewBox="0 0 24 24">Kubernetes Pod</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.kubernetes-deployment" viewBox="0 0 24 24">Kubernetes Deployment</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.cluster" viewBox="0 0 24 24">Cluster</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.node-pool" viewBox="0 0 24 24">Node Pool</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.serverless-function" viewBox="0 0 24 24">Serverless Function</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.edge-function" viewBox="0 0 24 24">Edge Function</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.batch-job" viewBox="0 0 24 24">Batch Job</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.worker" viewBox="0 0 24 24">Worker</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.scheduler" viewBox="0 0 24 24">Scheduler</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.cron-job" viewBox="0 0 24 24">Cron Job</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.autoscaling-group" viewBox="0 0 24 24">Autoscaling Group</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.gpu-compute" viewBox="0 0 24 24">Gpu Compute</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.bare-metal" viewBox="0 0 24 24">Bare Metal</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.application-runtime" viewBox="0 0 24 24">Application Runtime</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.process" viewBox="0 0 24 24">Process</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.thread-pool" viewBox="0 0 24 24">Thread Pool</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.sidecar" viewBox="0 0 24 24">Sidecar</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.init-container" viewBox="0 0 24 24">Init Container</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.job-runner" viewBox="0 0 24 24">Job Runner</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.build-agent" viewBox="0 0 24 24">Build Agent</title>
+<rect x="4" y="4" width="16" height="16" rx="3"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.object-storage" viewBox="0 0 24 24">Object Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.block-storage" viewBox="0 0 24 24">Block Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.file-storage" viewBox="0 0 24 24">File Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.shared-volume" viewBox="0 0 24 24">Shared Volume</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.backup" viewBox="0 0 24 24">Backup</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.archive" viewBox="0 0 24 24">Archive</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-lake" viewBox="0 0 24 24">Data Lake</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-warehouse" viewBox="0 0 24 24">Data Warehouse</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-mart" viewBox="0 0 24 24">Data Mart</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.cold-storage" viewBox="0 0 24 24">Cold Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.hot-storage" viewBox="0 0 24 24">Hot Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.blob" viewBox="0 0 24 24">Blob</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.filesystem" viewBox="0 0 24 24">Filesystem</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.persistent-volume" viewBox="0 0 24 24">Persistent Volume</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.snapshot" viewBox="0 0 24 24">Snapshot</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.replication-storage" viewBox="0 0 24 24">Replication Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.content-delivery" viewBox="0 0 24 24">Content Delivery</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.static-assets" viewBox="0 0 24 24">Static Assets</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.media-storage" viewBox="0 0 24 24">Media Storage</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.document-store" viewBox="0 0 24 24">Document Store</title>
+<path d="M4 6.5 12 3l8 3.5v11L12 21l-8-3.5z"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.database" viewBox="0 0 24 24">Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.relational-database" viewBox="0 0 24 24">Relational Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.postgresql" viewBox="0 0 24 24">Postgresql</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.mysql" viewBox="0 0 24 24">Mysql</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.sql-server" viewBox="0 0 24 24">Sql Server</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.nosql-database" viewBox="0 0 24 24">Nosql Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.document-database" viewBox="0 0 24 24">Document Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.key-value-store" viewBox="0 0 24 24">Key Value Store</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.wide-column-store" viewBox="0 0 24 24">Wide Column Store</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.graph-database" viewBox="0 0 24 24">Graph Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.time-series-database" viewBox="0 0 24 24">Time Series Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.vector-database" viewBox="0 0 24 24">Vector Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.search-index" viewBox="0 0 24 24">Search Index</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.in-memory-database" viewBox="0 0 24 24">In Memory Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.read-replica" viewBox="0 0 24 24">Read Replica</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.primary-replica" viewBox="0 0 24 24">Primary Replica</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.sharded-database" viewBox="0 0 24 24">Sharded Database</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.partitioned-table" viewBox="0 0 24 24">Partitioned Table</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-migration" viewBox="0 0 24 24">Data Migration</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.schema-registry" viewBox="0 0 24 24">Schema Registry</title>
+<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.api-gateway" viewBox="0 0 24 24">Api Gateway</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.load-balancer" viewBox="0 0 24 24">Load Balancer</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.reverse-proxy" viewBox="0 0 24 24">Reverse Proxy</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.forward-proxy" viewBox="0 0 24 24">Forward Proxy</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.service-mesh" viewBox="0 0 24 24">Service Mesh</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.service-discovery" viewBox="0 0 24 24">Service Discovery</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.dns" viewBox="0 0 24 24">Dns</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.cdn" viewBox="0 0 24 24">Cdn</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.vpc-network" viewBox="0 0 24 24">Vpc Network</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.subnet" viewBox="0 0 24 24">Subnet</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.public-subnet" viewBox="0 0 24 24">Public Subnet</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.private-subnet" viewBox="0 0 24 24">Private Subnet</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.internet-gateway" viewBox="0 0 24 24">Internet Gateway</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.nat-gateway" viewBox="0 0 24 24">Nat Gateway</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.firewall" viewBox="0 0 24 24">Firewall</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.web-application-firewall" viewBox="0 0 24 24">Web Application Firewall</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.vpn" viewBox="0 0 24 24">Vpn</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.private-link" viewBox="0 0 24 24">Private Link</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.peering" viewBox="0 0 24 24">Peering</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.router" viewBox="0 0 24 24">Router</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.switch" viewBox="0 0 24 24">Switch</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.network-interface" viewBox="0 0 24 24">Network Interface</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.ip-address" viewBox="0 0 24 24">Ip Address</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.ingress" viewBox="0 0 24 24">Ingress</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.egress" viewBox="0 0 24 24">Egress</title>
+<rect x="3.5" y="3.5" width="17" height="17" rx="4"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.queue" viewBox="0 0 24 24">Queue</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.message-broker" viewBox="0 0 24 24">Message Broker</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.event-stream" viewBox="0 0 24 24">Event Stream</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.topic-pubsub" viewBox="0 0 24 24">Topic Pubsub</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.rabbitmq" viewBox="0 0 24 24">Rabbitmq</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.kafka" viewBox="0 0 24 24">Kafka</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.dead-letter-queue" viewBox="0 0 24 24">Dead Letter Queue</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.retry-queue" viewBox="0 0 24 24">Retry Queue</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.event-bus" viewBox="0 0 24 24">Event Bus</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.webhook" viewBox="0 0 24 24">Webhook</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.event-source" viewBox="0 0 24 24">Event Source</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.consumer-group" viewBox="0 0 24 24">Consumer Group</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.producer" viewBox="0 0 24 24">Producer</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.consumer" viewBox="0 0 24 24">Consumer</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.stream-processor" viewBox="0 0 24 24">Stream Processor</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.change-data-capture" viewBox="0 0 24 24">Change Data Capture</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.outbox-pattern" viewBox="0 0 24 24">Outbox Pattern</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.inbox-pattern" viewBox="0 0 24 24">Inbox Pattern</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.message-filter" viewBox="0 0 24 24">Message Filter</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.fanout" viewBox="0 0 24 24">Fanout</title>
+<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.identity-user" viewBox="0 0 24 24">Identity User</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.identity-provider" viewBox="0 0 24 24">Identity Provider</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.single-sign-on" viewBox="0 0 24 24">Single Sign On</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.oauth" viewBox="0 0 24 24">Oauth</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.openid-connect" viewBox="0 0 24 24">Openid Connect</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.access-token" viewBox="0 0 24 24">Access Token</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.api-key" viewBox="0 0 24 24">Api Key</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.security-key" viewBox="0 0 24 24">Security Key</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.secrets-manager" viewBox="0 0 24 24">Secrets Manager</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.key-management" viewBox="0 0 24 24">Key Management</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.certificate" viewBox="0 0 24 24">Certificate</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.tls" viewBox="0 0 24 24">Tls</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.encryption" viewBox="0 0 24 24">Encryption</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.decryption" viewBox="0 0 24 24">Decryption</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.policy-engine" viewBox="0 0 24 24">Policy Engine</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.role-based-access" viewBox="0 0 24 24">Role Based Access</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.permission" viewBox="0 0 24 24">Permission</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.zero-trust" viewBox="0 0 24 24">Zero Trust</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.audit-log" viewBox="0 0 24 24">Audit Log</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.compliance" viewBox="0 0 24 24">Compliance</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.vault" viewBox="0 0 24 24">Vault</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.mfa" viewBox="0 0 24 24">Mfa</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.session" viewBox="0 0 24 24">Session</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.service-account" viewBox="0 0 24 24">Service Account</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.trust-boundary" viewBox="0 0 24 24">Trust Boundary</title>
+<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.monitoring" viewBox="0 0 24 24">Monitoring</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.metrics-chart" viewBox="0 0 24 24">Metrics Chart</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.log-file" viewBox="0 0 24 24">Log File</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.distributed-tracing" viewBox="0 0 24 24">Distributed Tracing</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.trace-span" viewBox="0 0 24 24">Trace Span</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.alert" viewBox="0 0 24 24">Alert</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.incident" viewBox="0 0 24 24">Incident</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.dashboard" viewBox="0 0 24 24">Dashboard</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.health-check" viewBox="0 0 24 24">Health Check</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.synthetic-monitor" viewBox="0 0 24 24">Synthetic Monitor</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.profiler" viewBox="0 0 24 24">Profiler</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.telemetry" viewBox="0 0 24 24">Telemetry</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.sla" viewBox="0 0 24 24">Sla</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.slo" viewBox="0 0 24 24">Slo</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.error-budget" viewBox="0 0 24 24">Error Budget</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.uptime" viewBox="0 0 24 24">Uptime</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.latency" viewBox="0 0 24 24">Latency</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.throughput" viewBox="0 0 24 24">Throughput</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.error-rate" viewBox="0 0 24 24">Error Rate</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.heatmap" viewBox="0 0 24 24">Heatmap</title>
+<circle cx="12" cy="12" r="8.5"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.microservice" viewBox="0 0 24 24">Microservice</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.monolith" viewBox="0 0 24 24">Monolith</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.modular-monolith" viewBox="0 0 24 24">Modular Monolith</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.frontend-app" viewBox="0 0 24 24">Frontend App</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.mobile-app" viewBox="0 0 24 24">Mobile App</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.web-app" viewBox="0 0 24 24">Web App</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.backend-service" viewBox="0 0 24 24">Backend Service</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.bff" viewBox="0 0 24 24">Bff</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.graphql" viewBox="0 0 24 24">Graphql</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.rest-api" viewBox="0 0 24 24">Rest Api</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.grpc" viewBox="0 0 24 24">Grpc</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.websocket" viewBox="0 0 24 24">Websocket</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.tcp-connection" viewBox="0 0 24 24">Tcp Connection</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.http-request" viewBox="0 0 24 24">Http Request</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.client" viewBox="0 0 24 24">Client</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.external-system" viewBox="0 0 24 24">External System</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.third-party-service" viewBox="0 0 24 24">Third Party Service</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.integration" viewBox="0 0 24 24">Integration</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.adapter" viewBox="0 0 24 24">Adapter</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.facade" viewBox="0 0 24 24">Facade</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.orchestrator" viewBox="0 0 24 24">Orchestrator</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.workflow" viewBox="0 0 24 24">Workflow</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.state-machine" viewBox="0 0 24 24">State Machine</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.saga" viewBox="0 0 24 24">Saga</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.circuit-breaker" viewBox="0 0 24 24">Circuit Breaker</title>
+<rect x="3.5" y="5" width="17" height="14" rx="2.5"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.etl-pipeline" viewBox="0 0 24 24">Etl Pipeline</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="3"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.elt-pipeline" viewBox="0 0 24 24">Elt Pipeline</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M8 9h8M8 12h8M8 15h5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-pipeline" viewBox="0 0 24 24">Data Pipeline</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9.5 9.5h5v5h-5z"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-transform" viewBox="0 0 24 24">Data Transform</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="12" cy="16" r="1.5"/><path d="M9.5 8h5M9 9.2l2.2 5.4m3.8-5.4-2.2 5.4"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-validation" viewBox="0 0 24 24">Data Validation</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 15.5 10 12l2 2 5-6"/><path d="M14 8h3v3"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-quality" viewBox="0 0 24 24">Data Quality</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-catalog" viewBox="0 0 24 24">Data Catalog</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M6 8h12M6 12h8M6 16h10"/><circle cx="17" cy="12" r="1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.data-lineage" viewBox="0 0 24 24">Data Lineage</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M4 10h3m10 4h3"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.feature-store" viewBox="0 0 24 24">Feature Store</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.ml-model" viewBox="0 0 24 24">Ml Model</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M6 16 10 8l3 5 2-3 3 6"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.llm-service" viewBox="0 0 24 24">Llm Service</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 8h10v8H7z"/><path d="M9 11h6m-6 2h4"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.embedding-service" viewBox="0 0 24 24">Embedding Service</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M8 6v12m4-12v12m4-12v12"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.vector-search" viewBox="0 0 24 24">Vector Search</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M6 6h12v12H6z"/><path d="M6 10h12M10 10v8"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.inference-endpoint" viewBox="0 0 24 24">Inference Endpoint</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 12h10"/><path d="m13 8 4 4-4 4"/><circle cx="18" cy="12" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.model-training" viewBox="0 0 24 24">Model Training</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M8 8 12 5l4 3v8l-4 3-4-3z"/><path d="M8 8l4 3 4-3M12 11v8"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.recommendation-engine" viewBox="0 0 24 24">Recommendation Engine</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><path d="M10 12h4"/><circle cx="12" cy="5" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.fraud-detection" viewBox="0 0 24 24">Fraud Detection</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 7h10v10H7z"/><path d="M9 5v2m6-2v2m-6 10v2m6-2v2"/><circle cx="17" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.rules-engine" viewBox="0 0 24 24">Rules Engine</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M6 18V9m4 9V5m4 13v-6m4 6V7"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.analytics" viewBox="0 0 24 24">Analytics</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="12" cy="19" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol>
+<symbol id="archflux.business-intelligence" viewBox="0 0 24 24">Business Intelligence</title>
+<path d="M4 5h6v5H4zM14 14h6v5h-6z"/><path d="M10 7.5h4v9h-4"/>
+<g stroke="#8B83FF"><path d="M8 6h8v12H8z"/><path d="m10 10 2 2 3-3"/><circle cx="19" cy="9" r="1.25" fill="#8B83FF" stroke="none"/></g>
+</symbol></svg>

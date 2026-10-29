@@ -1,0 +1,13 @@
+# archflux-web (self-contained so the service can be split into its own repo)
+node_modules
+dist
+dist-ssr
+coverage
+playwright-report/
+test-results/
+*.local
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store

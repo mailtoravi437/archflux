@@ -1,0 +1,20 @@
+# archflux-web — standalone service stack (SERVICES_SPEC §5.2, separate topology).
+#   docker compose -f frontend/compose.yml --env-file frontend/.env up -d --build
+# The browser calls archflux-api directly at API_URL; no proxy, no shared network.
+name: archflux-web
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
+    image: archflux-web:local
+    restart: unless-stopped
+    stop_grace_period: 10s
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    environment:
+      API_URL: ${API_URL:-http://localhost:3001/api}
+      WS_URL: ${WS_URL:-}
+      API_UPSTREAM: ${API_UPSTREAM:-}
