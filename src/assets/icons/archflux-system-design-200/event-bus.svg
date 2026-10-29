@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-<title>Event Bus</title>
-<path d="M4 5.5h16v11H11l-5 3v-3H4z"/>
-<g stroke="#8B83FF"><path d="M7 8h10M7 12h6M7 16h10"/><path d="m15 11 2 1-2 1"/><circle cx="6" cy="18" r="1.25" fill="#8B83FF" stroke="none"/></g>
-</svg>

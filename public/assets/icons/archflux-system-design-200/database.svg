@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-<title>Database</title>
-<ellipse cx="12" cy="5.5" rx="7.5" ry="2.8"/><path d="M4.5 5.5v13c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8v-13"/><path d="M4.5 12c0 1.6 3.4 2.8 7.5 2.8s7.5-1.2 7.5-2.8"/>
-<g stroke="#8B83FF"><path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="5"/><circle cx="6" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
-</svg>

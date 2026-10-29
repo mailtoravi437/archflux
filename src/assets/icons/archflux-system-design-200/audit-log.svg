@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-<title>Audit Log</title>
-<path d="M12 2.8 20 6v5.2c0 4.8-3.3 8-8 10-4.7-2-8-5.2-8-10V6z"/>
-<g stroke="#8B83FF"><circle cx="12" cy="12" r="5"/><path d="M12 7v5l3 2"/><circle cx="18" cy="6" r="1.25" fill="#8B83FF" stroke="none"/></g>
-</svg>
