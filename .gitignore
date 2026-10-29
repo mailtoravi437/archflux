@@ -48,3 +48,6 @@ google-cloud-sdk/
 
 # Private keys for local SSO testing are never committed (AGENTS.md: no secrets)
 backend/src/main/resources/sso-dev/*.key
+
+# Large SDK archive (never commit binaries this size)
+google-cloud-cli-*.tar.gz
