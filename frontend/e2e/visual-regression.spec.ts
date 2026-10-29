@@ -380,4 +380,41 @@ test.describe('Visual Regression: R1 screens (baselines pending human approval)'
     await expect(page.getByRole('region', { name: 'Layers' })).toBeVisible();
     await expect(page).toHaveScreenshot('r1-layers-popover.png', shot);
   });
+
+  // R1-E08-T04: History with two local checkpoints ticked and the pair compare view open.
+  // Guest path: local checkpoints are created through the Reviews screen "Tag Checkpoint" UI
+  // (no cloud stack needed). A node is added between the two so the diff is not empty.
+  test('history pair compare', async ({ page }) => {
+    const tag = async (name: string) => {
+      await page.goto('/#/reviews');
+      await page.getByRole('textbox', { name: 'Checkpoint name' }).fill(name);
+      await page.getByRole('button', { name: '+ Tag Checkpoint' }).click();
+      await expect(page.getByText(`Named Version Checkpoints (${name === 'baseline-a' ? 1 : 2})`)).toBeVisible();
+    };
+    await tag('baseline-a');
+    await gotoCanvas(page);
+    const status = page.getByTestId('canvas-status');
+    const before = Number(await status.getAttribute('data-nodes'));
+    await page.locator('[data-tool="service"]').click();
+    await page.mouse.click(...emptySpots[0]);
+    await expect(status).toHaveAttribute('data-nodes', String(before + 1), { timeout: 10000 });
+    await tag('baseline-b');
+
+    await page.goto('/#/history');
+    const panel = page.getByRole('complementary', { name: 'Version history' });
+    await expect(panel).toBeVisible();
+    await panel.getByRole('checkbox', { name: /^Select baseline-a for compare/ }).check();
+    await panel.getByRole('checkbox', { name: /^Select baseline-b for compare/ }).check();
+    await expect(panel.getByText('2 selected · older on the left')).toBeVisible();
+    await panel.getByRole('button', { name: 'Compare selected versions' }).click();
+    await expect(page.getByRole('main').getByText(/History of/)).toHaveCount(0);
+    await page.waitForLoadState('networkidle');
+    // Toasts from the setup steps expire on their own; capture only once they are gone.
+    await expect(page.locator('.toast-tray .toast-msg')).toHaveCount(0, { timeout: 20000 });
+    // Timestamps and the day heading in the version list differ per run; mask them so only layout and content are compared.
+    await expect(page).toHaveScreenshot('r1-history-pair-compare.png', {
+      ...shot,
+      mask: [panel.locator('li > span:nth-of-type(2)'), panel.locator('summary'), panel.getByRole('heading', { level: 2 })],
+    });
+  });
 });
