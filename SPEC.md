@@ -1,5 +1,7 @@
 # ArchFlux Master Specification
 
+> **Version:** 3.9.0 | **Last Updated:** 2026-10-24 | **Status:** ✅ Current
+
 > **Single source of truth for development.** Every feature, code change, or design decision must be reflected here. If it's not in the spec, it doesn't exist.
 
 ---
@@ -9,49 +11,52 @@
 | Spec | Scope | Status |
 |------|-------|--------|
 | [SPEC.md](SPEC.md) | This master index | ✅ Current |
-| [PRODUCTIZATION_SPEC.md](PRODUCTIZATION_SPEC.md) | **v3.0.0 product contract: tiers, P0/P1 requirements, roadmap** | ✅ Current |
-| [SPEC_REPORT.md](SPEC_REPORT.md) | Verified as-built inventory (features, flows, FE/BE/DB) | ✅ Current |
-| [FRONTEND_SPEC.md](FRONTEND_SPEC.md) | React 19 + TypeScript SPA | ✅ Current |
-| [BACKEND_SPEC.md](BACKEND_SPEC.md) | Spring Boot 3.5 REST + WebSocket | ✅ Current |
-| [UI_UX_SPEC.md](UI_UX_SPEC.md) | Design system & interactions | ✅ Current |
+| [SERVICES_SPEC.md](docs/specs/SERVICES_SPEC.md) | **Service boundaries: `frontend/` (archflux-web) + `backend/` (archflux-api), topologies, CI/CD, gap register** | ✅ Current (v2.1.0) |
+| [FRONTEND_SPEC.md](docs/specs/FRONTEND_SPEC.md) | React 19 + TypeScript SPA | ✅ Current |
+| [BACKEND_SPEC.md](docs/specs/BACKEND_SPEC.md) | Spring Boot 3.5 REST + WebSocket | ✅ Current |
+| [PRODUCT_SPEC.md](docs/specs/PRODUCT_SPEC.md) | **Product v4: "advanced Lucidchart for architecture" — gap map, 28 flows, 56 screens, all but 3 designed, R1–R4 roadmap** | 🟡 Proposed |
+| [REVIEW_VERSIONING_SPEC.md](docs/specs/REVIEW_VERSIONING_SPEC.md) | **Versions, proposals (PRs), review, comments: model, merge, permissions, notifications, edge cases** | 🟡 Proposed |
+| [AGENTS.md](AGENTS.md) | **Contract for every AI agent (Claude, Codex, Cursor, Gemini, free models): spec-first workflow, hard rules, commands, definition of done** | ✅ Current |
+| [docs/specs/impl/](docs/specs/impl/README.md) | **Implementation specs: R1 backlog (84 tasks, 14 epics, parallel waves), shared contract DATA_MODEL_R1 (types, `.arch` v2, V10–V14, API), codebase map, conventions** | 🟡 Proposed (Wave 0 may start) |
+| [docs/design/artboards/](docs/design/artboards/README.md) | **Finalized design (47 artboards as HTML): source of truth for how every screen looks** | ✅ Current |
+| [docs/agents/](docs/agents/README.md) | **Agent roles: planner, spec writer, frontend/backend implementer, test engineer, reviewer, QA, plus copy-paste prompts** | ✅ Current |
+| [UI_REVAMP_SPEC.md](docs/specs/UI_REVAMP_SPEC.md) | **UI revamp: audit, principles, IA, tokens, phased rollout (replaces UI_UX_SPEC; Appendix A keeps its quality bars and status language). Visuals: [docs/design/artboards](docs/design/artboards/README.md) are the source of truth** | 🚧 In progress |
+| [docs/deploy/AWS.md](docs/deploy/AWS.md) | **AWS deployment: CloudFormation, ECR, EC2 compose, CI/CD** | ✅ Current |
+| [docs/deploy/DEPLOY.md](docs/deploy/DEPLOY.md) | Operate: DB bootstrap, env, health, backup/restore | ✅ Current |
 
 ---
 
 ## Architecture Overview
 
+Two independently built and deployed services (contract: [SERVICES_SPEC.md](docs/specs/SERVICES_SPEC.md)):
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ArchFlux System                          │
-├─────────────────────────────────────────────────────────────────┤
-│  Frontend (React 19 + TS + Vite)          Backend (Spring 3.5) │
-│  ┌─────────────────────────┐            ┌────────────────────┐  │
-│  │ Hash Router (SPA)       │◄──REST──►  │ Controllers        │  │
-│  │ 5 Split Contexts        │            │ Services           │  │
-│  │ Yjs Collaboration       │◄──WS──────►│ STOMP Broker       │  │
-│  │ Canvas 2D Rendering     │            │ JPA + PostgreSQL   │  │
-│  │ Local Contract Derivation           │ Flyway Migrations  │  │
-│  └─────────────────────────┘            └────────────────────┘  │
-│         ▲                                         ▲               │
-│         │              Docker Compose              │               │
-│         └──────────────────┬──────────────────────┘               │
-│                            ▼                                       │
-│                    PostgreSQL 17 + Redis                           │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────── frontend/ (archflux-web) ────────────┐        ┌──────────── backend/ (archflux-api) ─────────────┐
+│ React 19 + TS + Vite SPA, served by nginx        │        │ Spring Boot 3.5, Java 21                         │
+│ Hash router · 5 split contexts · Canvas 2D       │ REST   │ Controllers → Services → JPA                     │
+│ src/config.ts: apiUrl/wsUrl from /config.json    │───────►│ /api/v1/**  (CORS + Origin allow-list)           │
+│ Optional nginx proxy (API_UPSTREAM) for          │  WS    │ /ws (STOMP)  · Flyway (classpath migrations)     │
+│ same-origin (integrated) topology                │───────►│ PostgreSQL 17 + Redis 7                          │
+└──────────────────────────────────────────────────┘        └──────────────────────────────────────────────────┘
+   Integrated: root compose.yml (web proxies /api)      Separate: frontend/compose.yml + backend/compose.yml
 ```
+
+> Known open gap SVC-O1: the collaboration client speaks y-websocket while the server speaks STOMP.
 
 ---
 
 ## Quick Reference: Key Files
 
-| Area | Frontend | Backend |
+| Area | Frontend (`frontend/`) | Backend (`backend/`) |
 |------|----------|---------|
-| **Entry** | `src/main.tsx` | `server/src/main/java/com/archflux/ArchfluxApplication.java` |
-| **Routes** | `src/App.tsx` | `server/src/main/java/com/archflux/web/*Controller.java` |
-| **State** | `src/store.tsx` (5 contexts) | `server/src/main/java/com/archflux/service/*Service.java` |
-| **Types** | `src/types.ts` | `server/src/main/java/com/archflux/domain/*.java` |
-| **API** | `src/api.ts` | `server/src/main/resources/application.yml` |
-| **Schema** | — | `db/migrations/V*__*.sql` |
-| **Config** | `vite.config.ts`, `tsconfig.json` | `server/pom.xml` |
+| **Entry** | `src/main.tsx` | `src/main/java/com/archflux/ArchfluxApplication.java` |
+| **Routes** | `src/App.tsx` (+ `src/app/`) | `src/main/java/com/archflux/web/*Controller.java` |
+| **State** | `src/state/store.tsx` (5 contexts) | `src/main/java/com/archflux/service/*Service.java` |
+| **Types** | `src/types.ts` | `src/main/java/com/archflux/domain/*.java` |
+| **API / config** | `src/lib/api.ts`, `src/lib/config.ts` | `src/main/resources/application.yml` |
+| **Schema** | — | `src/main/resources/db/migration/V*__*.sql` (single source) |
+| **Build** | `package.json`, `vite.config.ts`, `Dockerfile` | `pom.xml`, `Dockerfile` |
+| **Compose** | `compose.yml` (web only) | `compose.yml` (db + redis + server) |
 
 ---
 
@@ -69,9 +74,10 @@
 | New React component | `FRONTEND_SPEC.md` (Project Structure) |
 | New React Context / hook | `FRONTEND_SPEC.md` (State Management / Hooks) |
 | New Yjs message type | `FRONTEND_SPEC.md` (Collaboration) + `BACKEND_SPEC.md` (WebSocket) |
-| New lint rule | `BACKEND_SPEC.md` (Linting Rules) + `UI_UX_SPEC.md` (Linter UI) |
-| New UI pattern / component | `UI_UX_SPEC.md` (relevant section) + `FRONTEND_SPEC.md` |
-| Config change | Both specs (Config sections) |
+| New lint rule | `BACKEND_SPEC.md` (Linting Rules) + `UI_REVAMP_SPEC.md` + the artboard (Linter UI) |
+| New UI pattern / component | the artboard in `docs/design/artboards/` + `UI_REVAMP_SPEC.md` + `FRONTEND_SPEC.md` |
+| Config change | Both specs (Config sections) + `SERVICES_SPEC.md` if it crosses the service boundary |
+| New service-level file (Dockerfile, compose, workflow, env var) | `SERVICES_SPEC.md` |
 | New migration | `BACKEND_SPEC.md` (Database Schema) |
 
 ### Update Checklist (per PR)
@@ -107,9 +113,82 @@ Each spec header includes:
 
 ---
 
+## Product v4 Plan (2026-10-24, v3.5.0)
+
+> Contract: [PRODUCT_SPEC.md](docs/specs/PRODUCT_SPEC.md) v4.2.0. Order: product spec (this change) → designs
+> for every flow in the Claude Design canvas (one page per flow) → sign-off → R1 implementation, each R1
+> capability getting its own FRONTEND/BACKEND spec section with acceptance criteria before code.
+
+---
+
+## UI Revamp Plan (2026-10-24, v3.4.0)
+
+> Contract: [UI_REVAMP_SPEC.md](docs/specs/UI_REVAMP_SPEC.md) v1.0.0 §9. Spec-driven order: plan (this
+> change) → Phase 1 (foundation + canvas workspace, incl. FE-V2 label fix) → Phase 2 (pages) → verify
+> (tests, QA sweep, axe, before/after screenshots) → Phase 3 next release.
+
+---
+
+## QA Fix Plan (2026-10-24, v3.3.0)
+
+> Source: full-stack QA pass. Gaps: [SERVICES_SPEC](docs/specs/SERVICES_SPEC.md) SVC-G25…G34,
+> [FRONTEND_SPEC](docs/specs/FRONTEND_SPEC.md) FE-Q1…Q12. Order: critical/high first, then medium, low.
+
+| # | Item | Gap IDs |
+|---|------|---------|
+| Q1 | Cloud save + cross-device library + server delete | SVC-G34, FE-Q1 |
+| Q2 | GitHub webhook HMAC-only delivery | SVC-G25 |
+| Q3 | Session revocation on logout/refresh | SVC-G26 |
+| Q4 | Rate limiting on real client IP + per-address magic-link cap | SVC-G27 |
+| Q5 | Redact secrets in request logs | SVC-G28 |
+| Q6 | 404 for unknown routes, springdoc upgrade + prod disable, mail health off, 401 entry point, env template | SVC-G29…G33 |
+| Q7 | UI fixes: a11y label, phone layouts, dev-only note, status labels, honest ping, contrast, ARIA, nav hint, SSO tab | FE-Q2…Q12 |
+
+---
+
+## Restructure · No Mock Data · AWS Work Plan (2026-10-24, v3.2.0)
+
+> Contracts: [SERVICES_SPEC.md](docs/specs/SERVICES_SPEC.md) v2.1.0 §2/§6/§10 (SVC-G19…G23) and
+> [FRONTEND_SPEC.md](docs/specs/FRONTEND_SPEC.md) v1.5.0 "No mock data" (FE-M1…M8).
+
+**Spec-driven order:** (1) specs updated (this change) → (2) move docs/files → (3) frontend `src/` regroup +
+mock removal with tests → (4) AWS infra + overlay + workflows → (5) gates green, links verified.
+
+| # | Item | Gap IDs | Acceptance |
+|---|------|---------|------------|
+| R1 | Root = entry points; docs under `docs/{specs,deploy,ops,design,qa,archive}`; delete stray/GCP/DO files | SVC-G19 | SERVICES_SPEC §8 acc. 7, 10 |
+| R2 | Regroup `frontend/src` into `app/ state/ lib/ data/` | FE-M8 | `tsc -b`, tests, lint green |
+| R3 | Remove all mock/demo data; empty-state first run; honest resync | FE-M1…M7 | FRONTEND_SPEC "No mock data" acc. 1–6 |
+| R4 | CloudFormation (EC2, SG, EIP, ECR, OIDC role) | SVC-G20 | template parses; acc. 9 |
+| R5 | `compose.aws.yml` (ECR images, required secrets, no host ports, Caddy TLS) | SVC-G21, G22 | acc. 8 |
+| R6 | Deploy workflows: build → ECR → SSH `remote-deploy.sh` with health-gated rollback | SVC-G20 | acc. 9 |
+| R7 | Remove systemd/pm2/host-nginx VM deploy files; archive PRODUCTION_SPEC | SVC-G20 | no tracked GCP/DO/systemd deploy path |
+
+---
+
+## Service Split Work Plan (2026-10-24)
+
+> Contract: [SERVICES_SPEC.md](docs/specs/SERVICES_SPEC.md) v2.0.0 — layout §2, gap register §8, acceptance §8.
+
+**Spec-driven order:** (1) spec updated (this change) → (2) restructure into `frontend/` + `backend/` →
+(3) close SVC-G1…G15 with tests → (4) gates green per service → (5) update deploy docs.
+
+| # | Item | Gap IDs | Acceptance |
+|---|------|---------|------------|
+| S1 | Untrack secrets + vendored SDK, add `.example` templates, scrub docs | G1, G2 | `git ls-files` clean of secrets/SDK |
+| S2 | Move frontend → `frontend/`, `server/` → `backend/`, `db/` → `backend/db` | G3, G11 | each service builds alone |
+| S3 | `src/config.ts` runtime config; login URLs `/v1` | G4, G5 | unit tests |
+| S4 | Backend public URLs, hash redirects, magic link via API | G6, G7 | `AuthControllerTest` |
+| S5 | Unified origin allow-list (CORS, Origin check, WS) | G8, G9 | `OriginCheckFilterTest` |
+| S6 | nginx `API_UPSTREAM` proxy include + CSP from `API_URL` | G10 | `docker build frontend`, compose config |
+| S7 | Classpath migrations in tests | G11, G12 | `mvn test` green |
+| S8 | Path-scoped CI + deploy workflows; PG17 everywhere | G13, G14 | workflow lint |
+
+---
+
 ## Current Release Work Plan (2026-10-14) — ✅ Shipped
 
-Derived from [UI_UX_SPEC.md](UI_UX_SPEC.md#implementation-plan-this-release). Backend change: checkpoint branch filter. All 19 items implemented; gates green (see Verification below).
+Derived from UI_UX_SPEC (deleted 2026-10-25; historical). Backend change: checkpoint branch filter. All 19 items implemented; gates green (see Verification below).
 
 ### Follow-through (UI_UX_SPEC v2.3.0)
 Spec v2.2.0 review surfaced conformance gaps; all closed this release:
@@ -140,8 +219,8 @@ No changes this release. The work plan uses existing endpoints only (`GET/POST c
 
 ## Productization v3.0.0 Work Plan
 
-> Governing contract: [PRODUCTIZATION_SPEC.md](PRODUCTIZATION_SPEC.md) (tiers, P0/P1, roadmap).
-> As-built baseline: [SPEC_REPORT.md](SPEC_REPORT.md) (verified inventory + §12 gaps).
+> Governing contract: PRODUCTIZATION_SPEC (deleted 2026-10-25; binding parts are now [PRODUCT_SPEC Appendix A](docs/specs/PRODUCT_SPEC.md)).
+> As-built baseline: SPEC_REPORT (deleted 2026-10-25; superseded by [CODEBASE_MAP](docs/specs/impl/CODEBASE_MAP.md)).
 
 **Release boundary:** Release A (reliable single-user) first. No capability ships as GA until its
 acceptance criteria + operational evidence are met — otherwise it is labeled Preview, Demo, or Not connected.
@@ -166,7 +245,7 @@ Proof: backend 77/77 (two-user isolation, app-role, V6 upgrade), frontend 90 + 1
 compose stack booting clean (SAML/OAuth2 offline-safe defaults, JWT fail-fast) with a live two-user
 magic-link → cookie → CRUD + isolation + logout run under the `archflux_app` role (exit met).
 
-### Phase 2+ — tracked in PRODUCTIZATION_SPEC.md §§16–19
+### Phase 2+ — superseded by PRODUCT_SPEC §7 (R1–R4); PRODUCTIZATION_SPEC deleted 2026-10-25
 Data integrity → GitHub/review → first real connector → collaboration decision → beta.
 
 ### P0/P1 → spec traceability
@@ -185,33 +264,51 @@ Data integrity → GitHub/review → first real connector → collaboration deci
 
 ## Development Workflow
 
+### Spec-driven, agent-ready (v3.8.0)
+
+1. **Spec first:** change the owning spec, then `docs/specs/impl/DATA_MODEL_R1.md` if the contract
+   changes.
+2. **Task:** write the task section in the epic.
+3. **Implement and test:** do the work, then test against the task's acceptance.
+4. **Review:** a reviewer checks it, then BACKLOG is set to done.
+
+Any AI agent, including free or small models, starts at [AGENTS.md](AGENTS.md) and picks work from
+[docs/specs/impl/BACKLOG.md](docs/specs/impl/BACKLOG.md). Roles and prompts are in
+[docs/agents/](docs/agents/README.md).
+
 ### Local Setup
 ```bash
-# Frontend
-npm install && npm run dev        # http://localhost:5173
+# Backend service (needs Docker for PostgreSQL + Redis)
+docker compose -f backend/compose.yml up -d db redis
+cd backend && mvn spring-boot:run            # http://localhost:3001
 
-# Backend (requires Docker: PostgreSQL + Redis)
-cd server && mvn spring-boot:run  # http://localhost:3001
+# Frontend service (dev server proxies /api → :3001)
+cd frontend && npm install && npm run dev    # http://localhost:5173
 
-# Or full stack
-docker compose up -d
+# Integrated stack (same-origin, nginx proxies /api)
+docker compose up -d --build                 # http://localhost:8080
+
+# Separate stacks (cross-origin)
+docker compose -f backend/compose.yml up -d --build    # API  :3001
+docker compose -f frontend/compose.yml up -d --build   # web  :8080
 ```
 
 ### Testing Gates
 | Layer | Command | Must Pass |
 |-------|---------|-----------|
-| Frontend TypeScript | `npx tsc --build --force` | 0 errors |
-| Frontend Unit | `npm test` | 47 passed |
-| Frontend E2E | `npm run test:e2e` | 13/13 critical journeys |
-| Visual Regression | `npm run test:visual` | 29/29 baselines |
-| Backend Compile | `cd server && mvn compile` | SUCCESS |
-| Backend Tests | `cd server && mvn test` | 46/46 passed |
+| Frontend TypeScript | `cd frontend && npx tsc -b` | 0 errors |
+| Frontend Lint | `cd frontend && npm run lint` | 0 errors |
+| Frontend Unit | `cd frontend && npm test` | all passed (163+ at 2026-10-24) |
+| Frontend E2E | `cd frontend && npm run test:e2e` | critical journeys green |
+| Visual Regression | `cd frontend && npm run test:visual` | baselines green |
+| Backend Tests | `cd backend && mvn test` | all passed (92+ at 2026-10-24) |
+| Compose | `docker compose config --quiet` (root + each service file) | valid |
+| Images | `docker build frontend` · `docker build backend` | success |
 
 ### Before Merge
 ```bash
-# Run all gates locally
-npm run build && npm test && npm run test:e2e && npm run test:visual
-cd server && mvn test
+(cd frontend && npx tsc -b && npm run lint && npm test && npm run build)
+(cd backend && mvn test)
 ```
 
 ---

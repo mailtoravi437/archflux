@@ -12,15 +12,25 @@ dist
 dist-ssr
 *.local
 
-# Vite env files (generated at build time by CI; never commit real values)
+# Env files: never commit real values (SERVICES_SPEC §7). Only *.env.example templates.
 .env
-.env.production
-.env.local
-.env.*.local
+.env.*
 !.env.example
+**/.env
+**/.env.*
+!**/.env.example
 
 # Java build artifacts
-server/target/
+backend/target/
+
+# Test outputs
+playwright-report/
+test-results/
+coverage/
+
+# Vendored tools / archives (SVC-G2)
+google-cloud-sdk/
+*.tar.gz
 
 # Editor directories and files
 .vscode/*
@@ -32,3 +42,9 @@ server/target/
 *.njsproj
 *.sln
 *.sw?
+
+# Vite dependency cache
+.vite/
+
+# Private keys for local SSO testing are never committed (AGENTS.md: no secrets)
+backend/src/main/resources/sso-dev/*.key

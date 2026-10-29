@@ -1,0 +1,73 @@
+# ArchFlux on AWS EC2 — overlay for the INTEGRATED topology (SERVICES_SPEC §10.2).
+# Lives on the instance at /opt/archflux next to the root compose.yml; run via
+# deploy/aws/remote-deploy.sh, or by hand:
+#   docker compose --env-file .env --env-file images.env \
+#     -f compose.yml -f deploy/aws/compose.aws.yml up -d
+#
+# - Images come from ECR, built once in CI: the instance never builds (build reset).
+#   Tags live in images.env (written by remote-deploy.sh); unset = :latest.
+# - Every secret is REQUIRED (:?) — a missing value aborts instead of falling back
+#   to the DEV defaults in backend/compose.yml (SVC-G21).
+# - Only caddy publishes host ports (80/443, automatic HTTPS for APP_DOMAIN).
+name: archflux
+
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in /opt/archflux/.env}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD in /opt/archflux/.env}
+    ports: !reset []
+
+  server:
+    build: !reset null
+    image: ${ECR_REGISTRY:?set ECR_REGISTRY in /opt/archflux/.env}/archflux-api:${API_IMAGE_TAG:-latest}
+    ports: !reset []
+    # Optional settings (EMAIL_*, RESEND_/SENDGRID_API_KEY, GITHUB_/GOOGLE_/OIDC_
+    # client ids, SAML_*) pass through only when present in .env.
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-archflux}
+      SPRING_DATASOURCE_USERNAME: ${DB_APP_USER:-archflux_app}
+      SPRING_DATASOURCE_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD}
+      DB_APP_USER: ${DB_APP_USER:-archflux_app}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD}
+      SPRING_FLYWAY_USER: ${POSTGRES_USER:-archflux}
+      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      APP_API_TOKEN: ${API_TOKEN:?set API_TOKEN}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      APP_COOKIE_SECURE: "true"
+      SESSION_COOKIE_SECURE: "true"
+      FRONTEND_URL: https://${APP_DOMAIN:?set APP_DOMAIN}
+      PUBLIC_API_URL: https://${APP_DOMAIN:?set APP_DOMAIN}/api
+      CORS_ALLOWED_ORIGINS: https://${APP_DOMAIN:?set APP_DOMAIN}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+
+  web:
+    build: !reset null
+    image: ${ECR_REGISTRY:?set ECR_REGISTRY}/archflux-web:${WEB_IMAGE_TAG:-latest}
+    ports: !reset []
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?set APP_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL (Let's Encrypt account email)}
+    volumes:
+      - ./deploy/aws/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:

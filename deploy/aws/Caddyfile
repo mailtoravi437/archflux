@@ -1,0 +1,13 @@
+# TLS edge for ArchFlux on AWS (SERVICES_SPEC §10.2, SVC-G22).
+# Automatic HTTPS (Let's Encrypt) for APP_DOMAIN; HTTP redirects to HTTPS.
+# Everything goes to the web container, which serves the SPA and proxies
+# /api, /ws, /oauth2, /login/oauth2, /saml2 to the API.
+{
+	email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	encode zstd gzip
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	reverse_proxy web:80
+}

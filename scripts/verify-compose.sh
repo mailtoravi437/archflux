@@ -55,7 +55,7 @@ READY="$(curl -s "http://localhost:${WEB_PORT}/api/ready")"
 echo "$READY"
 case "$READY" in
   *'"ready":true'*|*'"ready": true'*) echo "    ready OK" ;;
-  *) echo "FAIL: API not ready (schema missing? see Database bootstrap in DEPLOY.md)" >&2; exit 1 ;;
+  *) echo "FAIL: API not ready (schema missing? see Database bootstrap in docs/deploy/DEPLOY.md)" >&2; exit 1 ;;
 esac
 
 echo "--- versions"

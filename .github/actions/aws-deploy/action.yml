@@ -1,0 +1,73 @@
+name: Deploy service to the ArchFlux EC2 host
+description: >-
+  Copies the runtime bundle to /opt/archflux and runs deploy/aws/remote-deploy.sh
+  for one service (SERVICES_SPEC §10.3). The image must already be in ECR.
+
+inputs:
+  service:
+    description: server | web
+    required: true
+  image-tag:
+    description: ECR image tag to deploy
+    required: true
+  host:
+    description: Instance public IP / DNS (secret VM_HOST)
+    required: true
+  user:
+    description: SSH user (ec2-user on Amazon Linux)
+    required: true
+  ssh-key:
+    description: Private key for the instance key pair (secret VM_SSH_KEY)
+    required: true
+  known-hosts:
+    description: Pinned known_hosts line(s) for the host (secret VM_KNOWN_HOSTS). Empty = trust on first use.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Configure SSH
+      shell: bash
+      env:
+        HOST: ${{ inputs.host }}
+        SSH_KEY: ${{ inputs.ssh-key }}
+        KNOWN_HOSTS: ${{ inputs.known-hosts }}
+      run: |
+        set -euo pipefail
+        install -d -m 700 ~/.ssh
+        umask 077
+        printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+        if [ -n "$KNOWN_HOSTS" ]; then
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+        else
+          echo "::warning::VM_KNOWN_HOSTS not set — trusting the host key on first use"
+          ssh-keyscan -T 15 -H "$HOST" > ~/.ssh/known_hosts 2>/dev/null
+        fi
+        cat > ~/.ssh/config <<EOF
+        Host archflux
+          HostName $HOST
+          User ${{ inputs.user }}
+          IdentityFile ~/.ssh/deploy_key
+          IdentitiesOnly yes
+          StrictHostKeyChecking yes
+          BatchMode yes
+          ServerAliveInterval 30
+        EOF
+
+    - name: Copy runtime bundle
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Only what compose needs at runtime; never --delete (keeps .env, images.env).
+        rsync -az --relative \
+          compose.yml backend/compose.yml frontend/compose.yml \
+          backend/docker/db-init deploy/aws \
+          archflux:/opt/archflux/
+
+    - name: Deploy ${{ inputs.service }}
+      shell: bash
+      env:
+        SERVICE: ${{ inputs.service }}
+        TAG: ${{ inputs.image-tag }}
+      run: ssh archflux "/opt/archflux/deploy/aws/remote-deploy.sh '$SERVICE' '$TAG'"
