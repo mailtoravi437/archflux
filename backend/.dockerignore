@@ -1,0 +1,8 @@
+target/
+.git
+.env
+.env.*
+db/
+deploy/
+scripts/
+docker/

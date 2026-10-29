@@ -1,0 +1,230 @@
+# ArchFlux server configuration.
+# DDL lives exclusively in db/ (manual psql). Hibernate NEVER creates schema.
+server:
+  port: ${PORT:3001}
+  # Honour X-Forwarded-* from trusted (private-network) proxies only — the
+  # integrated web proxy — so OAuth redirect URIs use the public host.
+  forward-headers-strategy: ${FORWARD_HEADERS_STRATEGY:native}
+  servlet:
+    session:
+      cookie:
+        secure: ${SESSION_COOKIE_SECURE:true}
+        same-site: ${SESSION_COOKIE_SAME_SITE:lax}
+        http-only: true
+        max-age: 2592000 # 30 days
+
+spring:
+  main:
+    lazy-initialization: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    hikari:
+      initialization-fail-timeout: 0
+      connection-timeout: 3000
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    repositories:
+      bootstrap-mode: lazy
+    properties:
+      hibernate:
+        timezone:
+          default_storage: NORMALIZE_UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  mail:
+    host: ${SMTP_HOST:smtp.sendgrid.net}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # OAuth2 / OIDC / SAML2 (single security key — YAML last-wins would drop oauth2 otherwise)
+  # Client ids/secrets default to non-functional placeholders so Boot's
+  # registration validation passes and the server boots without operator SSO
+  # material. Provider login is NOT usable until real credentials are set via
+  # env (see docs/deploy/DEPLOY.md SSO section) — the provider will reject the placeholder.
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID:Iv23lixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+            client-secret: ${GITHUB_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+            redirect-uri: "{baseUrl}/login/oauth2/code/github"
+            scope: read:user,user:email,repo
+            authorization-grant-type: authorization_code
+            client-name: GitHub
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:123456789012-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope: openid,email,profile
+            authorization-grant-type: authorization_code
+            client-name: Google
+            provider: google
+          oidc:
+            client-id: ${OIDC_CLIENT_ID:archflux-oidc-prod}
+            client-secret: ${OIDC_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+            redirect-uri: "{baseUrl}/login/oauth2/code/oidc"
+            scope: openid,email,profile
+            authorization-grant-type: authorization_code
+            client-name: SSO
+            provider: oidc
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
+            jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
+            user-name-attribute: sub
+          # Keycloak-shaped placeholder endpoints (static strings — no
+          # discovery I/O at startup). Point OIDC_ISSUER_URI at a real
+          # issuer and set OIDC_CLIENT_ID/SECRET for a working SSO login.
+          oidc:
+            authorization-uri: ${OIDC_ISSUER_URI:https://auth.example.com/realms/archflux}/protocol/openid-connect/auth
+            token-uri: ${OIDC_ISSUER_URI:https://auth.example.com/realms/archflux}/protocol/openid-connect/token
+            user-info-uri: ${OIDC_ISSUER_URI:https://auth.example.com/realms/archflux}/protocol/openid-connect/userinfo
+            jwk-set-uri: ${OIDC_ISSUER_URI:https://auth.example.com/realms/archflux}/protocol/openid-connect/certs
+            user-name-attribute: sub
+    saml2:
+      relyingparty:
+        registration:
+          archflux:
+            entity-id: ${SAML_ENTITY_ID:https://archflux.io}
+            assertion-consumer-service:
+              location: "{baseUrl}/login/saml2/sso/archflux"
+              binding: POST
+            singlelogout:
+              url: "{baseUrl}/logout/saml2/slo"
+              binding: REDIRECT
+            signing:
+              credentials:
+                # DEV-ONLY placeholder (sso-dev/) so the server boots without
+                # operator SSO material. Real deployments MUST set
+                # SAML_PRIVATE_KEY_LOCATION / SAML_CERT_LOCATION (Release D).
+                - private-key-location: ${SAML_PRIVATE_KEY_LOCATION:classpath:/sso-dev/archflux-sp.key}
+                  certificate-location: ${SAML_CERT_LOCATION:classpath:/sso-dev/archflux-sp.crt}
+            assertingparty:
+              entity-id: ${SAML_IDP_ENTITY_ID:https://auth.example.com}
+              singlesignon:
+                url: ${SAML_IDP_SSO_URL:https://auth.example.com/sso/saml}
+                binding: POST
+              singlelogout:
+                url: ${SAML_IDP_SLO_URL:https://auth.example.com/slo/saml}
+                binding: REDIRECT
+              verification:
+                credentials:
+                  # DEV-ONLY placeholder (see above). Replace with the real
+                  # IdP certificate or SAML verification fails closed.
+                  - certificate-location: ${SAML_IDP_CERT_LOCATION:classpath:/sso-dev/archflux-sp.crt}
+
+  # Redis for session storage & magic link tokens
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  # Session storage in Redis
+  session:
+    store-type: redis
+    redis:
+      namespace: "archflux:sessions:"
+      flush-mode: on_save
+    timeout: 30d
+
+# Phase 2 observability (PRODUCTIZATION_SPEC §13): minimal actuator
+# surface — health, info, metrics, Prometheus. Everything else stays off.
+management:
+  health:
+    # Mail goes through HTTP providers (Resend/SendGrid) or the dev mock; an SMTP
+    # probe with no credentials would report DOWN forever (SVC-G31).
+    mail:
+      enabled: false
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  # With endpoints.enabled-by-default=false the metrics-export auto-config
+  # backs off unless the product export is explicitly enabled.
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+app:
+  api-token: ${APP_API_TOKEN:${API_TOKEN:}}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  # SERVICES_SPEC §4.1/§4.2. Blank public-api-url = {frontend-url}/api; blank
+  # allowed-origins = frontend-url + local dev origins.
+  public-api-url: ${PUBLIC_API_URL:}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+  jwt-secret: ${JWT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
+  jwt-issuer: ${JWT_ISSUER:archflux}
+  jwt-audience: ${JWT_AUDIENCE:archflux-api}
+  jwt-access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:60}
+  jwt-refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:30}
+  # Previous HS256 secret accepted during key rotation (empty = no rotation key).
+  jwt-prev-secret: ${JWT_PREV_SECRET:}
+  # Secure flag for the ARCHFLUX_TOKEN cookie (dev/compose sets false for plain HTTP).
+  cookie-secure: ${APP_COOKIE_SECURE:true}
+  magic-link-ttl-minutes: 15
+  github:
+    api-token: ${GITHUB_API_TOKEN:}
+    api-url: ${GITHUB_API_URL:https://api.github.com}
+  webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
+
+  # Magic link email service
+  email:
+    provider: ${EMAIL_PROVIDER:mock} # mock, sendgrid, resend, ses
+    from: ${EMAIL_FROM:noreply@archflux.io}
+    sendgrid-api-key: ${SENDGRID_API_KEY:}
+    resend-api-key: ${app.resend-api-key:${RESEND_API_KEY:}}
+
+logging:
+  level:
+    com.archflux: INFO
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator: WARN
