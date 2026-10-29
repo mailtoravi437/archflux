@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Audit log and SSO</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; padding: 24px 32px; overflow: hidden">
+    <section aria-label="Audit log" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden">
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #EEF0F3">
+        <div style="display: flex; align-items: center"><h1 style="margin: 0; font-size: 20px; font-weight: 700; flex-grow: 1">Audit log</h1><button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Export CSV</button><button style="height: 30px; margin-left: 6px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Stream to SIEM</button></div>
+        <div style="display: flex; gap: 6px"><select aria-label="Actor" style="height: 30px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>Anyone</option></select><select aria-label="Action" style="height: 30px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>All actions</option></select><select aria-label="Period" style="height: 30px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>Last 7 days</option></select><input aria-label="Search audit" placeholder="Search resource" style="flex-grow: 1; height: 30px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1.1fr 1.6fr 1fr; gap: 10px; padding: 8px 16px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em"><span>When</span><span>Actor</span><span>Action</span><span>From</span></div>
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+        <div style="display: grid; grid-template-columns: 1fr 1.1fr 1.6fr 1fr; gap: 10px; padding: 9px 16px; border-top: 1px solid #F1F2F5; align-items: center">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5B6474">{{r.when}}</span><span>{{r.who}}</span>
+          <span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 1px 6px; border-radius: 4px; background: {{r.bg}}; color: {{r.fg}}">{{r.action}}</span> {{r.res}}</span>
+          <span style="font-size: 12px; color: #5B6474">{{r.from}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-label="Single sign-on" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 700">Single sign-on</h2>
+      <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+        <li style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 22px; height: 22px; border-radius: 11px; background: #DCF3E6; color: #047857; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">✓</span><span><strong>Identity provider</strong><br><span style="color: #5B6474">SAML · Okta · metadata uploaded</span></span></li>
+        <li style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 22px; height: 22px; border-radius: 11px; background: #DCF3E6; color: #047857; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">✓</span><span><strong>Domain verified</strong><br><span style="color: #5B6474">[company].com · DNS TXT record found</span></span></li>
+        <li style="display: flex; gap: 10px; align-items: flex-start"><span style="width: 22px; height: 22px; border-radius: 11px; background: #EEF0FF; color: #4338CA; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">3</span><span style="flex-grow: 1"><strong>Test with your account</strong><br><span style="color: #5B6474">Sign in through Okta in a new tab. Enforcement unlocks after a successful test.</span><br><button style="margin-top: 8px; height: 32px; padding: 0 12px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Run test sign-in</button></span></li>
+        <li style="display: flex; gap: 10px; align-items: flex-start; opacity: .55"><span style="width: 22px; height: 22px; border-radius: 11px; background: #F1F2F5; color: #5B6474; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">4</span><span><strong>Enforce for @[company].com</strong><br><span style="color: #5B6474">Password and magic-link sign-in turn off for this domain.</span></span></li>
+      </ol>
+      <div style="padding: 10px 12px; background: #F6F7F9; border-radius: 8px; color: #3D4553">Break-glass: owner <strong>[owner@company.com]</strong> can still sign in with a magic link if the identity provider is down. Use is audited.</div>
+      <label style="display: flex; gap: 8px"><input type="checkbox" checked>Provision users with SCIM (Okta)</label>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const n = { bg: '#F1F2F5', fg: '#3D4553' }, w = { bg: '#FEF3C7', fg: '#92400E' }, d = { bg: '#FDE8E8', fg: '#B91C1C' };
+    const r = (when, who, action, res, from, t) => Object.assign({ when, who, action, res, from }, t);
+    return {
+      no: false,
+      rows: [
+        r('10-24 11:02', '[Architect]', 'proposal.merge', '#14 → main v14', '81.2.x.x · Chrome', n),
+        r('10-24 10:40', '[Owner]', 'share.public_link', 'checkout-mesh.arch', '81.2.x.x · Safari', w),
+        r('10-24 09:15', '[Engineer]', 'export.pdf', 'payments-saga.arch', '10.0.x.x · Chrome', n),
+        r('10-23 18:22', '[Admin]', 'member.role_change', '[Contractor] → Commenter', '81.2.x.x', w),
+        r('10-23 17:05', '[Owner]', 'diagram.delete_forever', 'payments-v1.arch', '81.2.x.x', d),
+        r('10-23 16:00', 'Policy bot', 'review.bypass', '#13 merged by admin (reason: hotfix)', 'system', d),
+        r('10-23 09:00', 'Kubernetes prod', 'sync.accept', 'edge-routing.arch v8', 'connector', n),
+        r('10-22 14:31', '[Security]', 'auth.sso_test', 'Okta test passed', '81.2.x.x', n),
+        r('10-22 08:02', '[New hire]', 'auth.sign_in', 'magic link', '92.1.x.x · Firefox', n)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

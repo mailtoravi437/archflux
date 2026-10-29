@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — GitHub integration</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 24px 32px; overflow: hidden">
+    <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+      <div><p style="margin: 0 0 4px; font-size: 12px; color: #5B6474">Workspace settings › Integrations › GitHub</p><h1 style="margin: 0; font-size: 22px; font-weight: 700">Link checkout-mesh.arch to GitHub</h1></div>
+      <ol style="list-style: none; margin: 0; padding: 0; display: flex; gap: 8px">
+        <li style="flex: 1; padding: 10px 12px; border-radius: 8px; background: #DCF3E6; color: #047857; font-weight: 600">1 · App installed on [org]</li>
+        <li style="flex: 1; padding: 10px 12px; border-radius: 8px; background: #EEF0FF; color: #4338CA; font-weight: 600; box-shadow: inset 0 0 0 1.5px #4F46E5">2 · Repository &amp; path</li>
+        <li style="flex: 1; padding: 10px 12px; border-radius: 8px; background: #FFFFFF; color: #5B6474; border: 1px solid #E3E6EB">3 · Sync &amp; checks</li>
+        <li style="flex: 1; padding: 10px 12px; border-radius: 8px; background: #FFFFFF; color: #5B6474; border: 1px solid #E3E6EB">4 · Test</li>
+      </ol>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Where the .arch file lives</h2>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Repository<select style="height: 36px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; color: #1B1F27"><option>[org]/checkout-platform</option></select></label>
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px">
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Branch<input value="main" style="height: 36px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px"></label>
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Path<input value="docs/architecture/checkout.arch" style="height: 36px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px"></label>
+          </div>
+          <div style="padding: 10px 12px; border: 1px solid #F3D9A4; background: #FFFBEB; border-radius: 8px; display: flex; gap: 10px; align-items: center"><span style="flex-grow: 1; color: #92400E">A file already exists at this path (updated 3 days ago).</span><button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Compare &amp; import</button></div>
+          <span style="font-size: 12px; color: #5B6474">Don't see the repo? <a href="GitHub.dc.html">Grant access in GitHub</a> — the app only sees repositories you allow.</span>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Sync direction</h2>
+          <label style="display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1.5px solid #4F46E5; border-radius: 8px; background: #F7F7FF"><input type="radio" name="dir" checked><span><strong>Both ways</strong><br><span style="font-size: 12px; color: #5B6474">Merging in ArchFlux commits the file. A PR that changes the file opens a proposal here.</span></span></label>
+          <label style="display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid #E3E6EB; border-radius: 8px"><input type="radio" name="dir"><span><strong>ArchFlux → GitHub</strong><br><span style="font-size: 12px; color: #5B6474">ArchFlux is the source; Git is the record.</span></span></label>
+          <label style="display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid #E3E6EB; border-radius: 8px"><input type="radio" name="dir"><span><strong>GitHub → ArchFlux</strong><br><span style="font-size: 12px; color: #5B6474">Diagrams-as-code; ArchFlux renders and reviews.</span></span></label>
+          <h2 style="margin: 4px 0 0; font-size: 15px; font-weight: 600">Pull request checks</h2>
+          <label style="display: flex; gap: 8px"><input type="checkbox" checked>Post visual diff as a PR comment</label>
+          <label style="display: flex; gap: 8px"><input type="checkbox" checked>Report “ArchFlux review” status (required approvals)</label>
+          <label style="display: flex; gap: 8px"><input type="checkbox" checked>Run policies (blocking rules fail the check)</label>
+        </section>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end"><button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Back</button><button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Continue to test</button></div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return { no: false }; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Mobile library</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 14px; overflow: hidden">
+  <header style="padding: 16px 16px 8px; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #E3E6EB">
+    <div style="display: flex; align-items: center; gap: 10px"><span style="width: 28px; height: 28px; border-radius: 7px; background: #4F46E5"></span><span style="font-weight: 700; font-size: 18px; flex-grow: 1">ArchFlux</span><button aria-label="Notifications, 3 unread" style="width: 44px; height: 44px; border: none; background: transparent; position: relative"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1F27" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg><span style="position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 4px; background: #DC2626"></span></button></div>
+    <label style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-radius: 10px; background: #F1F2F5; color: #5B6474"><input aria-label="Search" placeholder="Search diagrams and elements" style="border: none; outline: none; background: transparent; font: inherit; flex-grow: 1"></label>
+    <div role="tablist" aria-label="Library" style="display: flex; gap: 18px"><span role="tab" aria-selected="true" style="padding-bottom: 8px; border-bottom: 2px solid #4F46E5; font-weight: 600">For you · 3</span><span role="tab" aria-selected="false" style="padding-bottom: 8px; color: #5B6474">Recent</span><span role="tab" aria-selected="false" style="padding-bottom: 8px; color: #5B6474">Starred</span></div>
+  </header>
+  <div style="flex-grow: 1; padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <sc-for list="{{items}}" as="i" hint-placeholder-count="5">
+      <a href="MobileReview.dc.html" style="display: flex; gap: 12px; padding: 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; text-decoration: none; color: inherit; min-height: 44px">
+        <span style="width: 10px; height: 10px; border-radius: 5px; background: {{i.dot}}; margin-top: 6px; flex-shrink: 0"></span>
+        <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-weight: 600">{{i.title}}</span><span style="font-size: 13px; color: #5B6474">{{i.sub}}</span></span>
+      </a>
+    </sc-for>
+  </div>
+  <nav aria-label="Primary" style="height: 64px; display: flex; justify-content: space-around; align-items: center; background: #FFFFFF; border-top: 1px solid #E3E6EB; font-size: 11px">
+    <a href="MobileLibrary.dc.html" aria-current="page" style="width: 64px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #4338CA; font-weight: 600; text-decoration: none">Home</a>
+    <a href="MobileLibrary.dc.html" style="width: 64px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5B6474; text-decoration: none">Library</a>
+    <a href="MobileReview.dc.html" style="width: 64px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5B6474; text-decoration: none">Reviews</a>
+    <a href="MobileLibrary.dc.html" style="width: 64px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5B6474; text-decoration: none">Account</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      items: [
+        { title: 'Review requested · #16', sub: 'payments-saga.arch · [Architect] · 2 h', dot: '#4F46E5' },
+        { title: '[Engineer] mentioned you', sub: 'checkout-mesh.arch · Kafka Event Mesh', dot: '#4F46E5' },
+        { title: '3 drift changes', sub: 'edge-routing.arch · Kubernetes prod', dot: '#D97706' },
+        { title: 'checkout-mesh.arch', sub: 'Saved v14 · you edited yesterday', dot: '#C3C8D1' },
+        { title: 'identity-platform.arch', sub: 'Saved v2 · Mon', dot: '#C3C8D1' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

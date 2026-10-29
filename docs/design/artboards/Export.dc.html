@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Export and publish</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v12" hint-size="1440px,48px"></dc-import>
+  <div style="position: absolute; left: 0; right: 0; top: 48px; bottom: 0; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px"></div>
+  <div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(15,18,25,.45)"></div>
+
+  <section role="dialog" aria-modal="true" aria-label="Export and publish" style="position: absolute; left: 260px; top: 100px; width: 920px; height: 680px; box-sizing: border-box; background: #FFFFFF; border-radius: 14px; box-shadow: 0 24px 64px rgba(16,24,40,.25); display: flex; flex-direction: column; overflow: hidden">
+    <div style="display: flex; align-items: center; gap: 20px; padding: 0 24px; border-bottom: 1px solid #E3E6EB">
+      <h1 style="margin: 0; font-size: 17px; font-weight: 700; padding: 18px 0">Export &amp; publish</h1>
+      <div role="tablist" aria-label="Mode" style="display: flex; gap: 16px; align-self: stretch">
+        <button role="tab" aria-selected="true" style="border: none; border-bottom: 2px solid #4F46E5; background: transparent; font: inherit; font-weight: 600">Export file</button>
+        <button role="tab" aria-selected="false" style="border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; color: #5B6474">Publish &amp; embed</button>
+      </div>
+      <span style="flex-grow: 1"></span>
+      <button aria-label="Close" style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; font-size: 18px; color: #5B6474">×</button>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; min-height: 0">
+      <div style="width: 380px; flex-shrink: 0; padding: 20px 24px; border-right: 1px solid #EEF0F3; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 600; color: #5B6474">Format</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{formats}}" as="f" hint-placeholder-count="9">
+              <button aria-pressed="{{f.on}}" style="{{f.style}}"><span style="font-weight: 600">{{f.name}}</span><span style="font-size: 11px; color: #5B6474">{{f.sub}}</span></button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 600; color: #5B6474">Include</span>
+          <div role="radiogroup" aria-label="Scope" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 2px; background: #F1F2F5; border-radius: 8px">
+            <button role="radio" aria-checked="false" style="height: 30px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px">Selection</button>
+            <button role="radio" aria-checked="false" style="height: 30px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px">This page</button>
+            <button role="radio" aria-checked="true" style="height: 30px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-size: 12px; font-weight: 600">All 4 pages</button>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 600; color: #5B6474">Options</span>
+          <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked>Legend and title block</label>
+          <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox">Hidden layers</label>
+          <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox" checked>Fit each page to A4 landscape</label>
+          <label style="display: flex; align-items: center; gap: 8px"><input type="checkbox">Include comments as appendix</label>
+        </div>
+        <span style="flex-grow: 1"></span>
+        <button style="height: 40px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Export PDF · 4 pages</button>
+      </div>
+
+      <div style="flex-grow: 1; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; background: #FAFBFC">
+        <span style="font-size: 12px; font-weight: 600; color: #5B6474">Preview</span>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <sc-for list="{{pages}}" as="p" hint-placeholder-count="4">
+            <div style="aspect-ratio: 1.414; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 6px; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 11px; font-weight: 600">{{p}}</span>
+              <span style="flex-grow: 1; background-image: radial-gradient(#E3E6EB 1px, transparent 1px); background-size: 10px 10px; border-radius: 4px"></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding: 12px; border: 1px solid #E3E6EB; border-radius: 10px; background: #FFFFFF; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-weight: 600">Live image for READMEs</span>
+          <span style="color: #5B6474">Always shows the latest saved version.</span>
+          <code style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px; background: #F6F7F9; border-radius: 6px; overflow: hidden; white-space: nowrap">![checkout](https://[your-domain]/d/checkout-mesh.svg)</code>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = 'height: 56px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding: 0 10px; border-radius: 8px; font: inherit; text-align: left; ';
+    const f = (name, sub, on) => ({ name, sub, on: on ? 'true' : 'false', style: base + (on ? 'border: 1.5px solid #4F46E5; background: #EEF0FF' : 'border: 1px solid #E3E6EB; background: #FFFFFF') });
+    return {
+      formats: [f('PDF', 'Multi-page', true), f('PNG', 'Up to 4×'), f('SVG', 'Vector'), f('.arch', 'Model + views'), f('Mermaid', 'Text'), f('draw.io', 'Editable'), f('Visio', '.vsdx'), f('CSV', 'Elements'), f('Markdown', 'Docs')],
+      pages: ['1 · Context', '2 · Containers', '3 · Deployment', '4 · Checkout sequence']
+    };
+  }
+}
+</script>
+</body>
+</html>

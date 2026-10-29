@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Boundaries and relationships</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 40px 48px; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; gap: 28px">
+  <h1 style="margin: 0; font-size: 22px; font-weight: 700">Boundaries &amp; relationships</h1>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Boundaries — AWS group guidelines + C4 + threat model</h2>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+      <sc-for list="{{bounds}}" as="b" hint-placeholder-count="10">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="{{b.box}}"><span style="position: absolute; left: 8px; top: 6px; font-size: 11px; font-weight: 600; color: {{b.fg}}">{{b.label}}</span></div>
+          <span style="font-weight: 600; font-size: 12px">{{b.name}}</span>
+          <span style="font-size: 11px; color: #5B6474">{{b.rule}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Relationships — every line has a direction and a “verb · protocol” label</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 40px">
+      <sc-for list="{{rels}}" as="r" hint-placeholder-count="4">
+        <div style="display: flex; align-items: center; gap: 14px; height: 72px; padding: 0 16px; background: #F6F7F9; border-radius: 10px">
+          <span style="width: 92px; flex-shrink: 0; font-weight: 600; font-size: 12px">{{r.name}}</span>
+          <span style="width: 80px; height: 40px; flex-shrink: 0; box-sizing: border-box; border: 1.5px solid #2563EB; border-radius: 6px; background: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{r.from}}</span>
+          <span style="position: relative; flex-grow: 1; height: 24px; display: flex; align-items: center">
+            <span style="{{r.line}}"></span>
+            <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" style="position: absolute; right: -2px"><path d="{{r.head}}" fill="{{r.headFill}}" stroke="#5B6474" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <span style="position: absolute; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; white-space: nowrap">{{r.label}}</span>
+          </span>
+          <span style="width: 80px; height: 40px; flex-shrink: 0; box-sizing: border-box; border: 1.5px solid {{r.toColor}}; border-radius: 6px; background: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{r.to}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin: 0; font-size: 12px; color: #5B6474">Sync vs async is carried by line pattern and arrowhead, not colour. Crossing lines get a jump; sequence steps add a numbered badge (“1 · Charge card”).</p>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const box = (border, fill, radius) => 'position: relative; height: 110px; box-sizing: border-box; border: ' + border + '; background: ' + fill + '; border-radius: ' + radius + 'px';
+    const line = (style) => 'flex-grow: 1; height: 0; border-top: 1.5px ' + style + ' #5B6474';
+    const filled = 'M1 1 11 6 1 11z';
+    const open = 'M1 1 11 6 1 11';
+    return {
+      bounds: [
+        { name: 'Cloud account', label: 'AWS Cloud · prod', rule: 'Solid #232F3E, square', fg: '#232F3E', box: box('1.5px solid #232F3E', '#FFFFFF', 0) },
+        { name: 'Region', label: 'Region · eu-west-1', rule: 'Dashed #00A4A6', fg: '#007A7C', box: box('1.5px dashed #00A4A6', '#FFFFFF', 0) },
+        { name: 'VPC', label: 'VPC · 10.0.0.0/16', rule: 'Solid #8C4FFF', fg: '#6B2FD6', box: box('1.5px solid #8C4FFF', '#FFFFFF', 0) },
+        { name: 'Public subnet', label: 'Public subnet', rule: 'Solid #7AA116, light fill', fg: '#4D6B0A', box: box('1.5px solid #7AA116', '#F2F8E6', 0) },
+        { name: 'Private subnet', label: 'Private subnet', rule: 'Solid #00A4A6, light fill', fg: '#007A7C', box: box('1.5px solid #00A4A6', '#E6F6F7', 0) },
+        { name: 'Availability zone', label: 'AZ a', rule: 'Dashed #00A4A6', fg: '#007A7C', box: box('1.5px dashed #00A4A6', '#FFFFFF', 0) },
+        { name: 'Security group', label: 'SG · orders', rule: 'Solid #DD344C', fg: '#B42339', box: box('1.5px solid #DD344C', '#FFFFFF', 0) },
+        { name: 'Kubernetes cluster', label: 'Cluster · eks-prod', rule: 'Solid #326CE5 (namespace dashed)', fg: '#1F4FB8', box: box('1.5px solid #326CE5', '#FFFFFF', 6) },
+        { name: 'C4 system boundary', label: 'Checkout system', rule: 'Dashed grey, radius 12', fg: '#4B5563', box: box('1.5px dashed #6B7280', '#FFFFFF', 12) },
+        { name: 'Trust boundary', label: 'Trust boundary · internet', rule: '2 px dashed red', fg: '#B91C1C', box: box('2px dashed #DC2626', '#FFFFFF', 6) }
+      ],
+      rels: [
+        { name: 'Synchronous', from: 'Orders', to: 'Payments', toColor: '#2563EB', label: 'Calls · gRPC', line: line('solid'), head: filled, headFill: '#5B6474' },
+        { name: 'Asynchronous', from: 'Orders', to: 'Kafka', toColor: '#6D28D9', label: 'Publishes · order-created', line: line('dashed'), head: open, headFill: 'none' },
+        { name: 'Replication', from: 'Orders DB', to: 'Replica', toColor: '#B45309', label: 'Replicates · CDC', line: line('dotted'), head: filled, headFill: '#5B6474' },
+        { name: 'Bidirectional', from: 'Client', to: 'Gateway', toColor: '#7C3AED', label: 'Syncs · WebSocket', line: line('solid'), head: filled, headFill: '#5B6474' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

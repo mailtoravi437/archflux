@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Living sync drift inbox</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Sync" doc="edge-routing.arch" status="3 drift" status-dot="#D97706" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 28px 32px; overflow: hidden">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <h1 style="margin: 0; font-size: 22px; font-weight: 700">Sync</h1>
+          <p style="margin: 4px 0 0; color: #5B6474">Reality vs diagram for edge-routing.arch · last checked 09:00 · next in 52 min</p>
+        </div>
+        <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Check now</button>
+        <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Add source</button>
+      </div>
+
+      <section aria-label="Sources" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <sc-for list="{{sources}}" as="s" hint-placeholder-count="3">
+          <div style="background: #FFFFFF; border: 1px solid {{s.border}}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="font-weight: 600; flex-grow: 1">{{s.name}}</span><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: {{s.fg}}"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{s.dot}}"></span>{{s.state}}</span></span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5B6474">{{s.scope}}</span>
+            <span style="font-size: 12px; color: #5B6474">{{s.meta}}</span>
+          </div>
+        </sc-for>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid #EEF0F3">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Drift inbox · 3 open</h2>
+          <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Open · 3</button>
+          <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Ignored · 5</button>
+          <button style="height: 28px; padding: 0 12px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 600">Accept all into diagram</button>
+        </div>
+        <sc-for list="{{drift}}" as="d" hint-placeholder-count="3">
+          <div style="display: grid; grid-template-columns: 96px 1.4fr 1.4fr 1fr auto; gap: 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #F1F2F5">
+            <span style="text-align: center; padding: 2px 0; border-radius: 999px; font-size: 11px; font-weight: 600; background: {{d.bg}}; color: {{d.fg}}">{{d.kind}}</span>
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{d.name}}</span><span style="font-size: 12px; color: #5B6474">{{d.source}}</span></span>
+            <span style="display: flex; flex-direction: column; gap: 2px; font-family: 'JetBrains Mono', monospace; font-size: 12px"><span style="color: #5B6474">diagram: {{d.diagram}}</span><span>reality: {{d.reality}}</span></span>
+            <span style="font-size: 12px; color: #5B6474">{{d.when}}</span>
+            <span style="display: flex; gap: 6px">
+              <button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 600">Accept</button>
+              <button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Ignore…</button>
+              <button style="height: 30px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #4338CA">Create issue</button>
+            </span>
+          </div>
+        </sc-for>
+        <p style="margin: 0; padding: 12px 16px; font-size: 12px; color: #5B6474">Accepting creates a named version (“Synced from Kubernetes prod”) you can review or undo.</p>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      sources: [
+        { name: 'Kubernetes · prod', scope: 'cluster eks-prod / ns edge', meta: 'Hourly · 41 resources mapped', state: 'Connected', dot: '#15803D', fg: '#047857', border: '#E3E6EB' },
+        { name: 'OpenAPI · gateway', scope: 'github.com/[org]/edge/openapi.yaml', meta: 'On merge to main · 18 routes', state: 'Connected', dot: '#15803D', fg: '#047857', border: '#E3E6EB' },
+        { name: 'Terraform · network', scope: 's3://[bucket]/network.tfstate', meta: 'Credentials expired 2 days ago', state: 'Needs attention', dot: '#D97706', fg: '#92400E', border: '#F3D9A4' }
+      ],
+      drift: [
+        { kind: 'In reality', name: 'rate-limiter', source: 'Kubernetes · Deployment', diagram: '—', reality: '3 replicas, envoy filter', when: 'Seen 09:00', bg: '#DCF3E6', fg: '#047857' },
+        { kind: 'Changed', name: 'POST /orders', source: 'OpenAPI · route', diagram: 'v1 body', reality: 'v2 body (+ currency)', when: 'Merged #482', bg: '#FEF3C7', fg: '#92400E' },
+        { kind: 'Missing', name: 'legacy-billing', source: 'Kubernetes · Service', diagram: 'present', reality: 'not found in ns edge', when: 'Since Mon', bg: '#FDE8E8', fg: '#B91C1C' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

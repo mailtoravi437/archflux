@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Editing surfaces</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v13" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+
+    <!-- Shape library.
+         Placement (2026-10-26): the drawer is 300 px wide and fills the full height of the canvas column
+         (top 16 px to bottom 16 px as a floating layer in the app, left = tool rail + 10 px). It sits ABOVE the
+         canvas chrome (minimap, View toolbar and pages bar are z-index 44; the drawer is 46), so nothing from the
+         chrome overlaps its rows while it is open; closing it restores the chrome. Header and search stay fixed;
+         the body (Recent, Elements, Boundaries, AWS, Kubernetes, Generic) scrolls INSIDE the drawer
+         (overflow-y: auto, min-height: 0), so every section is reachable by scrolling and by keyboard.
+         Tile (2026-10-26): 68 px high, 4 per row (about 63 px wide), glyph 30 px, label 11 px / 13 px line height,
+         centred, wraps to at most 2 lines then ellipsis (line-clamp 2); the button carries title = full name and
+         aria-label = full label, so a clamped name is always readable. -->
+    <aside aria-label="Shapes" style="width: 300px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #E3E6EB; display: flex; flex-direction: column; min-height: 0">
+      <div style="padding: 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #EEF0F3">
+        <span style="font-weight: 600">Shapes</span>
+        <label style="display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px"><input aria-label="Search shapes" placeholder="Search 600+ shapes" style="border: none; outline: none; font: inherit; flex-grow: 1"></label>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap"><button aria-pressed="true" style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #EEF0FF; color: #4338CA; font: inherit; font-size: 11px; font-weight: 600">AWS</button><button style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">GCP</button><button style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Azure</button><button style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">K8s</button><button style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Generic</button><button style="height: 24px; padding: 0 8px; border: none; border-radius: 999px; background: #F1F2F5; font: inherit; font-size: 11px">Team</button></div>
+      </div>
+      <div style="padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex-grow: 1; min-height: 0">
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="3">
+          <span style="font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em">{{c.name}}</span>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+            <sc-for list="{{c.items}}" as="i" hint-placeholder-count="4">
+              <button aria-label="{{i.label}}" title="{{i.label}}" style="height: 68px; min-width: 0; padding: 0 2px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font: inherit; font-size: 11px; line-height: 13px; text-align: center; color: #3D4553"><img src="{{i.src}}" alt="" style="width: 30px; height: 30px; border-radius: 4px"><span style="max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere">{{i.short}}</span></button>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+      <div style="position: absolute; left: 80px; top: 100px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(79,70,229,.25)"><strong>Order Service</strong><br><span style="font-size: 11px; color: #5B6474">ECS · Java</span></div>
+
+      <!-- Context menu -->
+      <div role="menu" aria-label="Order Service actions" style="position: absolute; left: 280px; top: 140px; width: 260px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; box-shadow: 0 16px 40px rgba(16,24,40,.16); padding: 6px; display: flex; flex-direction: column">
+        <sc-for list="{{menu}}" as="m" hint-placeholder-count="14">
+          <div role="{{m.role}}" style="{{m.style}}"><span style="flex-grow: 1">{{m.label}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A93A3">{{m.key}}</span></div>
+        </sc-for>
+      </div>
+
+      <!-- Command palette -->
+      <section role="dialog" aria-label="Command palette" style="position: absolute; left: 600px; top: 60px; width: 520px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; box-shadow: 0 24px 64px rgba(16,24,40,.22); overflow: hidden">
+        <label style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 16px; border-bottom: 1px solid #EEF0F3"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 1px 6px; border: 1px solid #E3E6EB; border-radius: 4px; color: #5B6474">⌘K</span><input role="combobox" aria-label="Command" value="align" style="flex-grow: 1; border: none; outline: none; font: inherit; font-size: 16px"></label>
+        <div style="padding: 6px">
+          <sc-for list="{{cmds}}" as="c" hint-placeholder-count="7">
+            <span style="{{c.head}}">{{c.group}}</span>
+            <div role="option" aria-selected="{{c.sel}}" style="{{c.style}}"><span style="flex-grow: 1">{{c.label}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A93A3">{{c.key}}</span></div>
+          </sc-for>
+        </div>
+        <div style="padding: 8px 16px; border-top: 1px solid #EEF0F3; font-size: 12px; color: #5B6474">Selection actions first · ↵ run · Tab filter by group</div>
+      </section>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const item = 'display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-radius: 6px';
+    const sep = 'height: 1px; background: #EEF0F3; margin: 4px 6px';
+    const grp = 'padding: 6px 10px 2px; font-size: 11px; font-weight: 600; color: #8A93A3; text-transform: uppercase; letter-spacing: .04em';
+    const m = (label, key, kind) => kind === 'sep' ? { role: 'separator', style: sep, label: '', key: '' } : kind === 'grp' ? { role: 'presentation', style: grp, label, key: '' } : { role: 'menuitem', style: item + (kind === 'hot' ? '; background: #EEF0FF' : '') + (kind === 'danger' ? '; color: #B91C1C' : ''), label, key };
+    const head = 'display: block; padding: 8px 10px 4px; font-size: 11px; font-weight: 600; color: #8A93A3; text-transform: uppercase; letter-spacing: .04em';
+    const row = (sel) => 'display: flex; align-items: center; height: 36px; padding: 0 10px; border-radius: 8px; ' + (sel ? 'background: #EEF0FF; color: #4338CA; font-weight: 600' : '');
+    const c = (group, label, key, sel) => ({ group, label, key, sel: String(!!sel), head: group ? head : 'display: none', style: row(sel) });
+    const aws = (short, label, src) => ({ short, label, src });
+    return {
+      cats: [
+        { name: 'Recent', items: [aws('ECS', 'Amazon ECS', '/_blob/e9d65c3efbf0afdb9006180c72dbb273'), aws('RDS', 'Amazon RDS', '/_blob/66032cf016f46026ff1c9185b589dc11'), aws('SQS', 'Amazon SQS', '/_blob/67ab0cc4e093ff99e36923cbfa13c76c'), aws('Lambda', 'AWS Lambda', '/_blob/c5fed55c4e27375c5c92550690df10a3')] },
+        { name: 'Networking', items: [aws('API GW', 'Amazon API Gateway', '/_blob/b095ac2c62a6864313fcb2df4245f7a0'), aws('ALB', 'Application Load Balancer', '/_blob/acec25a5cefcf42b33d566843bd4fd5e'), aws('CloudFront', 'Amazon CloudFront', '/_blob/450b04b56db27a458ac0c463d881150c'), aws('SNS', 'Amazon SNS', '/_blob/04329d9e8c4341b49f039f73b0e34fd5')] },
+        { name: 'Storage & data', items: [aws('S3', 'Amazon S3', '/_blob/e4ade1ecf9f129cff015ca73f876d8c6'), aws('DynamoDB', 'Amazon DynamoDB', '/_blob/ad8c64041984db77a4c3310c268ec9a2'), aws('EC2', 'Amazon EC2', '/_blob/d68c7dcf3670048a74cc09ae0df352f5'), aws('CloudWatch', 'Amazon CloudWatch', '/_blob/d234f916976045977c391375eb791c88')] }
+      ],
+      menu: [
+        m('Edit', '', 'grp'), m('Rename', '↵'), m('Replace icon', ''), m('Duplicate', '⌘D'), m('Copy style', '⌥⌘C'),
+        m('', '', 'sep'), m('Arrange', '', 'grp'), m('Group into container', '⌘G'), m('Bring to front', '⌘]'),
+        m('', '', 'sep'), m('Display', '', 'grp'), m('Icon · Card · Shape', '⌥1/2/3'),
+        m('', '', 'sep'), m('Review', '', 'grp'), m('Comment', 'C', 'hot'), m('Show impact', 'I'), m('History of this element', ''),
+        m('', '', 'sep'), m('Delete', '⌫', 'danger')
+      ],
+      cmds: [
+        c('Selection', 'Align left', '⌥A', true), c('', 'Align centres vertically', '⌥V'), c('', 'Distribute horizontally', '⌥⇧H'),
+        c('Layout', 'Auto-layout selection (left → right)', '⌥L'), c('', 'Tidy up spacing', ''),
+        c('Recent', 'Name this version', '⌘⇧S'), c('', 'Show impact', 'I')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Public viewer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <header style="height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 20px; border-bottom: 1px solid #E3E6EB">
+    <span style="font-weight: 700; font-size: 15px">Checkout — Container view</span>
+    <span style="color: #5B6474">[Company] · updated 2 h ago · v13</span>
+    <span style="flex-grow: 1"></span>
+    <div role="tablist" aria-label="Pages" style="display: flex; gap: 2px"><button role="tab" aria-selected="false" style="height: 30px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; color: #5B6474">Context</button><button role="tab" aria-selected="true" style="height: 30px; padding: 0 10px; border: none; border-radius: 6px; background: #EEF0FF; color: #4338CA; font: inherit; font-weight: 600">Containers</button><button role="tab" aria-selected="false" style="height: 30px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; color: #5B6474">Deployment</button></div>
+    <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Present</button>
+    <a href="Welcome.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font-weight: 600; text-decoration: none">Sign in to comment</a>
+  </header>
+  <div style="flex-grow: 1; position: relative; background-image: radial-gradient(#E3E6EB 1px, transparent 1px); background-size: 20px 20px">
+    <div style="position: absolute; left: 200px; top: 180px; width: 200px; height: 72px; box-sizing: border-box; padding: 12px; border: 1.5px solid #7C3AED; border-radius: 8px; background: #FFFFFF"><strong>Load balancer</strong><br><span style="font-size: 11px; color: #5B6474">ALB</span></div>
+    <span style="position: absolute; left: 400px; top: 216px; width: 120px; border-top: 1.5px solid #5B6474"></span>
+    <div style="position: absolute; left: 520px; top: 180px; width: 200px; height: 72px; box-sizing: border-box; padding: 12px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; box-shadow: 0 0 0 3px rgba(79,70,229,.25)"><strong>Order Service</strong><br><span style="font-size: 11px; color: #5B6474">ECS · Java</span></div>
+    <span style="position: absolute; left: 720px; top: 216px; width: 120px; border-top: 1.5px dashed #5B6474"></span>
+    <div style="position: absolute; left: 840px; top: 180px; width: 200px; height: 72px; box-sizing: border-box; padding: 12px; border: 1.5px solid #6D28D9; border-radius: 8px; background: #FFFFFF"><strong>order-events</strong><br><span style="font-size: 11px; color: #5B6474">Kafka</span></div>
+
+    <section aria-label="Element details" style="position: absolute; left: 520px; top: 270px; width: 300px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; box-shadow: 0 12px 32px rgba(16,24,40,.12); padding: 14px; display: flex; flex-direction: column; gap: 6px">
+      <strong style="font-size: 15px">Order Service</strong>
+      <span style="color: #5B6474">Service · ECS · Java · Owner: Payments</span>
+      <span>Accepts orders, reserves stock, publishes order-created.</span>
+      <span style="font-size: 12px; color: #5B6474">2 relationships in · 3 out</span>
+    </section>
+
+    <div style="position: absolute; left: 20px; bottom: 20px; display: flex; gap: 4px; padding: 4px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px"><button aria-label="Zoom out" style="width: 32px; height: 32px; border: none; background: transparent; font: inherit">−</button><span style="display: flex; align-items: center; padding: 0 6px">100%</span><button aria-label="Zoom in" style="width: 32px; height: 32px; border: none; background: transparent; font: inherit">+</button><button style="height: 32px; padding: 0 10px; border: none; background: transparent; font: inherit">Fit</button><button style="height: 32px; padding: 0 10px; border: none; background: transparent; font: inherit">Layers</button></div>
+    <a href="Welcome.dc.html" style="position: absolute; right: 20px; bottom: 20px; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 999px; color: #1B1F27; text-decoration: none"><span style="width: 18px; height: 18px; border-radius: 5px; background: #4F46E5"></span><span>Made with <strong>ArchFlux</strong> · Create your own</span></a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

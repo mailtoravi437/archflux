@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Sync</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+
+  <header style="height: 48px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 26px; height: 26px; border-radius: 7px; background: #4F46E5; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></div>
+      <span style="font-weight: 700; font-size: 15px">ArchFlux</span>
+    </div>
+    <span style="width: 1px; height: 20px; background: #E3E6EB"></span>
+    <span style="font-weight: 600">checkout-mesh.arch</span>
+    <nav aria-label="Primary" style="display: flex; gap: 2px; margin-left: 12px">
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Library</a>
+      <a href="Main.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Canvas</a>
+      <a href="Review.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Review</a>
+      <a href="Sync.dc.html" aria-current="page" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; background: #EEF0FF; color: #4338CA; text-decoration: none; font-weight: 600">Sync</a>
+      <a href="Library.dc.html" style="height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; color: #5B6474; text-decoration: none; font-weight: 500">Blueprints</a>
+    </nav>
+    <div style="flex-grow: 1"></div>
+    <button style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; cursor: pointer" aria-label="Status: local diagram"><span style="width: 8px; height: 8px; border-radius: 4px; background: #8A93A3" aria-hidden="true"></span><span style="font-weight: 500">Local</span></button>
+    <button style="width: 32px; height: 32px; border-radius: 16px; border: none; background: #E8EAFD; color: #4338CA; font: inherit; font-weight: 700; cursor: pointer" aria-label="Account — Ravi">R</button>
+  </header>
+
+  <main style="flex-grow: 1; overflow: hidden; padding: 28px 32px">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Sync</h1>
+          <p style="margin: 4px 0 0; color: #5B6474">Compare this diagram with what is running. Connect a source to detect drift.</p>
+        </div>
+        <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Re-sync</button>
+        <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Add source</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Status</span><span style="font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #8A93A3" aria-hidden="true"></span>Not connected</span></div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Sources</span><span style="font-size: 18px; font-weight: 700">0</span></div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Mapped services</span><span style="font-size: 18px; font-weight: 700">9</span></div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Last re-sync</span><span style="font-size: 18px; font-weight: 700">Never</span></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+        <section style="grid-column: span 2; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Drift</h2><span style="font-size: 12px; color: #5B6474">Derived from the canvas until a source is connected</span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #EEF0F3; border-radius: 8px">
+            <span style="padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #FEF3C7; color: #92400E">Isolated</span>
+            <span style="font-weight: 600; flex-grow: 1">Billing Worker</span><span style="color: #5B6474">No routes in or out</span>
+            <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer">Bind</button>
+            <button style="height: 28px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #5B6474; cursor: pointer">Dismiss</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #EEF0F3; border-radius: 8px">
+            <span style="padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; background: #FDE8E8; color: #B91C1C">Dangling</span>
+            <span style="font-weight: 600; flex-grow: 1">Auth Gateway → ?</span><span style="color: #5B6474">Route has no target</span>
+            <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer">Remove</button>
+            <button style="height: 28px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #5B6474; cursor: pointer">Dismiss</button>
+          </div>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Sources</h2>
+          <p style="margin: 0; color: #5B6474">No sources yet. Record where this diagram's truth lives.</p>
+          <button style="height: 40px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FAFBFC; font: inherit; font-weight: 500; text-align: left; padding: 0 12px; cursor: pointer">Kubernetes cluster</button>
+          <button style="height: 40px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FAFBFC; font: inherit; font-weight: 500; text-align: left; padding: 0 12px; cursor: pointer">OpenAPI contract</button>
+          <button style="height: 40px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FAFBFC; font: inherit; font-weight: 500; text-align: left; padding: 0 12px; cursor: pointer">Terraform state</button>
+        </section>
+      </div>
+
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 12px">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Files</h2>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Download .arch</button>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">SVG</button>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">CSV</button>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Import .arch</button>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- 2026-10-26 R1 STATES (owner design review of #/living). The frame above is the empty "not connected" screen. This frame adds the states the app must show and the artboard did not: (1) drift empty, honest (no "matches upstream" claim, because nothing upstream is compared in R1); (2) a saved source row (configuration only: always "Not connected" until a real provider check exists, never "Connected"); (3) an Activity section (the re-sync log: empty text, newest first, only real attempts); (4) notice strips for offline and a failed re-sync. "Mapped services" counts the elements on the canvas. "Last re-sync" is "Never" until a real attempt, then its local time. Drift row actions: Bind opens the element on the canvas so the user can connect it (it never invents a route); Remove deletes the dangling route (undoable); Dismiss hides the row for this browser session. -->
+<div style="width: 1440px; height: 1240px; box-sizing: border-box; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Sync" status="Local" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; overflow: hidden; padding: 28px 32px">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Sync</h1>
+          <p style="margin: 4px 0 0; color: #5B6474">Compare this diagram with what is running. Connect a source to detect drift.</p>
+        </div>
+        <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Re-sync</button>
+        <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Add source</button>
+      </div>
+
+      <!-- Notice strips: 8 px radius, 3 px left rule, role=alert. Shown only when true. -->
+      <div role="alert" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-left: 3px solid #DC2626; border-radius: 8px; padding: 10px 14px"><strong>You are offline.</strong> Re-sync is paused until the connection returns. Nothing is lost.</div>
+      <div role="alert" aria-label="Sync failed" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-left: 3px solid #DC2626; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 8px"><strong>Sync failed.</strong><span style="font-size: 12px; flex-grow: 1">The server returned an error.</span><button style="height: 28px; padding: 0 10px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-size: 12px; font-weight: 600">Retry sync</button></div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Status</span><span style="font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #8A93A3" aria-hidden="true"></span>Not connected</span></div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Sources</span><span style="font-size: 18px; font-weight: 700">1</span></div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Mapped services</span><span style="font-size: 18px; font-weight: 700">9</span></div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; color: #5B6474">Last re-sync</span><span style="font-size: 18px; font-weight: 700">10:42:05</span></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+        <section style="grid-column: span 2; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Drift</h2><span style="font-size: 12px; color: #5B6474">Derived from the canvas until a source is connected</span></div>
+          <!-- Drift empty (honest) -->
+          <section aria-label="No drift on the canvas" style="display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; padding: 16px">
+            <span aria-hidden="true" style="width: 56px; height: 56px; border-radius: 14px; border: 1.5px dashed #C3C8D1"></span>
+            <strong style="font-size: 15px">No drift on the canvas</strong>
+            <span style="color: #5B6474; max-width: 360px">Every element has a route in or out, and every route has a target. Nothing is compared with a running system until a source is connected.</span>
+          </section>
+        </section>
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Sources</h2>
+          <!-- 2026-10-26 Add source dialog (role=dialog, aria-label "Add source"): fields Name, Type, target; helper text "No credentials needed. Secrets are never collected here. Saving records the source only; nothing is checked." (the old "connectors poll public or local specs" is removed: nothing polls). Save connector adds the row at once with the state "Not connected" (no "Polling" state, no timer) and the toast reads "Source saved. Not connected: no provider is verified yet." -->
+          <!-- Saved source row: same card as Drift.dc.html sources, state is always Not connected in R1. 2026-10-26: no Retry control (there is no live provider to retry against); Remove only. -->
+          <div style="border: 1px solid #E3E6EB; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="font-weight: 600; flex-grow: 1">E2E Kafka</span><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #5B6474"><span style="width: 8px; height: 8px; border-radius: 4px; background: #8A93A3" aria-hidden="true"></span>Not connected</span></span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5B6474">cluster: us-east-1-prod | ns: default</span>
+            <span style="font-size: 12px; color: #5B6474">Saved as configuration only. No provider check has run.</span>
+            <span style="display: flex; gap: 6px"><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; cursor: pointer">Remove</button></span>
+          </div>
+          <button style="height: 40px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FAFBFC; font: inherit; font-weight: 500; text-align: left; padding: 0 12px; cursor: pointer">Kubernetes cluster</button>
+          <button style="height: 40px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FAFBFC; font: inherit; font-weight: 500; text-align: left; padding: 0 12px; cursor: pointer">OpenAPI contract</button>
+          <button style="height: 40px; border: 1px dashed #C3C8D1; border-radius: 8px; background: #FAFBFC; font: inherit; font-weight: 500; text-align: left; padding: 0 12px; cursor: pointer">Terraform state</button>
+        </section>
+      </div>
+
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; align-items: center; gap: 12px">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600; flex-grow: 1">Files</h2>
+        <button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Download .arch</button><button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">SVG</button><button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">CSV</button><button style="height: 32px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; cursor: pointer">Import .arch</button>
+      </section>
+
+      <!-- Activity: new section. Newest first; empty text until a real re-sync attempt. -->
+      <section aria-label="Activity" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-size: 15px; font-weight: 600">Activity</h2><span style="font-size: 12px; color: #5B6474">Newest first</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; padding: 8px 12px; border: 1px solid #EEF0F3; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px"><span>No re-sync: no live source is connected</span><span style="color: #5B6474">10:42:05</span></div>
+        <!-- 2026-10-26: Re-sync with no connected source shows NO progress bar, no "Polling", no toast claiming work ran. It writes the line above, Status stays Not connected and Last re-sync stays Never (nothing was synced). -->
+        <span style="color: #5B6474">Empty: "No re-sync attempts yet." (shown instead of the row above)</span>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

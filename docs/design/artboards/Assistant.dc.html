@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — AI assistant proposed edit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Saved v12" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px; overflow: hidden">
+      <div style="position: absolute; left: 16px; top: 16px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #FFFBEB; border: 1px solid #F3D9A4; border-radius: 10px; z-index: 2">
+        <span style="font-weight: 600; color: #92400E">Previewing assistant change</span><span style="color: #3D4553">+1 element · +2 routes · 1 route moved</span>
+        <button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Discard</button>
+        <button style="height: 30px; padding: 0 12px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Accept change</button>
+      </div>
+      <div style="position: absolute; left: 120px; top: 200px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; background: #FFFFFF; border: 1.5px solid #7C3AED; border-radius: 8px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">API Gateway</span><span style="font-size: 11px; color: #5B6474">Envoy</span></div>
+      <span style="position: absolute; left: 310px; top: 232px; width: 130px; height: 2px; background: #15803D"></span>
+      <div style="position: absolute; left: 440px; top: 200px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; background: #DCF3E6; border: 1.5px dashed #15803D; border-radius: 8px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Redis cache</span><span style="font-size: 11px; color: #047857">proposed · ElastiCache</span></div>
+      <span style="position: absolute; left: 630px; top: 232px; width: 130px; height: 2px; background: #15803D"></span>
+      <div style="position: absolute; left: 760px; top: 200px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; background: #FFFFFF; border: 1.5px solid #2563EB; border-radius: 8px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">ECS</span></div>
+      <span style="position: absolute; left: 310px; top: 300px; width: 450px; height: 0; border-top: 1.5px dashed #B91C1C; opacity: .7"></span>
+      <span style="position: absolute; left: 470px; top: 290px; padding: 2px 8px; border-radius: 999px; background: #FDE8E8; color: #B91C1C; font-size: 11px; font-weight: 600">old direct route removed</span>
+      <div style="position: absolute; left: 760px; top: 380px; width: 190px; height: 64px; box-sizing: border-box; padding: 10px 12px; background: #FFFFFF; border: 1.5px solid #D97706; border-radius: 8px; display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Orders DB</span><span style="font-size: 11px; color: #5B6474">Aurora</span></div>
+      <span style="position: absolute; left: 855px; top: 264px; width: 1.5px; height: 116px; background: #8A93A3"></span>
+    </div>
+
+    <aside aria-label="Assistant" style="width: 380px; flex-shrink: 0; background: #FFFFFF; border-left: 1px solid #E3E6EB; display: flex; flex-direction: column">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #E3E6EB"><span style="width: 24px; height: 24px; border-radius: 6px; background: #EEF0FF; color: #4338CA; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-hidden="true">✦</span><span style="font-weight: 600; flex-grow: 1">Assistant</span><span style="font-size: 12px; color: #5B6474">Proposals only</span></div>
+      <div style="flex-grow: 1; padding: 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+        <div style="align-self: flex-end; max-width: 280px; padding: 10px 12px; border-radius: 12px 12px 2px 12px; background: #4F46E5; color: #FFFFFF">Add a Redis cache in front of Order Service for GET /orders</div>
+        <div style="max-width: 320px; padding: 12px; border-radius: 12px 12px 12px 2px; background: #F6F7F9; display: flex; flex-direction: column; gap: 8px">
+          <span>I'll add <strong>Redis cache</strong> (ElastiCache) between API Gateway and Order Service, and route reads through it. Writes still go direct.</span>
+          <span style="font-size: 12px; color: #5B6474">Changes: +1 element, +2 routes, −1 route. Shown on the canvas.</span>
+          <span style="padding: 8px 10px; border-radius: 8px; background: #FFFBEB; border: 1px solid #F3D9A4; font-size: 12px; color: #92400E">Check: cache invalidation on order updates isn't modelled yet.</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span style="font-size: 12px; font-weight: 600; color: #5B6474">Try</span>
+          <button style="height: 34px; text-align: left; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit">Review this diagram for single points of failure</button>
+          <button style="height: 34px; text-align: left; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit">Write an ADR for the caching decision</button>
+          <button style="height: 34px; text-align: left; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit">Explain this diagram for a new hire</button>
+        </div>
+      </div>
+      <label style="margin: 12px 16px 16px; display: flex; gap: 8px; align-items: center; padding: 6px 6px 6px 12px; border: 1px solid #E3E6EB; border-radius: 10px">
+        <input aria-label="Ask the assistant" placeholder="Ask or describe a change…" style="flex-grow: 1; border: none; outline: none; font: inherit; font-size: 14px">
+        <button style="height: 32px; padding: 0 12px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Send</button>
+      </label>
+    </aside>
+  </div>
+</div>
+
+<!-- 2026-10-26 R1 STATE: the assistant is R2 (PRODUCT_SPEC 3.7, FL-11, SC-40). In R1 the canvas dock tab "AI assistant" shows only this honest notice. No sample AI output, no input, no Send, no "Try" suggestions, nothing that acts. The screen above is the R2 target. -->
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Canvas" status="Local · 3 issues" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: flex; min-height: 0">
+    <div style="flex-grow: 1; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px"></div>
+    <!-- Dock 320 px, tab "AI assistant" selected -->
+    <aside aria-label="Inspector" style="width: 320px; flex-shrink: 0; background: #FFFFFF; border-left: 1px solid #E3E6EB; display: flex; flex-direction: column; min-height: 0">
+      <div role="tablist" aria-label="Right panel" style="display: flex; gap: 2px; padding: 8px 12px 0; border-bottom: 1px solid #E3E6EB">
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #5B6474">Inspector</button>
+        <button role="tab" aria-selected="true" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid #4F46E5; background: transparent; font: inherit; font-weight: 600; color: #1B1F27">AI assistant</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #5B6474">Live</button>
+        <button role="tab" aria-selected="false" style="height: 36px; padding: 0 8px; border: none; border-bottom: 2px solid transparent; background: transparent; font: inherit; font-weight: 500; color: #5B6474">History</button>
+        <span style="flex-grow: 1"></span>
+        <button aria-label="Close panel" style="width: 28px; height: 28px; align-self: center; border: none; background: transparent; border-radius: 6px; color: #5B6474; font-size: 16px">×</button>
+      </div>
+      <div role="tabpanel" aria-label="AI assistant" style="padding: 24px 16px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #EEF0FF; color: #4338CA; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-hidden="true">✦</span>
+        <span style="height: 20px; padding: 0 8px; border-radius: 10px; background: #EEF0FF; color: #4338CA; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center">Coming in R2</span>
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600; color: #1B1F27">Assistant arrives in R2</h2>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #3D4553">The AI assistant is not available in this release. Nothing here is generated, and your diagram is never sent anywhere.</p>
+        <span style="font-size: 12px; font-weight: 600; color: #5B6474">What it will do</span>
+        <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; line-height: 1.5; color: #5B6474">
+          <li>Propose changes you preview on the canvas and accept or discard</li>
+          <li>Review a diagram for single points of failure</li>
+          <li>Draft an ADR for a design decision</li>
+          <li>Explain a diagram for a new teammate</li>
+        </ul>
+        <p style="margin: 0; padding-top: 12px; border-top: 1px solid #E3E6EB; font-size: 12px; line-height: 1.5; color: #5B6474">Looking for lint checks? Open the status menu in the app bar and choose Linter.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

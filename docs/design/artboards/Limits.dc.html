@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Limits and billing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: grid; grid-template-columns: 520px minmax(0, 1fr); gap: 24px; padding: 24px 32px; overflow: hidden">
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <section role="dialog" aria-label="Limit reached" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; box-shadow: 0 16px 40px rgba(16,24,40,.12); padding: 22px; display: flex; flex-direction: column; gap: 12px">
+        <span style="padding: 2px 10px; width: fit-content; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-size: 12px; font-weight: 600">Free plan · 3 of 3 cloud diagrams</span>
+        <h1 style="margin: 0; font-size: 18px; font-weight: 700">Save a 4th diagram to the cloud with Team</h1>
+        <p style="margin: 0; color: #5B6474">Nothing is blocked: your diagrams stay viewable, editable, exportable and deletable. This one stays on this device until you upgrade or free a slot.</p>
+        <ul style="margin: 0; padding-left: 18px; color: #3D4553; line-height: 22px"><li>Unlimited cloud diagrams and history</li><li>Proposals, reviews and GitHub</li><li>2 live sync sources</li></ul>
+        <div style="display: flex; gap: 8px"><button style="height: 38px; padding: 0 16px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Start 14-day Team trial</button><button style="height: 38px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 500">Keep on this device</button></div>
+      </section>
+      <section aria-label="Non-admin variant" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 11px; font-weight: 600; color: #5B6474">When you're not an admin</span>
+        <strong>Proposals are a Team feature</strong>
+        <span style="color: #5B6474">Ask [Admin] to upgrade — we'll include what you were trying to do.</span>
+        <button style="height: 34px; width: fit-content; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 500">Ask an admin</button>
+      </section>
+    </div>
+
+    <section aria-label="Plan and billing" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+      <div style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 20px; font-weight: 700; flex-grow: 1">Plan &amp; billing</h2><span style="color: #5B6474">Workspace settings</span></div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <div style="padding: 16px; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; gap: 6px"><strong>Free</strong><span style="font-size: 22px; font-weight: 700">$0</span><span style="color: #5B6474">3 cloud diagrams · 3 editors · 30-day history</span><span style="margin-top: 6px; font-size: 12px; color: #5B6474">Current plan</span></div>
+        <div style="padding: 16px; border: 1.5px solid #4F46E5; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 0 0 4px rgba(79,70,229,.08)"><strong>Team</strong><span style="font-size: 22px; font-weight: 700">[$ per editor / month]</span><span style="color: #5B6474">Unlimited diagrams · proposals &amp; reviews · GitHub · 2 sync sources</span><button style="margin-top: 6px; height: 34px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Upgrade</button></div>
+        <div style="padding: 16px; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; gap: 6px"><strong>Enterprise</strong><span style="font-size: 22px; font-weight: 700">Custom</span><span style="color: #5B6474">SSO/SCIM · audit · data residency · unlimited sources</span><button style="margin-top: 6px; height: 34px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 500">Contact sales</button></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+        <div style="padding: 14px; background: #F6F7F9; border-radius: 10px"><span style="font-size: 12px; color: #5B6474">Editors</span><br><strong style="font-size: 18px">3 / 3</strong></div>
+        <div style="padding: 14px; background: #F6F7F9; border-radius: 10px"><span style="font-size: 12px; color: #5B6474">Cloud diagrams</span><br><strong style="font-size: 18px">3 / 3</strong></div>
+        <div style="padding: 14px; background: #F6F7F9; border-radius: 10px"><span style="font-size: 12px; color: #5B6474">Viewers &amp; commenters</span><br><strong style="font-size: 18px">Free, unlimited</strong></div>
+      </div>
+      <p style="margin: 0; font-size: 12px; color: #5B6474">Viewers and commenters never need a paid seat. Cancelling keeps every diagram readable and exportable. Prices are placeholders pending the pricing decision (PRODUCT_SPEC Q6).</p>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return { no: false }; }
+}
+</script>
+</body>
+</html>

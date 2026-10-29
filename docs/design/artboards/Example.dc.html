@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Example checkout system in standard notation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#E3E6EB 1px, transparent 1px); background-size: 20px 20px; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <span style="position: absolute; left: 40px; top: 24px; font-size: 18px; font-weight: 700">Checkout — Container view (C4 L2)</span>
+
+  <!-- Person -->
+  <div style="position: absolute; left: 40px; top: 360px; display: flex; flex-direction: column; align-items: center">
+    <svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="1.5"/></svg>
+    <div style="margin-top: -6px; width: 120px; height: 52px; box-sizing: border-box; padding: 8px; border: 1.5px solid #1E3A8A; border-radius: 26px 26px 10px 10px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center"><span style="font-weight: 600">Shopper</span><span style="font-size: 11px; color: #5B6474">Person</span></div>
+  </div>
+
+  <!-- AWS Cloud / Region / VPC -->
+  <div style="position: absolute; left: 220px; top: 70px; width: 1000px; height: 800px; border: 1.5px solid #232F3E"><span style="position: absolute; left: 8px; top: 6px; font-size: 11px; font-weight: 700; color: #232F3E">AWS Cloud · prod</span></div>
+  <div style="position: absolute; left: 240px; top: 100px; width: 960px; height: 750px; border: 1.5px dashed #00A4A6"><span style="position: absolute; left: 8px; top: 6px; font-size: 11px; font-weight: 600; color: #007A7C">Region · eu-west-1</span></div>
+
+  <!-- CDN (outside VPC, inside region edge) -->
+  <div style="position: absolute; left: 270px; top: 360px; width: 170px; height: 72px; box-sizing: border-box; padding: 10px; border: 1.5px solid #0E7490; border-radius: 8px; background: #FFFFFF; display: flex; gap: 8px"><img src="/_blob/450b04b56db27a458ac0c463d881150c" alt="" style="width: 30px; height: 30px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">Edge CDN</span><span style="font-size: 11px; color: #5B6474">CloudFront</span></span></div>
+
+  <div style="position: absolute; left: 470px; top: 140px; width: 710px; height: 690px; border: 1.5px solid #8C4FFF"><span style="position: absolute; left: 8px; top: 6px; font-size: 11px; font-weight: 600; color: #6B2FD6">VPC · 10.0.0.0/16</span></div>
+  <div style="position: absolute; left: 490px; top: 175px; width: 190px; height: 630px; border: 1.5px solid #7AA116; background: #F2F8E6"><span style="position: absolute; left: 8px; top: 6px; font-size: 11px; font-weight: 600; color: #4D6B0A">Public subnet</span></div>
+  <div style="position: absolute; left: 700px; top: 175px; width: 460px; height: 630px; border: 1.5px solid #00A4A6; background: #E6F6F7"><span style="position: absolute; left: 8px; top: 6px; font-size: 11px; font-weight: 600; color: #007A7C">Private subnet</span></div>
+
+  <!-- Gateway -->
+  <div style="position: absolute; left: 505px; top: 360px; width: 160px; height: 72px; box-sizing: border-box; padding: 10px; border: 1.5px solid #7C3AED; border-radius: 8px; background: #FFFFFF; display: flex; gap: 8px"><img src="/_blob/acec25a5cefcf42b33d566843bd4fd5e" alt="" style="width: 30px; height: 30px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">Load balancer</span><span style="font-size: 11px; color: #5B6474">ALB</span></span></div>
+
+  <!-- Services -->
+  <div style="position: absolute; left: 730px; top: 240px; width: 180px; height: 72px; box-sizing: border-box; padding: 10px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; gap: 8px"><img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 30px; height: 30px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">ECS · Java</span></span></div>
+  <div style="position: absolute; left: 730px; top: 480px; width: 180px; height: 72px; box-sizing: border-box; padding: 10px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF; display: flex; gap: 8px"><img src="/_blob/e9d65c3efbf0afdb9006180c72dbb273" alt="" style="width: 30px; height: 30px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">Payment Service</span><span style="font-size: 11px; color: #5B6474">ECS · Go</span></span></div>
+  <div style="position: absolute; left: 730px; top: 680px; width: 180px; height: 72px; box-sizing: border-box; padding: 10px; border: 1.5px solid #C2410C; border-radius: 8px; background: #FFFFFF; display: flex; gap: 8px"><img src="/_blob/c5fed55c4e27375c5c92550690df10a3" alt="" style="width: 30px; height: 30px; border-radius: 4px"><span style="display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">Receipt mailer</span><span style="font-size: 11px; color: #5B6474">Lambda · Node</span></span></div>
+
+  <!-- Data: RDS cylinder -->
+  <div style="position: absolute; left: 970px; top: 210px; width: 160px; height: 96px">
+    <svg width="160" height="96" viewBox="0 0 160 96" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M1 12v72c0 6 35.4 11 79 11s79-5 79-11V12" fill="#FFFFFF" stroke="#B45309" stroke-width="1.5"/><ellipse cx="80" cy="12" rx="79" ry="11" fill="#FFFFFF" stroke="#B45309" stroke-width="1.5"/></svg>
+    <span style="position: absolute; left: 12px; top: 32px; display: flex; gap: 6px"><img src="/_blob/66032cf016f46026ff1c9185b589dc11" alt="" style="width: 26px; height: 26px; border-radius: 4px"><span style="display: flex; flex-direction: column"><span style="font-weight: 600">Orders DB</span><span style="font-size: 11px; color: #5B6474">Aurora PostgreSQL</span></span></span>
+  </div>
+  <!-- Redis cache cylinder -->
+  <div style="position: absolute; left: 970px; top: 330px; width: 160px; height: 96px">
+    <svg width="160" height="96" viewBox="0 0 160 96" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M1 12v72c0 6 35.4 11 79 11s79-5 79-11V12" fill="#FFFFFF" stroke="#B91C1C" stroke-width="1.5"/><ellipse cx="80" cy="12" rx="79" ry="11" fill="#FFFFFF" stroke="#B91C1C" stroke-width="1.5"/></svg>
+    <span style="position: absolute; left: 12px; top: 32px; display: flex; gap: 6px"><span style="width: 26px; height: 26px; border-radius: 6px; background: #FDE8E8; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="#B91C1C" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><span style="display: flex; flex-direction: column"><span style="font-weight: 600">Cart cache</span><span style="font-size: 11px; color: #5B6474">Redis · ElastiCache</span></span></span>
+  </div>
+  <!-- SQS queue pipe -->
+  <div style="position: absolute; left: 950px; top: 490px; width: 196px; height: 70px">
+    <svg width="196" height="70" viewBox="0 0 196 70" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M15 1h166c7 0 14 15.2 14 34s-7 34-14 34H15C7 69 1 53.8 1 35S7 1 15 1z" fill="#FFFFFF" stroke="#BE185D" stroke-width="1.5"/><ellipse cx="181" cy="35" rx="14" ry="34" fill="#FFFFFF" stroke="#BE185D" stroke-width="1.5"/><path d="M126 22v26M140 22v26M154 22v26" stroke="#F9A8D4" stroke-width="5" stroke-linecap="round"/></svg>
+    <span style="position: absolute; left: 12px; top: 18px; display: flex; gap: 6px"><img src="/_blob/67ab0cc4e093ff99e36923cbfa13c76c" alt="" style="width: 26px; height: 26px; border-radius: 4px"><span style="display: flex; flex-direction: column"><span style="font-weight: 600">receipts</span><span style="font-size: 11px; color: #5B6474">SQS</span></span></span>
+  </div>
+  <!-- S3 bucket -->
+  <div style="position: absolute; left: 970px; top: 670px; width: 160px; height: 92px">
+    <svg width="160" height="92" viewBox="0 0 160 92" aria-hidden="true" style="position: absolute; left: 0; top: 0"><path d="M1 11 13 82c1 5 31 9 67 9s66-4 67-9l12-71" fill="#FFFFFF" stroke="#15803D" stroke-width="1.5"/><ellipse cx="80" cy="11" rx="79" ry="10" fill="#FFFFFF" stroke="#15803D" stroke-width="1.5"/></svg>
+    <span style="position: absolute; left: 22px; top: 32px; display: flex; gap: 6px"><img src="/_blob/e4ade1ecf9f129cff015ca73f876d8c6" alt="" style="width: 26px; height: 26px; border-radius: 4px"><span style="display: flex; flex-direction: column"><span style="font-weight: 600">Receipts</span><span style="font-size: 11px; color: #5B6474">S3</span></span></span>
+  </div>
+
+  <!-- External -->
+  <div style="position: absolute; left: 1250px; top: 480px; width: 160px; height: 72px; box-sizing: border-box; padding: 10px; border: 1.5px dashed #6B7280; border-radius: 8px; background: #F3F4F6; display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">Card processor</span><span style="font-size: 11px; color: #5B6474">External system</span></div>
+
+  <!-- Relationships -->
+  <span style="position: absolute; left: 160px; top: 396px; width: 110px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 440px; top: 396px; width: 65px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 665px; top: 396px; width: 35px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 700px; top: 276px; height: 120px; border-left: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 700px; top: 276px; width: 30px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 910px; top: 258px; width: 60px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 910px; top: 290px; width: 40px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 950px; top: 290px; height: 88px; border-left: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 950px; top: 378px; width: 20px; border-top: 1.5px solid #5B6474"></span>
+  <span style="position: absolute; left: 820px; top: 312px; height: 168px; border-left: 1.5px dashed #5B6474"></span>
+  <span style="position: absolute; left: 910px; top: 525px; width: 40px; border-top: 1.5px dashed #5B6474"></span>
+  <span style="position: absolute; left: 1146px; top: 516px; width: 104px; border-top: 1.5px solid #5B6474; transform: translateY(0)"></span>
+  <span style="position: absolute; left: 1050px; top: 560px; height: 120px; border-left: 1.5px dashed #5B6474"></span>
+  <span style="position: absolute; left: 910px; top: 716px; width: 60px; border-top: 1.5px solid #5B6474"></span>
+
+  <span style="position: absolute; left: 172px; top: 384px; padding: 1px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px">Uses · HTTPS</span>
+  <span style="position: absolute; left: 914px; top: 236px; padding: 1px 6px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 10px">SQL</span>
+  <span style="position: absolute; left: 828px; top: 380px; padding: 1px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px">Requests payment · async</span>
+  <span style="position: absolute; left: 1150px; top: 494px; padding: 1px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px">Charges · HTTPS</span>
+  <span style="position: absolute; left: 1058px; top: 610px; padding: 1px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px">Triggers</span>
+  <span style="position: absolute; left: 914px; top: 694px; padding: 1px 6px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 10px">Writes PDF</span>
+
+  <!-- Legend -->
+  <section aria-label="Legend" style="position: absolute; left: 40px; top: 640px; width: 150px; padding: 10px 12px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; display: flex; flex-direction: column; gap: 6px; font-size: 11px">
+    <span style="font-weight: 700">Legend</span>
+    <span style="display: flex; align-items: center; gap: 6px"><span style="width: 28px; border-top: 1.5px solid #5B6474"></span>Synchronous</span>
+    <span style="display: flex; align-items: center; gap: 6px"><span style="width: 28px; border-top: 1.5px dashed #5B6474"></span>Asynchronous</span>
+    <span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 10px; border: 1.5px dashed #6B7280; background: #F3F4F6"></span>External</span>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

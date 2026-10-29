@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux app bar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<!-- 2026-10-26 Status menu and Linter (SC-12). The status button (32 px, label "Local · N issues") opens a menu (role="menu", aria-label "Status", 10 px radius, 6 px padding, 1px #E3E6EB border) with: Save to server, Export .arch, Linter (N issues), Re-sync.
+     "Linter (N issues)" is the only entry point to the lint list now that the dock has no Linter tab. It opens a modal dialog (role="dialog", aria-modal, aria-label "Architecture linter"): 480 px wide, max-height 80vh, radius 12 px, bg #FFFFFF, 1px #E3E6EB border, shadow 0 12px 32px rgba(0,0,0,.18), over a rgba(0,0,0,.40) scrim.
+     Dialog header 48 px high, 16 px padding, bottom border #E3E6EB: title "Architecture linter" (15 px / 600) with an amber count pill (18 px high, #FEF3C7 bg, #92400E text, 11 px / 600) showing the real issue count; right side "Auto-Heal All" (32 px high, #4F46E5 bg, #FFFFFF, 13 px / 600, radius 6 px) and a 28 px "Close" x button. Body scrolls, 16 px padding, 10 px gap between lint cards. Cards are the existing lint cards (Isolated / Dangling / Protocol ambiguity, with Inspect and the fix button). Zero issues: one card "Zero lint errors" with an emerald (#15803D) left border. Esc closes, focus is trapped and returns to the status button. The count in the menu item and the dialog are the same number as the status label. -->
+<header style="height: 48px; box-sizing: border-box; display: flex; align-items: center; gap: 16px; padding: 0 16px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB; font-family: Inter, system-ui, sans-serif; font-size: 13px; color: #1B1F27">
+  <div style="display: flex; align-items: center; gap: 10px">
+    <div style="width: 26px; height: 26px; border-radius: 7px; background: #4F46E5; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg></div>
+    <span style="font-weight: 700; font-size: 15px">ArchFlux</span>
+  </div>
+  <sc-if value="{{showDoc}}" hint-placeholder-val="{{true}}">
+    <span style="width: 1px; height: 20px; background: #E3E6EB"></span>
+    <!-- Doc title is capped (2026-10-26): max-width 240, one line, ellipsis, full name in title + aria-label; nav and search keep their positions. -->
+    <button title="{{doc}}" style="display: flex; align-items: center; gap: 6px; height: 32px; max-width: 240px; min-width: 0; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; font-weight: 600; color: #1B1F27; cursor: pointer" aria-label="Diagram: {{doc}}. Switch, rename or create"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{doc}}</span><svg style="flex-shrink: 0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  </sc-if>
+  <nav aria-label="Primary" style="display: flex; gap: 2px; margin-left: 12px">
+    <sc-for list="{{nav}}" as="n" hint-placeholder-count="5">
+      <a href="{{n.href}}" style="{{n.style}}">{{n.label}}</a>
+    </sc-for>
+  </nav>
+  <div style="flex-grow: 1"></div>
+  <button style="display: flex; align-items: center; gap: 8px; height: 32px; width: 200px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #F6F7F9; font: inherit; color: #5B6474; cursor: pointer" aria-label="Search and commands (Command K)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span style="flex-grow: 1; text-align: left">Search</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 1px 5px; border: 1px solid #E3E6EB; border-radius: 4px; background: #FFFFFF">⌘K</span></button>
+  <sc-if value="{{showStatus}}" hint-placeholder-val="{{true}}">
+    <button style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; color: #1B1F27; cursor: pointer" aria-label="Diagram status">
+      <span style="width: 8px; height: 8px; border-radius: 4px; background: {{statusDot}}" aria-hidden="true"></span><span style="font-weight: 500">{{status}}</span>
+    </button>
+    <button style="height: 32px; padding: 0 14px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Share</button>
+  </sc-if>
+  <button style="width: 32px; height: 32px; border: none; background: transparent; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative" aria-label="Notifications, 3 unread"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6474" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span style="position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 4px; background: #DC2626; border: 1.5px solid #FFFFFF"></span></button>
+  <button style="width: 32px; height: 32px; border-radius: 16px; border: none; background: #E8EAFD; color: #4338CA; font: inherit; font-weight: 700; cursor: pointer" aria-label="Account">R</button>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["Home","Library","Canvas","Review","Sync","Blueprints"],"default":"Canvas"},"doc":{"editor":"text","default":"checkout-mesh.arch"},"status":{"editor":"text","default":"Saved v12"},"statusDot":{"editor":"color","default":"#15803D"},"showDoc":{"editor":"boolean","default":true},"showStatus":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":48}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const active = this.props.active ?? 'Canvas';
+    const items = [
+      { label: 'Home', href: 'Home.dc.html' },
+      { label: 'Library', href: 'Library.dc.html' },
+      { label: 'Canvas', href: 'Main.dc.html' },
+      { label: 'Review', href: 'Review.dc.html' },
+      { label: 'Sync', href: 'Drift.dc.html' }
+    ];
+    const base = 'height: 32px; display: flex; align-items: center; padding: 0 12px; border-radius: 6px; text-decoration: none; ';
+    return {
+      nav: items.map((i) => ({ ...i, style: base + (i.label === active ? 'background: #EEF0FF; color: #4338CA; font-weight: 600' : 'color: #5B6474; font-weight: 500') })),
+      doc: this.props.doc ?? 'checkout-mesh.arch',
+      status: this.props.status ?? 'Saved v12',
+      statusDot: this.props.statusDot ?? '#15803D',
+      showDoc: this.props.showDoc ?? true,
+      showStatus: this.props.showStatus ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>

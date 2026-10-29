@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Import mapping</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 28px 32px; overflow: hidden">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1">
+          <p style="margin: 0 0 4px; font-size: 12px; color: #5B6474">New diagram › Import file</p>
+          <h1 style="margin: 0; font-size: 22px; font-weight: 700">Review import: payments.drawio</h1>
+          <p style="margin: 4px 0 0; color: #5B6474">34 shapes found → 22 elements, 9 annotations, 3 skipped · 28 connectors → relationships</p>
+        </div>
+        <a href="NewDiagram.dc.html" style="height: 36px; display: flex; align-items: center; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; color: #1B1F27; font-weight: 500; text-decoration: none">Back</a>
+        <a href="Main.dc.html" style="height: 36px; display: flex; align-items: center; padding: 0 16px; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font-weight: 600; text-decoration: none">Import 31 items</a>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center; padding: 12px 14px; background: #FFFBEB; border: 1px solid #F3D9A4; border-radius: 10px">
+        <span style="width: 20px; height: 20px; border-radius: 10px; background: #FEF3C7; color: #92400E; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-hidden="true">!</span>
+        <span style="flex-grow: 1"><strong>3 shapes will be skipped</strong> — embedded images and a custom stencil we can't read. They are listed below; nothing else is changed.</span>
+        <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer">Download report</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+        <section style="grid-column: span 3; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden">
+          <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 40px; gap: 8px; padding: 10px 16px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em">
+            <span>Shape in file</span><span>Becomes</span><span>Confidence</span><span></span>
+          </div>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 40px; gap: 8px; padding: 10px 16px; border-top: 1px solid #F1F2F5; align-items: center">
+              <span style="display: flex; flex-direction: column"><span style="font-weight: 600">{{r.name}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5B6474">{{r.src}}</span></span>
+              <select aria-label="Map {{r.name}} to" style="height: 32px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit"><option>{{r.to}}</option><option>Annotation</option><option>Skip</option></select>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: {{r.fg}}; font-weight: 500"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{r.dot}}"></span>{{r.conf}}</span>
+              <input type="checkbox" checked aria-label="Include {{r.name}}" style="width: 16px; height: 16px">
+            </div>
+          </sc-for>
+        </section>
+        <section style="grid-column: span 2; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">Preview</h2>
+          <div role="img" aria-label="Import preview" style="height: 300px; position: relative; background: #F6F7F9; border-radius: 8px">
+            <span style="position: absolute; left: 20px; top: 20px; width: 360px; height: 250px; border: 1.5px dashed #2563EB; border-radius: 10px"></span>
+            <span style="position: absolute; left: 30px; top: 26px; font-size: 11px; font-weight: 600; color: #1D4ED8">VPC · prod</span>
+            <span style="position: absolute; left: 50px; top: 70px; width: 90px; height: 36px; border: 1.5px solid #7C3AED; border-radius: 6px; background: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">ALB</span>
+            <span style="position: absolute; left: 190px; top: 70px; width: 90px; height: 36px; border: 1.5px solid #2563EB; border-radius: 6px; background: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Payments</span>
+            <span style="position: absolute; left: 190px; top: 170px; width: 90px; height: 36px; border: 1.5px solid #D97706; border-radius: 6px; background: #FFFFFF; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Ledger DB</span>
+            <span style="position: absolute; left: 140px; top: 88px; width: 50px; height: 1.5px; background: #8A93A3"></span>
+            <span style="position: absolute; left: 235px; top: 106px; width: 1.5px; height: 64px; background: #8A93A3"></span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-weight: 600">Options</span>
+            <label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked>Keep original positions</label>
+            <label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked>Turn grouped boxes into containers</label>
+            <label style="display: flex; gap: 8px; align-items: center"><input type="checkbox">Replace icons with official AWS shapes</label>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const hi = { conf: 'High', dot: '#15803D', fg: '#047857' };
+    const md = { conf: 'Check', dot: '#D97706', fg: '#92400E' };
+    const no = { conf: 'Skipped', dot: '#B91C1C', fg: '#B91C1C' };
+    return {
+      no: false,
+      rows: [
+        { name: 'VPC prod', src: 'mxgraph.aws4.group_vpc', to: 'Container · VPC', ...hi },
+        { name: 'ALB', src: 'mxgraph.aws4.application_load_balancer', to: 'Gateway · Load balancer', ...hi },
+        { name: 'Payments', src: 'mxgraph.aws4.ecs_service', to: 'Service · ECS', ...hi },
+        { name: 'Ledger DB', src: 'mxgraph.aws4.rds_instance', to: 'Data store · RDS', ...hi },
+        { name: 'Fraud check', src: 'rounded=1;fillColor=#fff', to: 'Service', ...md },
+        { name: 'Notes', src: 'text;html=1', to: 'Annotation · Text', ...hi },
+        { name: 'logo.png', src: 'image;embedded', to: 'Skip', ...no },
+        { name: 'Custom stencil', src: 'stencil(eJy...)', to: 'Skip', ...no }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

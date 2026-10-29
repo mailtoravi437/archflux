@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Proposals</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Review" status="Saved v13" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 24px 32px; overflow: hidden">
+    <div style="max-width: 1100px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <div style="flex-grow: 1"><h1 style="margin: 0; font-size: 22px; font-weight: 700">Proposals</h1><p style="margin: 4px 0 0; color: #5B6474">checkout-mesh.arch · main is protected: 2 approvals + owner review + resolved threads</p></div>
+        <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">New proposal</button>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button aria-pressed="true" style="height: 30px; padding: 0 12px; border: 1px solid #4F46E5; border-radius: 999px; background: #EEF0FF; color: #4338CA; font: inherit; font-weight: 600">Open · 3</button>
+        <button style="height: 30px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit">Drafts · 1</button>
+        <button style="height: 30px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit">Merged · 12</button>
+        <button style="height: 30px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit">Closed · 2</button>
+        <button style="height: 30px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit">Review requested from me · 1</button>
+      </div>
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden">
+        <sc-for list="{{items}}" as="p" hint-placeholder-count="4">
+          <a href="Review.dc.html" style="display: grid; grid-template-columns: 2.4fr 1.1fr 1.2fr 1fr; gap: 14px; align-items: center; padding: 14px 16px; border-bottom: 1px solid #F1F2F5; color: inherit; text-decoration: none">
+            <span style="display: flex; flex-direction: column; gap: 3px"><span style="display: flex; gap: 8px; align-items: center"><span style="padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; background: {{p.sbg}}; color: {{p.sfg}}">{{p.status}}</span><span style="font-weight: 600">{{p.title}}</span></span><span style="font-size: 12px; color: #5B6474">{{p.meta}}</span></span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #3D4553">{{p.base}}</span>
+            <span style="font-size: 12px; color: {{p.revFg}}; font-weight: 500">{{p.review}}</span>
+            <span style="font-size: 12px; color: #5B6474; text-align: right">{{p.counts}}</span>
+          </a>
+        </sc-for>
+      </section>
+    </div>
+  </main>
+
+  <div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(15,18,25,.40)"></div>
+  <section role="dialog" aria-modal="true" aria-label="New proposal" style="position: absolute; left: 480px; top: 120px; width: 520px; box-sizing: border-box; background: #FFFFFF; border-radius: 14px; box-shadow: 0 24px 64px rgba(16,24,40,.25); padding: 22px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center"><h2 style="margin: 0; font-size: 17px; font-weight: 700; flex-grow: 1">New proposal</h2><button aria-label="Close" style="width: 32px; height: 32px; border: none; background: transparent; font-size: 18px; color: #5B6474">×</button></div>
+    <p style="margin: 0; color: #5B6474">Your edits go to a proposal based on <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 1px 6px; background: #F1F2F5; border-radius: 4px">main · v13</span>. main stays unchanged until it's merged.</p>
+    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Title<input value="Add read cache in front of Order Service" style="height: 36px; padding: 0 10px; border: 1px solid #4F46E5; border-radius: 6px; font: inherit; font-size: 13px; color: #1B1F27"></label>
+    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Description<textarea placeholder="Why, what changes, risks" style="height: 70px; padding: 8px 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; resize: none"></textarea></label>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 12px; color: #5B6474">Reviewers</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 36px; padding: 4px 8px; border: 1px solid #E3E6EB; border-radius: 6px">
+        <span style="display: inline-flex; gap: 6px; height: 26px; align-items: center; padding: 0 8px; border-radius: 999px; background: #EEF0FF; color: #4338CA; font-weight: 500">[Architect] ×</span>
+        <input aria-label="Add reviewer" placeholder="Add people or teams" style="border: none; outline: none; font: inherit; flex-grow: 1">
+      </div>
+      <span style="font-size: 12px; color: #5B6474">Added automatically when you change their elements: <strong style="color: #1B1F27">Payments team</strong> (owner of Order Service)</span>
+    </div>
+    <div style="display: flex; gap: 8px; justify-content: flex-end; padding-top: 6px">
+      <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Start as draft</button>
+      <button style="height: 36px; padding: 0 16px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Create &amp; start editing</button>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const open = { status: 'Open', sbg: '#DCF3E6', sfg: '#047857' };
+    const draft = { status: 'Draft', sbg: '#F1F2F5', sfg: '#3D4553' };
+    return {
+      items: [
+        { title: '#14 Introduce saga orchestration', meta: '[Engineer] · updated 2 h ago · 4 versions', base: 'v11 · 2 behind main', review: 'Changes requested', revFg: '#B91C1C', counts: '+3 −1 ~3 · 5 threads', ...open },
+        { title: '#15 Move search to OpenSearch Serverless', meta: '[Platform eng] · yesterday', base: 'v13 · up to date', review: '1 of 2 approvals', revFg: '#92400E', counts: '+1 −1 ~2 · 1 thread', ...open },
+        { title: '#16 Add fraud scoring step', meta: '[Data eng] · 3 days ago', base: 'v12 · 1 behind main', review: 'Review requested from you', revFg: '#4338CA', counts: '+2 ~1 · 0 threads', ...open },
+        { title: '#17 Region failover (DR)', meta: 'You · draft', base: 'v13 · up to date', review: 'Not requested', revFg: '#5B6474', counts: '+6 ~4', ...draft }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

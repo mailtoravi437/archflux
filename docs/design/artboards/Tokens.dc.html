@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Design tokens and controls</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1200px; height: 900px; box-sizing: border-box; padding: 40px 48px; display: flex; flex-direction: column; gap: 28px; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px">
+  <div>
+    <h1 style="margin: 0; font-size: 22px; font-weight: 700">Design tokens &amp; controls</h1>
+    <p style="margin: 4px 0 0; color: #5B6474">Inter for interface text · JetBrains Mono only for code, ids, keys and diffs · 4-pt spacing · radius 6 / 10</p>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Colour</h2>
+    <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{colors}}" as="c" hint-placeholder-count="8">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="height: 56px; border-radius: 8px; border: 1px solid #E3E6EB; background: {{c.hex}}"></span>
+          <span style="font-weight: 600; font-size: 12px">{{c.name}}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5B6474">{{c.hex}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Type scale</h2>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; align-items: end">
+      <div><div style="font-size: 20px; line-height: 28px; font-weight: 700">Page title</div><span style="font-size: 11px; color: #5B6474">xl · 20/28 · 700</span></div>
+      <div><div style="font-size: 15px; line-height: 22px; font-weight: 600">Card title</div><span style="font-size: 11px; color: #5B6474">lg · 15/22 · 600</span></div>
+      <div><div style="font-size: 13px; line-height: 20px">Body and inputs</div><span style="font-size: 11px; color: #5B6474">md · 13/20 · 400</span></div>
+      <div><div style="font-size: 12px; line-height: 18px; font-weight: 500">Controls</div><span style="font-size: 11px; color: #5B6474">sm · 12/18 · 500</span></div>
+      <div><div style="font-size: 11px; line-height: 16px; font-weight: 500">Caption · badge</div><span style="font-size: 11px; color: #5B6474">xs · 11/16 · 500</span></div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 600">Buttons</h2>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <button style="height: 40px; padding: 0 18px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Primary lg</button>
+      <button style="height: 32px; padding: 0 14px; border: none; border-radius: 6px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Primary md</button>
+      <button style="height: 32px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Secondary</button>
+      <button style="height: 32px; padding: 0 14px; border: none; border-radius: 6px; background: transparent; font: inherit; font-weight: 500; color: #3D4553">Ghost</button>
+      <button style="height: 32px; padding: 0 14px; border: 1px solid #F5C2C2; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; color: #B91C1C">Danger</button>
+      <button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 500">Small</button>
+      <button style="height: 32px; padding: 0 14px; border: 1px solid #4F46E5; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500; box-shadow: 0 0 0 3px rgba(79,70,229,.35)">Focus ring</button>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Inputs</h2>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Label<input value="Order Service" style="height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; font-size: 13px; color: #1B1F27"></label>
+      <div role="radiogroup" aria-label="Segmented example" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 2px; background: #F1F2F5; border-radius: 8px">
+        <button role="radio" aria-checked="true" style="height: 28px; border: none; border-radius: 6px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(16,24,40,.08); font: inherit; font-size: 12px; font-weight: 600">Card</button>
+        <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553">Box</button>
+        <button role="radio" aria-checked="false" style="height: 28px; border: none; border-radius: 6px; background: transparent; font: inherit; font-size: 12px; color: #3D4553">Icon</button>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Status button</h2>
+      <span style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; width: fit-content"><span style="width: 8px; height: 8px; border-radius: 4px; background: #8A93A3"></span>Local</span>
+      <span style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; width: fit-content"><span style="width: 8px; height: 8px; border-radius: 4px; background: #15803D"></span>Saved v12</span>
+      <span style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid #F3D9A4; border-radius: 6px; width: fit-content; color: #92400E; background: #FFFBEB"><span style="width: 8px; height: 8px; border-radius: 4px; background: #D97706"></span>Unsaved changes</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Node card</h2>
+      <div style="width: 200px; height: 72px; box-sizing: border-box; padding: 12px; border: 1.5px solid #2563EB; border-radius: 8px; display: flex; gap: 10px">
+        <span style="width: 28px; height: 28px; border-radius: 6px; background: #E8F0FE; flex-shrink: 0"></span>
+        <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">Order Service</span><span style="font-size: 11px; color: #5B6474">Spring Boot 3.3</span></span>
+      </div>
+      <span style="padding: 2px 8px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E3E6EB; font-size: 11px; color: #3D4553; width: fit-content">Edge label pill</span>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      colors: [
+        { name: 'App background', hex: '#F6F7F9' },
+        { name: 'Surface', hex: '#FFFFFF' },
+        { name: 'Border', hex: '#E3E6EB' },
+        { name: 'Text', hex: '#1B1F27' },
+        { name: 'Muted text', hex: '#5B6474' },
+        { name: 'Accent', hex: '#4F46E5' },
+        { name: 'Accent text', hex: '#4338CA' },
+        { name: 'Accent soft', hex: '#EEF0FF' },
+        { name: 'Success text', hex: '#047857' },
+        { name: 'Warning text', hex: '#92400E' },
+        { name: 'Warning soft', hex: '#FEF3C7' },
+        { name: 'Danger text', hex: '#B91C1C' },
+        { name: 'Node: service', hex: '#2563EB' },
+        { name: 'Node: gateway', hex: '#7C3AED' },
+        { name: 'Node: data', hex: '#D97706' },
+        { name: 'Edge', hex: '#8A93A3' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

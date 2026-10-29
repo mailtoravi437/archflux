@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Trash</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Library" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <main style="flex-grow: 1; padding: 24px 32px">
+    <div style="max-width: 1100px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: flex-end"><div style="flex-grow: 1"><h1 style="margin: 0; font-size: 22px; font-weight: 700">Trash</h1><p style="margin: 4px 0 0; color: #5B6474">Items are permanently removed after 30 days (Team: 90). Restoring puts them back where they were.</p></div></div>
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow: hidden">
+        <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1fr 200px; gap: 12px; padding: 10px 16px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-transform: uppercase; letter-spacing: .04em"><span>Item</span><span>From</span><span>Deleted by</span><span>Removed in</span><span></span></div>
+        <sc-for list="{{items}}" as="i" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1fr 200px; gap: 12px; padding: 12px 16px; border-top: 1px solid #F1F2F5; align-items: center">
+            <span style="display: flex; flex-direction: column"><span style="font-weight: 600">{{i.name}}</span><span style="font-size: 12px; color: #5B6474">{{i.kind}}</span></span>
+            <span style="color: #3D4553">{{i.from}}</span><span style="color: #3D4553">{{i.by}}</span><span style="color: {{i.fg}}; font-weight: 500">{{i.left}}</span>
+            <span style="display: flex; gap: 6px; justify-content: flex-end"><button style="height: 30px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 600">Restore</button><button style="height: 30px; padding: 0 10px; border: none; border-radius: 6px; background: transparent; font: inherit; color: #B91C1C">Delete forever</button></span>
+          </div>
+        </sc-for>
+      </section>
+    </div>
+  </main>
+
+  <div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(15,18,25,.40)"></div>
+  <section role="alertdialog" aria-label="Delete forever" style="position: absolute; left: 500px; top: 300px; width: 440px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 24px 64px rgba(16,24,40,.25); padding: 22px; display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 17px; font-weight: 700">Delete “payments-v1.arch” forever?</h2>
+    <p style="margin: 0; color: #5B6474">Removes the diagram, its 42 versions, 3 proposals and 18 comment threads. This can't be undone and is recorded in the audit log.</p>
+    <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #5B6474">Type the name to confirm<input value="payments-v1" style="height: 36px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit; color: #1B1F27"></label>
+    <div style="display: flex; gap: 8px; justify-content: flex-end"><button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-weight: 500">Cancel</button><button disabled style="height: 36px; padding: 0 14px; border: none; border-radius: 6px; background: #FCA5A5; color: #FFFFFF; font: inherit; font-weight: 600">Delete forever</button></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      no: false,
+      items: [
+        { name: 'payments-v1.arch', kind: 'Diagram · 42 versions', from: 'Payments', by: 'You · 3 days ago', left: '27 days', fg: '#3D4553' },
+        { name: 'Archive 2025', kind: 'Folder · 6 diagrams', from: 'Platform', by: '[Architect] · 1 week ago', left: '23 days', fg: '#3D4553' },
+        { name: '#11 Try service mesh', kind: 'Proposal (closed, deleted)', from: 'checkout-mesh.arch', by: '[Engineer] · 26 days ago', left: '4 days', fg: '#92400E' },
+        { name: 'scratch.arch', kind: 'Diagram · 3 versions', from: 'This device', by: 'You · 29 days ago', left: 'Tomorrow', fg: '#B91C1C' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

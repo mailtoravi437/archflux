@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Access states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 32px 40px; background: #FFFFFF; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; display: flex; flex-direction: column; gap: 20px">
+  <h1 style="margin: 0; font-size: 22px; font-weight: 700">Access &amp; permission states</h1>
+  <div style="flex-grow: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 20px">
+
+    <section aria-label="Request access" style="background: #F6F7F9; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+      <div style="width: 400px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <span style="width: 40px; height: 40px; border-radius: 10px; background: #EEF0FF; color: #4338CA; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700">You need access to “checkout-mesh.arch”</h2>
+        <p style="margin: 0; color: #5B6474">Owned by [Owner] · Payments space. Signed in as [you@company.com] — <a href="AccessStates.dc.html">switch account</a></p>
+        <select aria-label="Access level" style="height: 36px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit"><option>Request to comment</option><option>Request to edit</option><option>Request to view</option></select>
+        <textarea aria-label="Message to owner" placeholder="Add a note (optional)" style="height: 56px; padding: 8px 10px; border: 1px solid #E3E6EB; border-radius: 8px; font: inherit; resize: none"></textarea>
+        <button style="height: 38px; border: none; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font: inherit; font-weight: 600">Request access</button>
+        <span style="font-size: 12px; color: #5B6474">We'll email you when [Owner] responds.</span>
+      </div>
+    </section>
+
+    <section aria-label="Read-only viewer" style="background: #F6F7F9; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
+      <div style="height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB"><span style="font-weight: 600">checkout-mesh.arch</span><span style="padding: 1px 8px; border-radius: 999px; background: #F1F2F5; font-size: 11px; font-weight: 600">View only</span><span style="flex-grow: 1"></span><button style="height: 28px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px; font-weight: 500">Request edit access</button></div>
+      <div style="flex-grow: 1; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DADDE3 1px, transparent 1px); background-size: 20px 20px">
+        <div style="position: absolute; left: 60px; top: 60px; width: 170px; height: 60px; box-sizing: border-box; padding: 10px; border: 1.5px solid #2563EB; border-radius: 8px; background: #FFFFFF"><strong>Order Service</strong><br><span style="font-size: 11px; color: #5B6474">ECS · Java</span></div>
+        <span style="position: absolute; left: 230px; top: 90px; width: 80px; border-top: 1.5px solid #5B6474"></span>
+        <div style="position: absolute; left: 310px; top: 60px; width: 170px; height: 60px; box-sizing: border-box; padding: 10px; border: 1.5px solid #6D28D9; border-radius: 8px; background: #FFFFFF"><strong>order-events</strong><br><span style="font-size: 11px; color: #5B6474">Kafka</span></div>
+        <div style="position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); display: flex; gap: 4px; padding: 4px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px"><button style="height: 30px; padding: 0 10px; border: none; background: transparent; font: inherit">Zoom −</button><button style="height: 30px; padding: 0 10px; border: none; background: transparent; font: inherit">100%</button><button style="height: 30px; padding: 0 10px; border: none; background: transparent; font: inherit">Pages</button><button style="height: 30px; padding: 0 10px; border: none; background: transparent; font: inherit">Present</button></div>
+        <span style="position: absolute; left: 20px; bottom: 22px; font-size: 11px; color: #5B6474">Editing tools hidden, not disabled · comments if you're a commenter</span>
+      </div>
+    </section>
+
+    <section aria-label="Link expired" style="background: #F6F7F9; border-radius: 12px; display: flex; align-items: center; justify-content: center">
+      <div style="width: 380px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px">
+        <span style="width: 44px; height: 44px; border-radius: 22px; background: #FEF3C7; color: #92400E; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center" aria-hidden="true">!</span>
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700">This link has expired</h2>
+        <p style="margin: 0; color: #5B6474">The owner set it to expire on 20 Oct. Ask them for a new link.</p>
+        <button style="height: 36px; padding: 0 14px; border: 1px solid #E3E6EB; border-radius: 8px; background: #FFFFFF; font: inherit; font-weight: 500">Ask [Owner] for access</button>
+      </div>
+    </section>
+
+    <section aria-label="Not found or deleted" style="background: #F6F7F9; border-radius: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 20px; box-sizing: border-box">
+      <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 8px; justify-content: center">
+        <span style="font-size: 11px; font-weight: 600; color: #5B6474">Seen by the owner</span>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">“payments-v1.arch” is in the trash</h2>
+        <p style="margin: 0; color: #5B6474">Deleted by you 3 days ago · permanently removed in 27 days.</p>
+        <a href="Trash.dc.html" style="height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #4F46E5; color: #FFFFFF; font-weight: 600; text-decoration: none">Restore</a>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 8px; justify-content: center">
+        <span style="font-size: 11px; font-weight: 600; color: #5B6474">Seen by everyone else</span>
+        <h2 style="margin: 0; font-size: 16px; font-weight: 700">We can't find that diagram</h2>
+        <p style="margin: 0; color: #5B6474">It may have been moved or deleted, or you may not have access. The title is never shown.</p>
+        <a href="Home.dc.html" style="height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #E3E6EB; color: #1B1F27; font-weight: 500; text-decoration: none">Go to Home</a>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

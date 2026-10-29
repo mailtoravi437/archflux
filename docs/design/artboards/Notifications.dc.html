@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ArchFlux — Inbox and notification preferences</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #F6F7F9; color: #1B1F27; font-family: Inter, system-ui, sans-serif; font-size: 13px; overflow: hidden">
+  <dc-import name="AppBar" active="Home" show-doc="{{no}}" show-status="{{no}}" hint-size="1440px,48px"></dc-import>
+  <div style="flex-grow: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; padding: 24px 32px; overflow: hidden">
+    <section aria-label="Inbox" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden">
+      <div style="padding: 16px; border-bottom: 1px solid #EEF0F3; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center"><h1 style="margin: 0; font-size: 20px; font-weight: 700; flex-grow: 1">Inbox</h1><button style="height: 30px; padding: 0 10px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Mark all done</button></div>
+        <div role="tablist" aria-label="Inbox views" style="display: flex; gap: 16px"><span role="tab" aria-selected="true" style="padding-bottom: 6px; border-bottom: 2px solid #4F46E5; font-weight: 600">Inbox · 7</span><span role="tab" aria-selected="false" style="padding-bottom: 6px; color: #5B6474">Done</span><span role="tab" aria-selected="false" style="padding-bottom: 6px; color: #5B6474">Snoozed · 1</span></div>
+        <div style="display: flex; gap: 6px"><button aria-pressed="true" style="height: 26px; padding: 0 8px; border: 1px solid #4F46E5; border-radius: 999px; background: #EEF0FF; color: #4338CA; font: inherit; font-size: 12px; font-weight: 600">All</button><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Mentions</button><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Reviews</button><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Assigned</button><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 999px; background: #FFFFFF; font: inherit; font-size: 12px">Drift</button></div>
+      </div>
+      <div style="overflow: hidden">
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+          <div style="padding: 10px 16px 4px; font-size: 12px; font-weight: 600; color: #5B6474">{{g.doc}}</div>
+          <sc-for list="{{g.items}}" as="n" hint-placeholder-count="2">
+            <div style="{{n.style}}"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{n.dot}}; flex-shrink: 0; margin-top: 6px"></span><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span><strong>{{n.who}}</strong> {{n.what}}</span><span style="font-size: 12px; color: #5B6474">{{n.when}}</span></span><span style="display: flex; gap: 4px"><button style="height: 26px; padding: 0 8px; border: 1px solid #E3E6EB; border-radius: 6px; background: #FFFFFF; font: inherit; font-size: 12px">Done</button><button style="height: 26px; padding: 0 8px; border: none; background: transparent; font: inherit; font-size: 12px; color: #5B6474">Snooze</button></span></div>
+          </sc-for>
+        </sc-for>
+      </div>
+      <span style="margin-top: auto; padding: 10px 16px; border-top: 1px solid #EEF0F3; font-size: 12px; color: #5B6474">J/K move · ↵ open · E done · S snooze</span>
+    </section>
+
+    <section aria-label="Notification preferences" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 700">Notification preferences</h2>
+      <div style="display: grid; grid-template-columns: 2fr repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid #EEF0F3; border-radius: 8px; overflow: hidden">
+        <span style="padding: 10px 12px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474">EVENT</span><span style="padding: 10px 6px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-align: center">IN-APP</span><span style="padding: 10px 6px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-align: center">EMAIL</span><span style="padding: 10px 6px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-align: center">DIGEST</span><span style="padding: 10px 6px; background: #F6F7F9; font-size: 11px; font-weight: 600; color: #5B6474; text-align: center">SLACK</span>
+        <sc-for list="{{prefs}}" as="p" hint-placeholder-count="8">
+          <span style="padding: 10px 12px; border-top: 1px solid #EEF0F3">{{p.event}}</span>
+          <span style="padding: 10px 6px; border-top: 1px solid #EEF0F3; text-align: center"><input type="checkbox" checked aria-label="{{p.event}} in-app"></span>
+          <span style="padding: 10px 6px; border-top: 1px solid #EEF0F3; text-align: center"><input type="checkbox" checked="{{p.email}}" aria-label="{{p.event}} email"></span>
+          <span style="padding: 10px 6px; border-top: 1px solid #EEF0F3; text-align: center"><input type="checkbox" checked="{{p.digest}}" aria-label="{{p.event}} digest"></span>
+          <span style="padding: 10px 6px; border-top: 1px solid #EEF0F3; text-align: center"><input type="checkbox" checked="{{p.slack}}" aria-label="{{p.event}} Slack"></span>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center"><label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked>Quiet hours</label><select aria-label="From" style="height: 30px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>19:00</option></select><span>to</span><select aria-label="To" style="height: 30px; border: 1px solid #E3E6EB; border-radius: 6px; font: inherit"><option>08:00</option></select><span style="color: #5B6474">Digest at 09:00, Mon–Fri</span></div>
+      <span style="font-size: 12px; color: #5B6474">You follow diagrams you edit or comment on. Mute one from its ⋯ menu.</span>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const row = (unread) => 'display: flex; gap: 10px; padding: 10px 16px; align-items: flex-start; ' + (unread ? 'background: #F7F7FF' : '');
+    const n = (who, what, when, unread) => ({ who, what, when, style: row(unread), dot: unread ? '#4F46E5' : '#C3C8D1' });
+    const p = (event, email, digest, slack) => ({ event, email, digest, slack });
+    return {
+      no: false,
+      groups: [
+        { doc: 'checkout-mesh.arch', items: [n('[Engineer]', 'mentioned you on Kafka Event Mesh', '3 min', true), n('Payments team', 'requested changes on #14', '1 h', true)] },
+        { doc: 'payments-saga.arch', items: [n('[Architect]', 'requested your review on #16', '2 h', true), n('[Security]', 'assigned you “Mark data class”, due Fri', 'Yesterday', false)] },
+        { doc: 'edge-routing.arch', items: [n('Kubernetes prod', 'reported 3 drift changes', '1 h', true)] }
+      ],
+      prefs: [p('Mentions', true, false, true), p('Replies in my threads', false, true, false), p('Assigned to me', true, false, true), p('Review requested', true, false, true), p('Review on my proposal', true, false, true), p('Proposal merged / closed', false, true, false), p('New drift on followed diagrams', false, true, true), p('Access requests (owners)', true, false, false)]
+    };
+  }
+}
+</script>
+</body>
+</html>
