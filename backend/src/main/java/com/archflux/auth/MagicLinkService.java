@@ -103,7 +103,7 @@ public class MagicLinkService {
             <html>
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1f2937;">
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <div style="background: linear-gradient(135deg, #1E1B4B 0%, #4C1D95 100%); padding: 30px; border-radius: 12px 12px 0 0;">
+                    <div style="background: linear-gradient(135deg, #1E1B4B 0%%, #4C1D95 100%%); padding: 30px; border-radius: 12px 12px 0 0;">
                         <h1 style="color: white; margin: 0; font-size: 24px;">ArchFlux</h1>
                         <p style="color: #c7d2fe; margin: 8px 0 0;">Living System Canvas</p>
                     </div>
