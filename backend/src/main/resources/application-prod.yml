@@ -1,8 +1,6 @@
 # Production profile overrides — never commit real secrets.
 # Use the secret manager or env vars set by the deployment platform.
 spring:
-  profiles:
-    active: prod
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${DB_APP_USER:archflux_app}
