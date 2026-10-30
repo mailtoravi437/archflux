@@ -2,6 +2,7 @@ package com.archflux.auth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class SesEmailService implements EmailService {
     private final SesV2Client client;
     private final String fromEmail;
 
+    @Autowired
     public SesEmailService(
             @Value("${app.email.from:noreply@archflux.in}") String fromEmail,
             @Value("${aws.region:ap-southeast-2}") String region) {
