@@ -1,6 +1,9 @@
 # Production profile overrides — never commit real secrets.
 # Use the secret manager or env vars set by the deployment platform.
 spring:
+  autoconfigure:
+    # SAML needs an identity provider and signing key; production has neither yet (see app.saml.enabled).
+    exclude: org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyRegistrationAutoConfiguration
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${DB_APP_USER:archflux_app}
@@ -13,6 +16,8 @@ spring:
     locations: classpath:db/migration
 
 app:
+  saml:
+    enabled: false
   api-token: ${APP_API_TOKEN}
   cookie-secure: true
   frontend-url: ${FRONTEND_URL}
