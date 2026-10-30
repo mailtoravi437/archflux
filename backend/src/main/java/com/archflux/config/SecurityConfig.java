@@ -35,7 +35,9 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http,
+            @org.springframework.beans.factory.annotation.Value("${app.saml.enabled:true}") boolean samlEnabled)
+            throws Exception {
         http
             // Bridges the JWT identity validated by the outer AuthFilter into
             // the SecurityContext (cookie-authenticated requests carry no
@@ -64,9 +66,6 @@ public class SecurityConfig {
                 // Hands off to AuthController, which redirects to the SPA hash route.
                 .failureUrl("/api/v1/auth/failure")
             )
-            .saml2Login(saml2 -> saml2
-                .loginPage("/login")
-            )
             // NOTE: no oauth2ResourceServer JWT configurer — user JWTs are
             // validated by the outer AuthFilter (JJWT) and promoted into the
             // SecurityContext by RequestUserBridgeFilter. A resource-server
@@ -90,6 +89,11 @@ public class SecurityConfig {
                 })
             );
 
+        // SAML is optional: production runs without an identity provider (app.saml.enabled=false),
+        // so its registration and signing key are never needed there.
+        if (samlEnabled) {
+            http.saml2Login(saml2 -> saml2.loginPage("/login"));
+        }
         return http.build();
     }
 
