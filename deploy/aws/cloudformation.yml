@@ -45,6 +45,8 @@ Parameters:
 
 Conditions:
   MakeOidcProvider: !Equals [!Ref CreateGitHubOidcProvider, 'true']
+  # Option 2 (no OIDC): a CI user with ECR push rights; CI uses its access keys (GitHub secrets).
+  MakeCiUser: !Equals [!Ref CreateGitHubOidcProvider, 'false']
 
 Resources:
   ApiRepository:
@@ -157,6 +159,7 @@ Resources:
 
   GitHubDeployRole:
     Type: AWS::IAM::Role
+    Condition: MakeOidcProvider
     Properties:
       Description: GitHub Actions (main branch) pushes archflux images to ECR.
       AssumeRolePolicyDocument:
@@ -192,6 +195,30 @@ Resources:
                   - ecr:UploadLayerPart
                 Resource: [!GetAtt ApiRepository.Arn, !GetAtt WebRepository.Arn]
 
+  CiPushUser:
+    Type: AWS::IAM::User
+    Condition: MakeCiUser
+    Properties:
+      UserName: archflux-ci-push
+      Policies:
+        - PolicyName: ecr-push
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource: [!GetAtt ApiRepository.Arn, !GetAtt WebRepository.Arn]
+
 Outputs:
   PublicIp:
     Description: Point your domain's A record here, and set GitHub secret VM_HOST to it.
@@ -200,7 +227,12 @@ Outputs:
     Description: ECR_REGISTRY for /opt/archflux/.env and the GitHub variable of the same name.
     Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com
   DeployRoleArn:
-    Description: GitHub variable AWS_DEPLOY_ROLE_ARN.
+    Condition: MakeOidcProvider
+    Description: GitHub variable AWS_DEPLOY_ROLE_ARN (OIDC path).
     Value: !GetAtt GitHubDeployRole.Arn
+  CiPushUserName:
+    Condition: MakeCiUser
+    Description: IAM user for CI image pushes (no-OIDC path). Create its access key and store it as GitHub secrets.
+    Value: !Ref CiPushUser
   InstanceId:
     Value: !Ref Instance
