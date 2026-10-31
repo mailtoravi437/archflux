@@ -13,10 +13,21 @@ export interface RuntimeConfig {
   wsUrl: string;
   /** Optional contact address for "Contact us to upgrade"; the button is hidden when unset. */
   supportEmail?: string;
+  /** Public Firebase web config for phone sign-in (R1-SEC-02); absent when phone sign-in is not set up. */
+  firebase?: FirebaseWebConfig;
+}
+
+/** Public identifiers only (never secrets). */
+export interface FirebaseWebConfig {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  appId: string;
+  messagingSenderId?: string;
 }
 
 export interface ConfigSources {
-  runtime?: { apiUrl?: unknown; wsUrl?: unknown; supportEmail?: unknown } | null;
+  runtime?: { apiUrl?: unknown; wsUrl?: unknown; supportEmail?: unknown; firebase?: unknown } | null;
   env?: { VITE_API_URL?: string; VITE_WS_URL?: string };
   /** Page origin, e.g. `https://app.example.com`. */
   origin: string;
@@ -53,7 +64,25 @@ export function resolveConfig({ runtime, env = {}, origin }: ConfigSources): Run
     nonEmpty(runtime?.wsUrl) ?? nonEmpty(env.VITE_WS_URL) ?? deriveWsUrl(apiUrl, origin),
   );
   const supportEmail = nonEmpty(runtime?.supportEmail);
-  return supportEmail ? { apiUrl, wsUrl, supportEmail } : { apiUrl, wsUrl };
+  const firebase = parseFirebase(runtime?.firebase);
+  return {
+    apiUrl,
+    wsUrl,
+    ...(supportEmail ? { supportEmail } : {}),
+    ...(firebase ? { firebase } : {}),
+  };
+}
+
+function parseFirebase(raw: unknown): FirebaseWebConfig | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const apiKey = nonEmpty(r.apiKey);
+  const authDomain = nonEmpty(r.authDomain);
+  const projectId = nonEmpty(r.projectId);
+  const appId = nonEmpty(r.appId);
+  if (!apiKey || !authDomain || !projectId || !appId) return null;
+  const messagingSenderId = nonEmpty(r.messagingSenderId);
+  return { apiKey, authDomain, projectId, appId, ...(messagingSenderId ? { messagingSenderId } : {}) };
 }
 
 function pageOrigin(): string {
@@ -80,6 +109,11 @@ export function getConfig(): RuntimeConfig {
 
 export function getApiUrl(): string {
   return current.apiUrl;
+}
+
+/** Public Firebase web config, or null when phone sign-in is not configured for this deployment. */
+export function getFirebaseConfig(): FirebaseWebConfig | null {
+  return current.firebase ?? null;
 }
 
 export function getWsUrl(): string {

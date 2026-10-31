@@ -3,12 +3,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDiagram } from "../state/useDiagram";
 import { getSession, isSignedIn, setSession } from "../state/session";
 import { api } from "../lib/api";
-import { loginUrl } from "../lib/config";
+import { getFirebaseConfig, loginUrl } from "../lib/config";
+import { createPhoneAuth, E164_RE, phoneAuthErrorMessage, type PhoneAuthFlow } from "../lib/firebasePhone";
 import { safeNext } from "../lib/access";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Tab = "magic-link" | "saml" | "oidc";
+type Tab = "magic-link" | "phone" | "saml" | "oidc";
 
 // Honest copy for the server's ?error= codes (H1/H2).
 const ERROR_COPY: Record<string, string> = {
@@ -30,6 +31,16 @@ export default function LoginScreen() {
   const [searchParams] = useSearchParams();
   // Providers the server can really sign in with; none until the server answers (or if it fails).
   const [providers, setProviders] = useState<string[]>([]);
+  // Phone sign-in (R1-SEC-02): shown only when the server lists it AND the web config has Firebase.
+  const [phone, setPhone] = useState("");
+  const [phoneCode, setPhoneCode] = useState("");
+  const [phoneStep, setPhoneStep] = useState<"number" | "code">("number");
+  const [phoneBusy, setPhoneBusy] = useState(false);
+  const phoneFlow = useRef<PhoneAuthFlow | null>(null);
+  const recaptchaRef = useRef<HTMLDivElement | null>(null);
+  const phoneEnabled = providers.includes("phone") && getFirebaseConfig() !== null;
+
+  useEffect(() => () => phoneFlow.current?.dispose(), []);
 
   useEffect(() => {
     emailRef.current?.focus();
@@ -114,6 +125,58 @@ export default function LoginScreen() {
       .catch((err: Error) => {
         setBusy(false);
         setError(err.message);
+      });
+  };
+
+  const sendPhoneCode = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setError(null);
+    const number = phone.replace(/[\s-]/g, "");
+    if (!E164_RE.test(number)) {
+      setError("That phone number is not valid. Use the international format, for example +919876543210.");
+      return;
+    }
+    const cfg = getFirebaseConfig();
+    if (!cfg || !recaptchaRef.current) {
+      setError("Phone sign-in is not available on this site.");
+      return;
+    }
+    setPhoneBusy(true);
+    phoneFlow.current ??= createPhoneAuth(cfg, recaptchaRef.current);
+    phoneFlow.current
+      .sendCode(number)
+      .then(() => {
+        setPhoneBusy(false);
+        setPhoneCode("");
+        setPhoneStep("code");
+      })
+      .catch((err: unknown) => {
+        setPhoneBusy(false);
+        setError(phoneAuthErrorMessage(err));
+      });
+  };
+
+  const verifyPhoneCode = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setError(null);
+    if (!/^\d{6}$/.test(phoneCode.trim())) {
+      setError("Enter the 6-digit code from the SMS.");
+      return;
+    }
+    setPhoneBusy(true);
+    phoneFlow.current!
+      .confirm(phoneCode.trim())
+      .then((idToken) => api.signInWithFirebase(idToken))
+      .then(() => {
+        // The server set the cookie; the callback screen confirms it with /auth/me and lands in the app.
+        const next = safeNext(searchParams.get("next"));
+        navigate(`/auth/callback?provider=phone${next ? `&next=${encodeURIComponent(next)}` : ""}`, { replace: true });
+      })
+      .catch((err: unknown) => {
+        setPhoneBusy(false);
+        const apiMsg = err instanceof Error && !(err as { code?: unknown }).code?.toString().startsWith("auth/")
+          ? err.message : null;
+        setError(apiMsg ?? phoneAuthErrorMessage(err));
       });
   };
 
@@ -318,7 +381,7 @@ export default function LoginScreen() {
             style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}
             role="tablist"
             aria-label="Sign-in method">
-            {(["magic-link", ...(["saml", "oidc"] as const).filter((p) => providers.includes(p))] as Tab[]).map((t) => (
+            {(["magic-link", ...(phoneEnabled ? (["phone"] as const) : []), ...(["saml", "oidc"] as const).filter((p) => providers.includes(p))] as Tab[]).map((t) => (
               <button
                 key={t}
                 role="tab"
@@ -328,7 +391,7 @@ export default function LoginScreen() {
                   setTab(t);
                   setError(null);
                 }}>
-                {t === "magic-link" ? "Magic Link" : t === "saml" ? "SSO (SAML)" : "OIDC"}
+                {t === "magic-link" ? "Magic Link" : t === "phone" ? "Phone" : t === "saml" ? "SSO (SAML)" : "OIDC"}
               </button>
             ))}
           </div>
@@ -413,6 +476,96 @@ export default function LoginScreen() {
               )}
             </form>
           )}
+          {tab === "phone" && phoneEnabled && (
+            <form onSubmit={phoneStep === "number" ? sendPhoneCode : verifyPhoneCode}>
+              {phoneStep === "number" ? (
+                <>
+                  <label style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                    Phone number
+                    <input
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      className="doc-title-input"
+                      style={{
+                        width: "100%",
+                        background: "var(--bg-panel-subtle)",
+                        border: "1px solid var(--border-panel)",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        marginTop: 4,
+                      }}
+                      placeholder="+91 98765 43210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      disabled={phoneBusy}
+                      aria-label="Phone number"
+                      aria-errormessage={error ? "login-error" : undefined}
+                    />
+                  </label>
+                  <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "6px 0 0" }}>
+                    Include the country code. We send a one-time code by SMS.
+                  </p>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ width: "100%", justifyContent: "center", marginTop: 10 }}
+                    disabled={phoneBusy}
+                    aria-busy={phoneBusy}>
+                    {phoneBusy ? "Sending…" : "Send code"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <label style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                    Verification code
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      className="doc-title-input"
+                      style={{
+                        width: "100%",
+                        background: "var(--bg-panel-subtle)",
+                        border: "1px solid var(--border-panel)",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        marginTop: 4,
+                      }}
+                      placeholder="123456"
+                      value={phoneCode}
+                      onChange={(e) => setPhoneCode(e.target.value)}
+                      disabled={phoneBusy}
+                      aria-label="Verification code"
+                      aria-errormessage={error ? "login-error" : undefined}
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{ width: "100%", justifyContent: "center", marginTop: 10 }}
+                    disabled={phoneBusy}
+                    aria-busy={phoneBusy}>
+                    {phoneBusy ? "Verifying…" : "Verify and sign in"}
+                  </button>
+                  <div style={{ marginTop: 8 }}>
+                    <button
+                      type="button"
+                      className="btn btn--sm btn--secondary"
+                      onClick={() => {
+                        setPhoneStep("number");
+                        setError(null);
+                      }}>
+                      ← Use a different number
+                    </button>
+                  </div>
+                </>
+              )}
+            </form>
+          )}
+          {/* Invisible reCAPTCHA host (Firebase). Always mounted so the verifier has a stable node. */}
+          <div ref={recaptchaRef} />
           {tab === "saml" && (
             <form onSubmit={submitSaml}>
               <p style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8 }}>

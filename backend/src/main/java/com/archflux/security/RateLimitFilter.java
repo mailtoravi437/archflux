@@ -28,7 +28,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
   private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
 
   static final Set<String> LIMITED_PATHS =
-      Set.of("/api/v1/sync", "/api/v1/lint", "/api/v1/auth/magic-link");
+      Set.of("/api/v1/sync", "/api/v1/lint", "/api/v1/auth/magic-link",
+          "/api/v1/auth/firebase");
   static final double CAPACITY = 60.0;
   static final double REFILL_PER_SECOND = 1.0;
   /** Link-only requests: 30 per minute per IP. */

@@ -75,3 +75,17 @@ describe('loginUrl', () => {
     expect(loginUrl('oidc')).toBe('https://api.example.com/api/v1/auth/login/oidc');
   });
 });
+
+describe('runtime firebase config (R1-SEC-02)', () => {
+  const origin = 'https://app.example.com';
+  const fb = { apiKey: 'k', authDomain: 'd.firebaseapp.com', projectId: 'p', appId: 'a', messagingSenderId: 'm' };
+
+  it('reads the public firebase web config from /config.json', () => {
+    expect(resolveConfig({ runtime: { firebase: fb }, origin }).firebase).toEqual(fb);
+  });
+
+  it('omits firebase when a required field is missing or blank', () => {
+    expect(resolveConfig({ runtime: { firebase: { ...fb, apiKey: ' ' } }, origin }).firebase).toBeUndefined();
+    expect(resolveConfig({ runtime: { firebase: 'nope' }, origin }).firebase).toBeUndefined();
+  });
+});

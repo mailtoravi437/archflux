@@ -174,7 +174,7 @@ Redirect targets (the SPA uses **clean path URLs**; since 2026-10-31 no redirect
 | Any auth failure | `{frontend-url}/login?error=<code>` |
 | Magic link in email | `{public-api-url}/v1/auth/verify?token=<t>` (a backend endpoint, not an SPA route) |
 
-Login initiation (from the SPA): `{apiUrl}/v1/auth/login/{github|google|saml|oidc}`.
+Login initiation (from the SPA): `{apiUrl}/v1/auth/login/{github|google|saml|oidc}`. Phone sign-in is not a redirect: see §4.1a (R1-SEC-02).
 
 ### 4.1a Sign-in providers and account linking (R1-SEC-01, 2026-10-31)
 
@@ -187,6 +187,22 @@ Login initiation (from the SPA): `{apiUrl}/v1/auth/login/{github|google|saml|oid
 | H5 hardening | `GET /api/v1/auth/login/oidc?provider=` accepts only `github`, `google`, `oidc` (else 400). Prod sets `org.springframework.security` and `org.springframework.web` to INFO (base profile keeps DEBUG for dev) |
 
 Error codes shown at `/login?error=`: `email_not_verified`, `no_email`, `invalid_token`, plus provider error codes.
+
+#### Phone sign-in via Firebase Authentication (R1-SEC-02, decided 2026-10-31)
+
+| Rule | Behaviour |
+|---|---|
+| P1 browser | The SPA uses the Firebase JS SDK (`firebase/auth`): `RecaptchaVerifier` (invisible) then `signInWithPhoneNumber(phone)`, then `confirmationResult.confirm(code)`, then `user.getIdToken()`. The public web config (`apiKey`, `authDomain`, `projectId`, `appId`, `messagingSenderId`) comes from the runtime `/config.json` under `firebase` (written by `frontend/docker/40-archflux-runtime.sh` from `FIREBASE_*` env). No rebuild is needed to change it. These values are public identifiers, not secrets |
+| P2 exchange | The SPA sends `POST /api/v1/auth/firebase` with `{"idToken": "<firebase id token>"}` (JSON, same-origin, public path, CSRF Origin check applies). The Firebase SDK session is discarded after the exchange (`signOut`); ArchFlux's own cookie is the only session |
+| P3 verification | The backend verifies the token with firebase-admin `FirebaseAuth.verifyIdToken(token)` (signature against Google's public keys, `iss`/`aud` = project id, expiry). Only the project id is needed (`FIREBASE_PROJECT_ID`, `app.firebase.project-id`), no service-account key. Then it requires a non-blank `phone_number` claim and `firebase.sign_in_provider == "phone"` |
+| P4 account | The user is found or created by phone number (E.164, unique). A new phone user gets `provider='phone'`, `email` NULL and a personal workspace (same `provision_*` rules as email logins). The same phone always maps to the same user. A phone never links to an existing email account (no email is asserted, so there is nothing to match safely) |
+| P5 session | Success sets the same `ARCHFLUX_TOKEN` cookie and Redis session as the other login paths, audits `auth.login` (`provider=phone`) and returns `200 {"data": {"user": {...}}}`. No token is returned in the body |
+| P6 failure | An invalid, expired, revoked-style or non-phone token returns `401 {"error":{"code":"INVALID_FIREBASE_TOKEN"}}`; a malformed body returns `400 VALIDATION_ERROR`; phone sign-in not configured (`FIREBASE_PROJECT_ID` blank) returns `503 PHONE_SIGNIN_UNAVAILABLE`. Nothing is created and no cookie is set on any failure; `auth.login_failed` is audited without the token or the phone number |
+| P7 honest buttons | `GET /api/v1/auth/providers` lists `phone` only when `FIREBASE_PROJECT_ID` is set; the login screen shows the Phone tab only when the server lists `phone` and `/config.json` carries `firebase.apiKey` |
+| P8 schema (V21) | Phone-only users have no email, so `users.email` becomes nullable; `users.phone_number text` is added with a unique index and a CHECK `email IS NOT NULL OR phone_number IS NOT NULL` (and an E.164 shape check); `chk_users_provider` is widened with `'phone'`. Existing rows are untouched (all have an email). New SECURITY DEFINER `provision_phone_user(phone, name)` mirrors `provision_user`. API/JWT/`/me` carry `email: null` and `phone` for phone users. Email-only features (invites, share-by-email, access-request mail) skip users without an email |
+| P9 CSP | When `FIREBASE_API_KEY` is set the web container's CSP additionally allows Google reCAPTCHA and the Identity Toolkit: `script-src https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`, `frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/`, `connect-src https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google.com` |
+
+Config: `FIREBASE_PROJECT_ID` (backend, not secret; blank = phone sign-in off) and, for the web container, `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`, `FIREBASE_APP_ID`, `FIREBASE_MESSAGING_SENDER_ID`. Tests use a verifier test double; Google is never called from tests.
 
 ### 4.2 Origin policy (one allow-list, three enforcers) — SVC-G8/G9
 

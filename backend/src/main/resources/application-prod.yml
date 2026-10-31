@@ -27,6 +27,8 @@ app:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:${FRONTEND_URL}}
   email:
     provider: ${EMAIL_PROVIDER:sendgrid}
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:}
 
 logging:
   level:

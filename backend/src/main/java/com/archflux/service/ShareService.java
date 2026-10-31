@@ -268,6 +268,9 @@ public class ShareService {
       String html = "<p>" + HtmlUtils.htmlEscape(sharer) + " shared <strong>"
           + HtmlUtils.htmlEscape(diagram.getTitle()) + "</strong> with you on ArchFlux.</p>"
           + "<p><a href=\"" + HtmlUtils.htmlEscape(link) + "\">Open the diagram</a></p>";
+      if (target.getEmail() == null) {
+        return; // phone-only user: no mailbox to notify
+      }
       email.sendHtml(target.getEmail(), subject, html);
     } catch (Exception e) {
       log.warn("Share notification failed for diagram {}: {}", diagram.getId(),

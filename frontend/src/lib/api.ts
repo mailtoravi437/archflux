@@ -366,6 +366,14 @@ export const api = {
   getAuthProviders: () =>
     request<{ data: { providers: { id: string }[] } }>('/v1/auth/providers', {}, { probe: true }),
 
+  /** Phone sign-in (R1-SEC-02): exchange a Firebase ID token for the cookie session. */
+  signInWithFirebase: (idToken: string) =>
+    request<{ data: { user: { id: string; phone?: string | null; email?: string | null } } }>(
+      '/v1/auth/firebase',
+      { method: 'POST', body: JSON.stringify({ idToken }) },
+      { probe: true },
+    ),
+
   sendMagicLink: (email: string) =>
     request<{ data?: unknown }>('/v1/auth/magic-link', {
       method: 'POST',

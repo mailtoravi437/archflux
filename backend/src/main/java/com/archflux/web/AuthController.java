@@ -3,6 +3,8 @@ package com.archflux.web;
 import com.archflux.auth.JwtService;
 import com.archflux.auth.MagicLinkService;
 import com.archflux.auth.OAuthEmail;
+import com.archflux.auth.PhoneTokenVerifier;
+import com.archflux.service.ApiException;
 import com.archflux.auth.UserSessionService;
 import com.archflux.domain.User;
 import com.archflux.repo.UserRepository;
@@ -55,6 +57,9 @@ public class AuthController {
     private final JwtService jwtService;
     private final WorkspaceService workspaceService;
     private final AuditService auditService;
+    // Field-injected (not a constructor arg) so the existing hand-built controllers in tests keep compiling.
+    @org.springframework.beans.factory.annotation.Autowired
+    private PhoneTokenVerifier phoneTokenVerifier;
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
@@ -308,6 +313,35 @@ public class AuthController {
     }
 
     /**
+     * Phone sign-in (R1-SEC-02): exchange a Firebase phone ID token for the ArchFlux cookie session.
+     * Failure creates nothing and sets no cookie; the token and number are never logged.
+     */
+    @PostMapping("/firebase")
+    public ResponseEntity<Map<String, Object>> signInWithFirebase(
+            @RequestBody(required = false) Map<String, Object> body,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        Object raw = body == null ? null : body.get("idToken");
+        if (!(raw instanceof String idToken) || idToken.isBlank() || idToken.length() > 8192) {
+            throw ApiException.validation("idToken is required");
+        }
+        String phone;
+        try {
+            phone = phoneTokenVerifier.verify(idToken);
+        } catch (ApiException e) {
+            auditService.record(null, null, "auth.login_failed", "auth", e.code().toLowerCase(), "error");
+            throw e;
+        }
+        UUID userId = workspaceService.provisionPhoneLogin(phone);
+        User user = userRepository.findById(userId).orElseThrow(() ->
+            new IllegalStateException("provisioned user missing: " + userId));
+        String sessionId = sessionService.createSession(user, request.getRemoteAddr());
+        addAuthCookie(response, jwtService.generateToken(user, sessionId));
+        auditService.record(user.getId(), null, "auth.login", "user", user.getId().toString(), "ok");
+        return ResponseEntity.ok(Map.of("data", Map.of("user", userToMap(user))));
+    }
+
+    /**
      * Logout: destroy server session, invalidate the HTTP session, and clear
      * the ARCHFLUX_TOKEN cookie.
      */
@@ -509,6 +543,7 @@ public class AuthController {
         Map<String, Object> map = new HashMap<>();
         map.put("id", user.getId());
         map.put("email", user.getEmail());
+        map.put("phone", user.getPhoneNumber());
         map.put("name", user.getName());
         map.put("role", user.getRole());
         map.put("provider", user.getProvider());

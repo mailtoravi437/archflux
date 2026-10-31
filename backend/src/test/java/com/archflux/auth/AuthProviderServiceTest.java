@@ -75,4 +75,12 @@ class AuthProviderServiceTest {
     env.withProperty("app.saml.enabled", "false");
     assertTrue(new AuthProviderService(env).configured().isEmpty());
   }
+
+  @Test
+  void phoneIsOfferedOnlyWhenTheFirebaseProjectIdIsSet() {
+    assertTrue(new AuthProviderService(new MockEnvironment()).configured().isEmpty());
+    assertTrue(new AuthProviderService(new MockEnvironment().withProperty("app.firebase.project-id", " ")).configured().isEmpty());
+    assertEquals(List.of("phone"), new AuthProviderService(
+        new MockEnvironment().withProperty("app.firebase.project-id", "archflux-89085")).configured());
+  }
 }

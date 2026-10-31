@@ -26,7 +26,7 @@ public class AuthProviderService {
     this.env = env;
   }
 
-  /** Provider ids (github, google, oidc, saml) that can actually sign a user in. */
+  /** Provider ids (github, google, oidc, saml, phone) that can actually sign a user in. */
   public List<String> configured() {
     List<String> out = new ArrayList<>();
     if (realClient("github")) out.add("github");
@@ -39,6 +39,9 @@ public class AuthProviderService {
         && !isBlank(env.getProperty(SAML_SSO_URL_KEY))
         && !placeholderHost(env.getProperty(SAML_SSO_URL_KEY))) {
       out.add("saml");
+    }
+    if (!isBlank(env.getProperty("app.firebase.project-id"))) {
+      out.add("phone");
     }
     return out;
   }
