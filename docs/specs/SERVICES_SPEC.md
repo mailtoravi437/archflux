@@ -1,6 +1,6 @@
 # ArchFlux Service Architecture Specification
 
-> **Version:** 2.4.0 | **Last Updated:** 2026-10-31 | **Status:** ✅ Current
+> **Version:** 2.5.0 | **Last Updated:** 2026-10-31 | **Status:** ✅ Current
 > **Part of:** [Master Spec](../../SPEC.md) | **Maintenance:** [Protocol](../../SPEC.md#spec-maintenance-protocol)
 > **Supersedes:** `docs/SEPARATE_DEPLOY_SPEC.md` v1.0 (which proposed two repos and embedded real secrets).
 
@@ -170,6 +170,18 @@ Redirect targets (the SPA uses **clean path URLs**; since 2026-10-31 no redirect
 | Magic link in email | `{public-api-url}/v1/auth/verify?token=<t>` (a backend endpoint, not an SPA route) |
 
 Login initiation (from the SPA): `{apiUrl}/v1/auth/login/{github|google|saml|oidc}`.
+
+### 4.1a Sign-in providers and account linking (R1-SEC-01, 2026-10-31)
+
+| Rule | Behaviour |
+|---|---|
+| H1 verified email only | A provider login is accepted only when the provider asserts the email is verified: OIDC `email_verified=true` (Google, generic OIDC); GitHub primary email with `verified=true` from `GET /user/emails`. Otherwise nothing is created or linked, no cookie is set, `auth.login_failed` is audited and the redirect is `{frontend-url}/login?error=email_not_verified`. A login name that looks like an email is never used. `provision_user` still links an existing account by email, which is now safe because only verified emails reach it |
+| H2 GitHub private email | `GithubOAuth2UserService` always reads `/user/emails`; the profile email is never a fallback. No usable email (including a failed lookup) gives `?error=no_email` |
+| H3 no stored tokens | The provider access token is not persisted (`provision_user` gets NULL; V20 wipes old values). Nothing in the codebase reads `users.access_token`; the GitHub connector uses its own configured credentials. GitHub sign-in scope is `read:user,user:email` (no `repo`). A future connector that needs a provider token must add an encrypted (AES-GCM, key from env) connector grant, never `users.access_token` |
+| H4 honest buttons | `GET /api/v1/auth/providers` lists only providers with real credentials; the login screen renders only those (magic link otherwise) |
+| H5 hardening | `GET /api/v1/auth/login/oidc?provider=` accepts only `github`, `google`, `oidc` (else 400). Prod sets `org.springframework.security` and `org.springframework.web` to INFO (base profile keeps DEBUG for dev) |
+
+Error codes shown at `/login?error=`: `email_not_verified`, `no_email`, `invalid_token`, plus provider error codes.
 
 ### 4.2 Origin policy (one allow-list, three enforcers) — SVC-G8/G9
 

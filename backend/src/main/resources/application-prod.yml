@@ -31,6 +31,9 @@ app:
 logging:
   level:
     com.archflux: INFO
+    # Base profile logs these at DEBUG; in prod they would record OAuth parameters and codes.
+    org.springframework.security: INFO
+    org.springframework.web: INFO
 
 # OpenAPI document + Swagger UI are build/dev tooling; never public in prod (SVC-G30).
 springdoc:

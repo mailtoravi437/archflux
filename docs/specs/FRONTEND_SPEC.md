@@ -1,6 +1,6 @@
 # ArchFlux Frontend Specification
 
-> **Version:** 1.7.0 | **Last Updated:** 2026-10-24 | **Status:** ✅ Current
+> **Version:** 1.8.0 | **Last Updated:** 2026-10-31 | **Status:** ✅ Current
 > **Part of:** [Master Spec](../../SPEC.md) | **Maintenance:** [Protocol](../../SPEC.md#spec-maintenance-protocol)
 > **Governing contract:** [PRODUCT_SPEC Appendix A](PRODUCT_SPEC.md#appendix-a-platform-contracts-moved-from-productization_spec-v300-2026-10-25) — see
 > [Productization (v3.0.0) Deltas](#productization-v300--frontend-deltas) below.
@@ -121,6 +121,8 @@ src/
 |----------|----------------|
 | Base URL | `getApiUrl()` from `src/config.ts` (`/config.json` → `VITE_API_URL` → `/api`); paths are `/v1/...` |
 | Login initiation | `{apiUrl}/v1/auth/login/{github,google,saml,oidc}` (full-page navigation) |
+| Provider buttons | Rendered only for providers returned by `GET /v1/auth/providers` (R1-SEC-01). None configured, or the request failing, shows the magic-link form only: no GitHub/Google buttons, no SSO tabs. The old "repository read/write scope" line is removed |
+| Login errors | `?error=email_not_verified` and `?error=no_email` show an honest explanation (provider email not verified / no email from provider) |
 | Transport auth | `ARCHFLUX_TOKEN` cookie (`credentials: 'include'`); no `Authorization` header, no localStorage token |
 | Login | OAuth/magic-link redirects set the cookie; callback screen probes `GET /api/v1/auth/me`, then `setSession({mode, email})` |
 | Logout | `POST /api/v1/auth/logout` → guest session + legacy-token wipe → `/login` |
@@ -345,7 +347,8 @@ tracked there with acceptance criteria; this spec's Project Structure gains `com
 | FE-Q9 | Contrast < 4.5:1: linter chip (3.48), status badge (2.86 @ 9 px), active rail label (3.59) | Darker tokens for small text; badge ≥ 10 px | axe color-contrast clean on all routes |
 | FE-Q10 | ARIA: `role=row` containing inputs (Settings → General), `role=tablist` containing a non-tab button (canvas utility bar) | Valid roles | axe aria-required-children clean |
 | FE-Q11 | Phones: the nav tab strip scrolls sideways with no affordance | Edge fade indicates more tabs | visual |
-| FE-Q12 | Login offers both "SAML" and "Single Sign-On (SAML)" | One "SSO (SAML)" tab (org slug optional) | unit/e2e |
+| FE-Q12 | Login offers both "SAML" and "Single Sign-On (SAML)" | One "SSO (SAML)" tab (org slug optional), shown only when SAML is configured | unit/e2e |
+| FE-Q13 | Login shows GitHub/Google/SSO/OIDC controls even when the server has only placeholder credentials; GitHub copy claims repo read/write | Only configured providers are shown (`GET /v1/auth/providers`) | unit `login-providers.test.tsx` |
 
 E2E suites that need a populated canvas seed `tests/fixtures/sampleDiagram.ts` through `e2e/fixtures.ts`
 (`seedSampleWorkspace`) — the same 9-node graph the app used to ship, so existing baselines stay comparable.

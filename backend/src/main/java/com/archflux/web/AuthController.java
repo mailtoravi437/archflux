@@ -2,6 +2,7 @@ package com.archflux.web;
 
 import com.archflux.auth.JwtService;
 import com.archflux.auth.MagicLinkService;
+import com.archflux.auth.OAuthEmail;
 import com.archflux.auth.UserSessionService;
 import com.archflux.domain.User;
 import com.archflux.repo.UserRepository;
@@ -18,8 +19,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -47,13 +46,15 @@ public class AuthController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
+    /** OAuth registration ids /login/oidc may forward to (H5): never an arbitrary string. */
+    private static final java.util.Set<String> OAUTH_REGISTRATIONS = java.util.Set.of("github", "google", "oidc");
+
     private final UserRepository userRepository;
     private final UserSessionService sessionService;
     private final MagicLinkService magicLinkService;
     private final JwtService jwtService;
     private final WorkspaceService workspaceService;
     private final AuditService auditService;
-    private final OAuth2AuthorizedClientService authorizedClientService;
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
@@ -73,15 +74,13 @@ public class AuthController {
                           MagicLinkService magicLinkService,
                           JwtService jwtService,
                           WorkspaceService workspaceService,
-                          AuditService auditService,
-                          OAuth2AuthorizedClientService authorizedClientService) {
+                          AuditService auditService) {
         this.userRepository = userRepository;
         this.sessionService = sessionService;
         this.magicLinkService = magicLinkService;
         this.jwtService = jwtService;
         this.workspaceService = workspaceService;
         this.auditService = auditService;
-        this.authorizedClientService = authorizedClientService;
     }
 
     /**
@@ -135,8 +134,12 @@ public class AuthController {
             @RequestParam(required = false) String redirectUri,
             @RequestParam(required = false) String provider,
             HttpServletResponse response) throws IOException {
+        String registration = provider == null ? "oidc" : provider;
+        if (!OAUTH_REGISTRATIONS.contains(registration)) {
+            return ResponseEntity.badRequest().build();
+        }
         String targetRedirect = redirectUri != null ? redirectUri : spaUrl("/canvas");
-        String oidcRedirect = "/oauth2/authorize/" + (provider != null ? provider : "oidc") + "?redirect_uri=" +
+        String oidcRedirect = "/oauth2/authorize/" + registration + "?redirect_uri=" +
             java.net.URLEncoder.encode(targetRedirect, java.nio.charset.StandardCharsets.UTF_8);
         response.sendRedirect(oidcRedirect);
         return ResponseEntity.ok().build();
@@ -152,12 +155,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 
-        String email = extractEmail(principal);
-        if (email == null || email.isBlank()) {
-            log.warn("OAuth2 success with no email attribute from {}", request.getRemoteAddr());
-            response.sendRedirect(spaUrl("/login?error=no_email"));
-            return;
-        }
+        OAuthEmail.Result resolved = OAuthEmail.resolve(principal);
         // @AuthenticationPrincipal only carries the OAuth2User (never the token),
         // so recover the registration id from the SecurityContext when available.
         org.springframework.security.core.Authentication auth =
@@ -165,8 +163,16 @@ public class AuthController {
         final String provider = (auth instanceof OAuth2AuthenticationToken token)
             ? token.getAuthorizedClientRegistrationId()
             : extractProvider(principal);
+        if (!resolved.ok()) {
+            // H1: an email the provider has not verified never links to or creates an account.
+            log.warn("OAuth2 login refused ({}) for provider {} from {}", resolved.error(), provider,
+                request.getRemoteAddr());
+            auditService.record(null, null, "auth.login_failed", "auth", resolved.error(), "error");
+            response.sendRedirect(spaUrl("/login?error=") + resolved.error());
+            return;
+        }
+        String email = resolved.email();
         String providerId = extractProviderId(principal);
-        String accessToken = extractAccessToken(principal);
         String avatarUrl = extractAvatarUrl(principal);
         String displayName = extractDisplayName(principal);
 
@@ -177,7 +183,7 @@ public class AuthController {
         // role). provision_login upserts by email, refreshes profile +
         // last_login_at, and ensures a personal workspace.
         UUID userId = workspaceService.provisionLogin(null, email, displayName,
-            "member", provider, providerId, avatarUrl, accessToken);
+            "member", provider, providerId, avatarUrl, null /* H3: provider token is never stored */);
         User user = userRepository.findById(userId).orElseThrow(() ->
             new IllegalStateException("provisioned user missing: " + userId));
 
@@ -216,11 +222,11 @@ public class AuthController {
             HttpServletRequest request) {
 
         if (principal != null) {
-            String email = extractEmail(principal);
-            if (email == null || email.isBlank()) {
+            OAuthEmail.Result resolved = OAuthEmail.resolve(principal);
+            if (!resolved.ok()) {
                 return ResponseEntity.status(404).build();
             }
-            return userRepository.findByEmailIgnoreCase(email)
+            return userRepository.findByEmailIgnoreCase(resolved.email())
                 .map(user -> ResponseEntity.ok(userToMap(user)))
                 .orElse(ResponseEntity.status(404).build());
         }
@@ -468,29 +474,6 @@ public class AuthController {
 
     // Principal helpers
 
-    private String extractEmail(Object principal) {
-        if (principal instanceof OidcUser oidc) {
-            return oidc.getEmail();
-        }
-        if (principal instanceof OAuth2User oauth2) {
-            Object email = oauth2.getAttributes().get("email");
-            if (email instanceof String s && !s.isBlank()) return s;
-            Object login = oauth2.getAttributes().get("login");
-            if (login instanceof String l && !l.isBlank() && l.contains("@")) return l;
-        }
-        if (principal instanceof org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal saml) {
-            for (String key : List.of("email", "Email", "emailaddress", "nameID")) {
-                Object v = saml.getAttributes().get(key);
-                if (v instanceof String s && !s.isBlank()) return s;
-                if (v instanceof java.util.List<?> list && !list.isEmpty() && list.get(0) instanceof String s && !s.isBlank()) return s;
-            }
-            String name = saml.getName();
-            if (name != null && name.contains("@")) return name;
-            return null;
-        }
-        return null;
-    }
-
     private String extractProvider(OAuth2User principal) {
         if (principal instanceof OAuth2AuthenticationToken token) {
             return token.getAuthorizedClientRegistrationId();
@@ -520,20 +503,6 @@ public class AuthController {
             }
         }
         return null;
-    }
-
-    private String extractAccessToken(OAuth2User principal) {
-        if (principal instanceof OAuth2AuthenticationToken token) {
-            String registrationId = token.getAuthorizedClientRegistrationId();
-            String principalName = token.getName();
-            OAuth2AuthorizedClient authorizedClient = authorizedClientService
-                .loadAuthorizedClient(registrationId, principalName);
-            if (authorizedClient != null) {
-                return authorizedClient.getAccessToken().getTokenValue();
-            }
-        }
-        // For other OAuth2User implementations, try to get from attributes
-        return (String) principal.getAttributes().get("access_token");
     }
 
     private Map<String, Object> userToMap(User user) {

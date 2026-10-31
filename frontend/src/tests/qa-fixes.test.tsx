@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { api } from '../lib/api';
 import { MemoryRouter } from 'react-router-dom';
 import { DiagramProvider } from '../state/store';
 import LoginScreen from '../screens/LoginScreen';
@@ -30,10 +31,12 @@ describe('dashboard status badge (FE-Q6)', () => {
 });
 
 describe('login screen', () => {
-  it('offers one real SSO (SAML) tab and no simulated SSO sign-in (FE-Q12)', () => {
+  it('offers one real SSO (SAML) tab and no simulated SSO sign-in (FE-Q12)', async () => {
+    vi.spyOn(api, 'getAuthProviders').mockResolvedValue({ data: { providers: [{ id: 'saml' }, { id: 'oidc' }] } });
     renderLogin();
+    await waitFor(() => expect(screen.getAllByRole('tab')).toHaveLength(3));
     const tabs = screen.getAllByRole('tab').map((t) => t.textContent);
-    expect(tabs).toEqual(['Magic Link', 'Google', 'SSO (SAML)', 'OIDC']);
+    expect(tabs).toEqual(['Magic Link', 'SSO (SAML)', 'OIDC']);
     expect(screen.queryByLabelText('SSO organization')).toBeNull();
   });
 

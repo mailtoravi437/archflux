@@ -341,24 +341,12 @@ class AuthControllerTest extends PostgresIT {
             "email", "oauth@test.com",
             "name", "OAuth User",
             "id", "98765",
+            "email_verified", true,
             "avatar_url", "https://avatars.example.com/u/98765"
         );
         DefaultOAuth2User oauth2User = new DefaultOAuth2User(
             Collections.emptyList(), attributes, "email"
         );
-
-        // Mock authorized client
-        OAuth2AuthorizedClient authorizedClient = mock(OAuth2AuthorizedClient.class);
-        when(authorizedClient.getAccessToken()).thenReturn(
-            new org.springframework.security.oauth2.core.OAuth2AccessToken(
-                org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType.BEARER,
-                "github-access-token",
-                java.time.Instant.now(),
-                java.time.Instant.now().plusSeconds(3600)
-            )
-        );
-        when(authorizedClientService.loadAuthorizedClient(eq("github"), eq("oauth@test.com")))
-            .thenReturn(authorizedClient);
 
         // Create OAuth2AuthenticationToken
         OAuth2AuthenticationToken authToken = new OAuth2AuthenticationToken(
@@ -378,7 +366,7 @@ class AuthControllerTest extends PostgresIT {
         when(jwtService.getAccessTokenTtlSeconds()).thenReturn(3600L);
         com.archflux.web.AuthController controller = controllerWithDevCookies(
             new com.archflux.web.AuthController(
-                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, new AuditService(auditEvents), authorizedClientService));
+                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, new AuditService(auditEvents)));
         var httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
         when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
         var httpRes = new org.springframework.mock.web.MockHttpServletResponse();
@@ -405,6 +393,8 @@ class AuthControllerTest extends PostgresIT {
         assertTrue("https://avatars.example.com/u/98765".equals(saved.get().getAvatarUrl()),
             "avatar should be stored, got: " + saved.get().getAvatarUrl());
         verify(jwtService).generateToken(any(User.class), any());
+        // H3: the provider access token is never persisted.
+        assertTrue(saved.get().getAccessToken() == null, "provider access token must not be stored");
         // Login is audited with actor + outcome (PROD-009).
         assertTrue(auditEvents.findByActionOrderByCreatedAtDesc(
                 "auth.login",
@@ -426,7 +416,7 @@ class AuthControllerTest extends PostgresIT {
 
         com.archflux.web.AuthController controller = controllerWithDevCookies(
             new com.archflux.web.AuthController(
-                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, new AuditService(auditEvents), authorizedClientService));
+                userRepository, userSessionService, magicLinkService, jwtService, workspaceService, new AuditService(auditEvents)));
         var httpReq = mock(jakarta.servlet.http.HttpServletRequest.class);
         when(httpReq.getRemoteAddr()).thenReturn("127.0.0.1");
         var httpRes = new org.springframework.mock.web.MockHttpServletResponse();
@@ -468,5 +458,124 @@ class AuthControllerTest extends PostgresIT {
         when(userSessionService.isRevoked("revoked-me")).thenReturn(true);
         mockMvc.perform(get("/api/v1/auth/me").header("Authorization", "Bearer " + token))
             .andExpect(status().isUnauthorized());
+    }
+
+    // ---- H1/H3/H4/H5 (2026-10-31) ----
+
+    private com.archflux.web.AuthController newController() {
+        return controllerWithDevCookies(new com.archflux.web.AuthController(
+            userRepository, userSessionService, magicLinkService, jwtService, workspaceService,
+            new AuditService(auditEvents)));
+    }
+
+    private org.springframework.mock.web.MockHttpServletResponse success(
+            org.springframework.security.oauth2.core.user.OAuth2User principal, String registrationId) throws Exception {
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+            new OAuth2AuthenticationToken(principal, Collections.emptyList(), registrationId));
+        try {
+            when(userSessionService.createSession(any(User.class), any())).thenReturn("s");
+            when(jwtService.generateToken(any(User.class), any())).thenReturn("jwt");
+            when(jwtService.getAccessTokenTtlSeconds()).thenReturn(3600L);
+            var req = mock(jakarta.servlet.http.HttpServletRequest.class);
+            when(req.getRemoteAddr()).thenReturn("127.0.0.1");
+            var res = new org.springframework.mock.web.MockHttpServletResponse();
+            newController().handleSuccess(principal, req, res);
+            return res;
+        } finally {
+            org.springframework.security.core.context.SecurityContextHolder.clearContext();
+        }
+    }
+
+    private static org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser googleUser(
+            String email, Object verified) {
+        Map<String, Object> claims = new java.util.HashMap<>(Map.of("sub", "g-1", "email", email, "name", "Mallory"));
+        if (verified != null) claims.put("email_verified", verified);
+        var token = new org.springframework.security.oauth2.core.oidc.OidcIdToken(
+            "t", java.time.Instant.now(), java.time.Instant.now().plusSeconds(60), claims);
+        return new org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser(
+            Collections.emptyList(), token);
+    }
+
+    @Test
+    void unverifiedProviderEmailCannotTakeOverAnExistingAccount() throws Exception {
+        var res = success(googleUser(testEmail, false), "google");
+
+        assertTrue(res.getRedirectedUrl().contains("/login?error=email_not_verified"),
+            "got: " + res.getRedirectedUrl());
+        assertTrue(res.getHeader("Set-Cookie") == null, "no session cookie may be set");
+        verify(jwtService, never()).generateToken(any(User.class), any());
+        verify(userSessionService, never()).createSession(any(User.class), any());
+        var existing = userRepository.findByEmailIgnoreCase(testEmail).orElseThrow();
+        assertTrue("github".equals(existing.getProvider()) && "12345".equals(existing.getProviderId()),
+            "existing account must be untouched, provider=" + existing.getProvider());
+        assertTrue(auditEvents.findByActionOrderByCreatedAtDesc("auth.login_failed",
+                org.springframework.data.domain.PageRequest.of(0, 10)).stream()
+            .anyMatch(e -> "email_not_verified".equals(e.getResourceId())),
+            "expected an auth.login_failed audit event");
+    }
+
+    @Test
+    void unverifiedProviderEmailCreatesNoAccount() throws Exception {
+        var res = success(googleUser("brand-new@example.com", null), "google");
+        assertTrue(res.getRedirectedUrl().contains("error=email_not_verified"));
+        assertTrue(userRepository.findByEmailIgnoreCase("brand-new@example.com").isEmpty());
+    }
+
+    @Test
+    void verifiedProviderEmailLinksToTheExistingAccount() throws Exception {
+        var res = success(googleUser(testEmail, true), "google");
+        assertTrue(res.getRedirectedUrl().contains("/auth/callback?provider=google"),
+            "got: " + res.getRedirectedUrl());
+        verify(jwtService).generateToken(argThat((User u) -> testUserId.equals(u.getId())), any());
+    }
+
+    @Test
+    void githubProfileEmailWithoutVerifiedFlagIsRejected() throws Exception {
+        var user = new DefaultOAuth2User(Collections.emptyList(),
+            Map.of("id", "1", "login", "mallory", "email", testEmail), "id");
+        var res = success(user, "github");
+        assertTrue(res.getRedirectedUrl().contains("error=email_not_verified"));
+        verify(jwtService, never()).generateToken(any(User.class), any());
+    }
+
+    @Test
+    void providerAccessTokenIsNotStoredOrLoaded() throws Exception {
+        var res = success(googleUser("fresh@example.com", true), "google");
+        assertTrue(res.getRedirectedUrl().contains("/auth/callback"));
+        var saved = userRepository.findByEmailIgnoreCase("fresh@example.com").orElseThrow();
+        assertTrue(saved.getAccessToken() == null);
+    }
+
+    @Test
+    void oidcLoginRejectsAProviderOutsideTheAllowList() throws Exception {
+        mockMvc.perform(get("/api/v1/auth/login/oidc").param("provider", "../../evil"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/auth/login/oidc").param("provider", "saml"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/auth/login/oidc").param("provider", "google"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", org.hamcrest.Matchers.startsWith("/oauth2/authorize/google?")));
+        mockMvc.perform(get("/api/v1/auth/login/oidc"))
+            .andExpect(header().string("Location", org.hamcrest.Matchers.startsWith("/oauth2/authorize/oidc?")));
+    }
+
+    @MockitoBean
+    private com.archflux.auth.AuthProviderService providerService;
+
+    @Test
+    void providersEndpointListsNothingWhenNoProviderIsConfigured() throws Exception {
+        when(providerService.configured()).thenReturn(java.util.List.of());
+        mockMvc.perform(get("/api/v1/auth/providers"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.providers").isArray())
+            .andExpect(jsonPath("$.data.providers.length()").value(0));
+    }
+
+    @Test
+    void providersEndpointListsOnlyConfiguredProviders() throws Exception {
+        when(providerService.configured()).thenReturn(java.util.List.of("google"));
+        mockMvc.perform(get("/api/v1/auth/providers"))
+            .andExpect(jsonPath("$.data.providers.length()").value(1))
+            .andExpect(jsonPath("$.data.providers[0].id").value("google"));
     }
 }

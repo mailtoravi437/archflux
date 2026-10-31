@@ -53,6 +53,8 @@ the hotspot locks.
 | D7 | Icon uploads need a workspace asset store (S3 bucket in `deploy/aws`) | defer to R2 | icon-picker "Uploaded" tab |
 | D8 | REVIEW_VERSIONING_SPEC §8 puts comment anchors, mentions and the inbox in R1; PRODUCT_SPEC §7 puts K4/K5 in R2 | follow PRODUCT_SPEC (R2); reconcile the specs before R2 | none in R1 |
 | D9 | Viewers can see a diagram's member list | yes (decided in the E07-T02 spec) | — |
+| D10 | AI assistant (PRODUCT_SPEC §3.7) | **Decided 2026-10-31 (owner): stays in R2; no AI code in R1** | — |
+| D11 | Sign-in providers | **Decided 2026-10-31 (owner): fix the security issues first (R1-SEC-01); Google, then GitHub, are enabled later when the owner supplies credentials** | enabling Google/GitHub in prod only |
 
 ## Tasks
 
@@ -187,6 +189,7 @@ delivered visually by E14-T02 and T03.
 
 | ID | Found by | Summary | Status |
 |---|---|---|---|
+| R1-SEC-01 | sign-in plan `docs/plans/SIGN-IN-METHODS-2026-10-31.md` H1-H5 | Provider login adopted an existing account by an unverified email (account takeover); GitHub private emails gave `no_email`; the provider access token was stored in plaintext (`users.access_token`) and GitHub asked for `repo`; login showed buttons for providers with placeholder credentials; `/login/oidc?provider=` forwarded any string; prod logged Spring Security/Web at DEBUG | done 2026-10-31 (backend `OAuthEmailTest`, `GithubOAuth2UserServiceTest`, `AuthProviderServiceTest`, `AuthControllerTest` (`unverifiedProviderEmailCannotTakeOverAnExistingAccount`, `providerAccessTokenIsNotStoredOrLoaded`, `oidcLoginRejectsAProviderOutsideTheAllowList`, `providersEndpoint*`); frontend `login-providers.test.tsx`; migration V20) |
 | R1-BUG-18 | owner screenshots | On the canvas, Ctrl+A did not select freehand pen strokes or free texts, so Delete left them on screen (select-all only took nodes) | fixed 2026-10-31 (`useCanvasKeyboard` select-all also puts stroke and text ids in `multiSel`, selection outline drawn for them; `deleteNodes` removes nodes, edges, strokes and texts in one undo step. Tests: select-all-strokes.test.tsx `Ctrl+A then Delete removes nodes, edges, strokes and texts; one undo restores all`, `Ctrl+A then Delete clears a doc that has a single stroke and nothing else`) |
 | R1-BUG-17 | E13-T05 routes audit | The backend has no y-websocket endpoint: only the STOMP `/ws` is registered (`WebSocketConfig`), while the SPA's `useCollaboration` joins `ws://<api>/ws/diagram-<uuid>`. Repro: sign in, share a cloud diagram, open `#/canvas`, watch the console: WebSocket handshake 404, retried. Live cursors and CRDT sync cannot work against this API. Needs a backend decision (y-websocket relay or move the client to STOMP), so not a small fix. Decided and fixed 2026-10-26: stateless y-websocket relay `/ws/diagram-{uuid}` (SERVICES_SPEC §4.4); test `DiagramRelayTest`, `collaboration-relay-url.test.ts`, `e2e/realtime-cursors.spec.ts` (two users, live cursor) | fixed 2026-10-26 |
 | R1-BUG-16 | E13-T05 routes audit | A signed-in user opening a local-only diagram (`doc-...` id) made the canvas open a realtime socket for a diagram the server never saw: 3 console errors per canvas open (`/canvas`, `/proposal`, `/auth/callback`, template flows). `useCollaboration` and `usePresence` now only join server (UUID) diagrams. Test `collaboration-local-docs.test.ts` (failed first) | fixed 2026-10-26 |
@@ -207,4 +210,5 @@ delivered visually by E14-T02 and T03.
 | R1-BUG-01 | coordinator e2e run | Duplicate `#635BFF` in STROKE_COLORS/BORDER_SWATCHES gives a React duplicate-key warning (exists in HEAD); fixed in R1-E01-T09 | done 2026-10-25 |
 
 ## Changelog
+- 2026-10-31: owner decisions D10 (AI assistant stays in R2) and D11 (sign-in security first); R1-SEC-01 added and done.
 - 1.0.0 (2026-10-24): backlog generated from epics 00–13; waves computed from dependencies.

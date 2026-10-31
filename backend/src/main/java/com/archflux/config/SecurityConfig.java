@@ -36,6 +36,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
+            com.archflux.auth.GithubOAuth2UserService githubUserService,
             @org.springframework.beans.factory.annotation.Value("${app.saml.enabled:true}") boolean samlEnabled)
             throws Exception {
         http
@@ -62,6 +63,9 @@ public class SecurityConfig {
                     endpoint.baseUri("/oauth2/authorize"))
                 .redirectionEndpoint(endpoint ->
                     endpoint.baseUri("/login/oauth2/code/*"))
+                // GitHub (plain OAuth2): resolve the verified primary email (H1/H2). Google and
+                // generic OIDC use the OIDC user service, which carries email_verified.
+                .userInfoEndpoint(u -> u.userService(githubUserService))
                 .defaultSuccessUrl("/api/v1/auth/success", true)
                 // Hands off to AuthController, which redirects to the SPA path route.
                 .failureUrl("/api/v1/auth/failure")
