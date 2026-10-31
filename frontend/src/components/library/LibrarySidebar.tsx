@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLibrary } from '../../state/library';
 import { FolderTree } from './FolderTree';
@@ -21,9 +22,21 @@ export function LibrarySidebar({ active }: { active: SidebarActive }) {
   const navigate = useNavigate();
   const lib = useLibrary();
   const selectedFolder = active === 'all' ? lib.currentFolderId : null;
+  // Phones: the sidebar collapses behind a toggle so content gets the full width.
+  const [open, setOpen] = useState(false);
 
   return (
-    <nav aria-label="Workspace" className="libside">
+    <>
+    <button
+      type="button"
+      className="libside-toggle"
+      aria-expanded={open}
+      aria-controls="libside-nav"
+      onClick={() => setOpen((o) => !o)}
+    >
+      {open ? 'Hide workspace menu' : 'Show workspace menu'}
+    </button>
+    <nav id="libside-nav" aria-label="Workspace" className={`libside${open ? ' is-open' : ''}`}>
       {ITEMS.map((it) => (
         <Link
           key={it.id}
@@ -51,5 +64,6 @@ export function LibrarySidebar({ active }: { active: SidebarActive }) {
         Trash
       </Link>
     </nav>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import { IndexRoute } from '../app/IndexRoute';
 import { RECENT_OPENED_KEY } from '../state/recentDocs';
 import { resetLibraryState } from '../state/library';
+import { blueprintGraph, blueprints } from '../data/blueprints';
 import { sampleNodes, sampleEdges } from './fixtures/sampleDiagram';
 
 const realFetch = globalThis.fetch;
@@ -41,6 +42,17 @@ afterEach(() => {
 });
 
 describe('Home screen (R1-E10-T01)', () => {
+  it('template cards show the counts of the graph they create (BUG-LIVE-009)', () => {
+    renderHome();
+    const section = screen.getByRole('region', { name: 'Start from a template' });
+    for (const b of blueprints.slice(0, 4)) {
+      const g = blueprintGraph(b.id);
+      const btn = within(section).getAllByRole('button').find((x) => x.textContent?.startsWith(b.title));
+      expect(btn?.textContent).toContain(`${b.category} · ${g.nodes.length} elements · ${g.edges.length} connections`);
+      expect(btn.textContent).toContain(`${b.category} · ${g.nodes.length} elements · ${g.edges.length} connections`);
+    }
+  });
+
   it('continue shows last 4 opened docs', () => {
     seed(6, ['doc-5', 'doc-3', 'doc-1', 'doc-4', 'doc-2']);
     renderHome();

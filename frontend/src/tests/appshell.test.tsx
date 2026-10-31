@@ -52,3 +52,21 @@ describe('AppShell app bar chrome (R1-E14-T01)', () => {
     expect(avatar.querySelectorAll('span').length).toBe(1);
   });
 });
+
+// BUG-LIVE-026: every app route uses "<Page> · ArchFlux".
+describe('AppShell page titles (BUG-LIVE-026)', () => {
+  it.each([
+    ['/home', 'Home · ArchFlux'],
+    ['/dashboard', 'Library · ArchFlux'],
+    ['/trash', 'Trash · ArchFlux'],
+    ['/blueprints', 'Blueprints · ArchFlux'],
+  ])('%s -> %s', (route, title) => {
+    setupShell(route);
+    expect(document.title).toBe(title);
+  });
+
+  it('an unknown route is just "ArchFlux", never "ArchFlux · ArchFlux"', () => {
+    setupShell('/no-such-page');
+    expect(document.title).toBe('ArchFlux');
+  });
+});

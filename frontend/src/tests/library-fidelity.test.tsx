@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { DiagramProvider } from '../state/store';
 import DashboardScreen from '../screens/DashboardScreen';
 import { sampleNodes, sampleEdges } from './fixtures/sampleDiagram';
-import { relativeTime } from '../components/library/libraryModel';
+import { librarySubtitle, relativeTime } from '../components/library/libraryModel';
 
 // R1-E14-T04: Library page = docs/design/artboards/Library.dc.html.
 
@@ -179,5 +179,17 @@ describe('relativeTime', () => {
     expect(relativeTime(now - 3 * 24 * HOUR, now)).toBe('3 days ago');
     expect(relativeTime(now - 8 * 24 * HOUR, now)).toBe('last week');
     expect(relativeTime(now - 15 * 24 * HOUR, now)).toBe('2 weeks ago');
+  });
+});
+
+describe('librarySubtitle with a view (BUG-LIVE-022)', () => {
+  const docs = [{ id: 'a' }, { id: 'b' }, { id: SERVER_ID }];
+  it('says both counts when a view is active', () => {
+    expect(librarySubtitle(docs, false, { label: 'starred', shown: 1 })).toBe('1 starred of 3 diagrams on this device');
+    expect(librarySubtitle(docs, true, { label: 'recent', shown: 3 })).toBe('3 recent of 3 diagrams · 1 saved to the server · 2 on this device');
+    expect(librarySubtitle(docs, false, { label: 'starred', shown: 0 })).toBe('0 starred of 3 diagrams on this device');
+  });
+  it('is unchanged without a view', () => {
+    expect(librarySubtitle(docs, false)).toBe('3 diagrams on this device');
   });
 });

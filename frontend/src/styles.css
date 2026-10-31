@@ -2940,6 +2940,18 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   gap: 4px;
   overflow-y: auto;
 }
+.libside-toggle { display: none; }
+@media (max-width: 720px) {
+  .libshell { flex-direction: column; height: auto; min-height: 100%; }
+  .libside-toggle {
+    display: flex; align-items: center; height: 40px; margin: 8px 16px 0; padding: 0 12px;
+    border: 1px solid var(--border-panel); border-radius: 8px; background: var(--bg-panel);
+    color: var(--text-main); font: inherit; font-weight: 500; cursor: pointer;
+  }
+  .libside { display: none; width: auto; border-right: none; border-bottom: 1px solid var(--border-panel); }
+  .libside.is-open { display: flex; }
+  .libshell > .libpage-page { width: 100%; max-width: 100%; box-sizing: border-box; }
+}
 .libside__item {
   height: 32px;
   display: flex;

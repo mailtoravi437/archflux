@@ -6,15 +6,15 @@
 import type { ArchEdge, ArchNode, Blueprint } from '../types';
 import { normalizeDoc } from '../lib/docModel';
 
-export const blueprints: Blueprint[] = [
+type CatalogEntry = Omit<Blueprint, 'nodeCount' | 'edgeCount'>;
+
+const catalog: CatalogEntry[] = [
   {
     id: 'event-kafka-cqrs',
     title: 'Event-Driven Microservices with Kafka & CQRS',
     category: 'Microservices',
     icon: '⚡',
     desc: 'Kafka topics splitting command write-paths from materialized read-paths with outbox safety.',
-    nodeCount: 6,
-    edgeCount: 5,
   },
   {
     id: 'multi-region-vpc',
@@ -23,8 +23,6 @@ export const blueprints: Blueprint[] = [
     icon: '🌍',
     iconSrc: '/icons/node-icons/globe.svg',
     desc: 'Dual-region VPCs, Global Accelerator anycast, regional failover with health-checked endpoints.',
-    nodeCount: 6,
-    edgeCount: 5,
   },
   {
     id: 'rag-pipeline',
@@ -32,8 +30,6 @@ export const blueprints: Blueprint[] = [
     category: 'AI / RAG',
     icon: '🧠',
     desc: 'Ingest → chunk → embed → vector DB retrieval with LLM cache and eval stream.',
-    nodeCount: 6,
-    edgeCount: 5,
   },
   {
     id: 'k8s-service-mesh',
@@ -42,8 +38,6 @@ export const blueprints: Blueprint[] = [
     icon: '☸️',
     iconSrc: '/icons/node-icons/k8s.svg',
     desc: 'Istio sidecars, ingress gateway, mTLS policy engine and telemetry pipeline.',
-    nodeCount: 6,
-    edgeCount: 5,
   },
   {
     id: 'zero-trust-gateway',
@@ -52,8 +46,6 @@ export const blueprints: Blueprint[] = [
     icon: '🔐',
     iconSrc: '/icons/node-icons/lock.svg',
     desc: 'OAuth2 gateway, JWT verifier, policy engine, audit log stream and session cache.',
-    nodeCount: 5,
-    edgeCount: 4,
   },
   {
     id: 'ledger-sourcing',
@@ -61,8 +53,6 @@ export const blueprints: Blueprint[] = [
     category: 'Data & Streaming',
     icon: '💳',
     desc: 'Append-only event log, projector workers, balance read models and audit trail.',
-    nodeCount: 6,
-    edgeCount: 5,
   },
   {
     id: 'iot-ingestion',
@@ -70,8 +60,6 @@ export const blueprints: Blueprint[] = [
     category: 'Data & Streaming',
     icon: '📡',
     desc: 'MQTT brokers at edge, stream processing, hot/warm TimeSeries tiers and alerting.',
-    nodeCount: 6,
-    edgeCount: 5,
   },
   {
     id: 'graphql-federation',
@@ -80,8 +68,6 @@ export const blueprints: Blueprint[] = [
     icon: '🕸️',
     iconSrc: '/icons/node-icons/globe.svg',
     desc: 'Federated gateway composing ownership-scoped subgraphs with schema checks.',
-    nodeCount: 5,
-    edgeCount: 4,
   },
   {
     id: 'edge-cdn',
@@ -90,10 +76,17 @@ export const blueprints: Blueprint[] = [
     icon: '🌐',
     iconSrc: '/icons/node-icons/globe.svg',
     desc: 'Edge workers, dynamic CDN routing, origin shield and cache-invalidation stream.',
-    nodeCount: 5,
-    edgeCount: 4,
   },
 ];
+
+/**
+ * The catalog with counts computed from the graph each template creates
+ * (never hard-coded), so every screen shows what the canvas will contain.
+ */
+export const blueprints: Blueprint[] = catalog.map((b) => {
+  const g = blueprintGraph(b.id);
+  return { ...b, nodeCount: g.nodes.length, edgeCount: g.edges.length };
+});
 
 /** Deterministic blueprint graph payloads — used by Load-to-Canvas. */
 /** Starter graph for a blueprint, normalised like every other load path (DATA_MODEL_R1 §1.2). */
@@ -161,7 +154,7 @@ function rawBlueprintGraph(id: string): { nodes: ArchNode[]; edges: ArchEdge[] }
         edges: [E('cmd', 'kafka', 'append'), E('cmd', 'write', 'commit'), E('kafka', 'proj', 'consume'), E('proj', 'read', 'upsert'), E('read', 'query', 'serve')],
       };
     default: {
-      const bp = blueprints.find((b) => b.id === id);
+      const bp = catalog.find((b) => b.id === id);
       const title = bp?.title ?? id;
       return {
         nodes: [

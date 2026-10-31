@@ -73,6 +73,22 @@ describe('Library UI (R1-E06-T04)', () => {
     expect(screen.queryByText('beta.arch')).toBeNull();
   });
 
+  it('Starred subtitle counts the filtered view, not the whole library (BUG-LIVE-022)', async () => {
+    const first = renderLibrary();
+    expect(screen.getByText('2 diagrams on this device')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Star alpha.arch' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Star alpha.arch' }).getAttribute('aria-pressed')).toBe('true'));
+    first.unmount();
+    renderLibrary('/dashboard?view=starred');
+    expect(await screen.findByText('1 starred of 2 diagrams on this device')).toBeTruthy();
+    expect(screen.queryByText('2 diagrams on this device')).toBeNull();
+  });
+
+  it('Starred subtitle with nothing starred says 0 starred, not the total (BUG-LIVE-022 edge)', async () => {
+    renderLibrary('/dashboard?view=starred');
+    expect(await screen.findByText('0 starred of 2 diagrams on this device')).toBeTruthy();
+  });
+
   it('Move to… dialog moves doc', async () => {
     renderLibrary();
     await createFolder('Platform');

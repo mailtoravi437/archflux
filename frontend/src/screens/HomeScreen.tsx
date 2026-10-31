@@ -147,7 +147,7 @@ export default function HomeScreen() {
                       style={{ ...card, width: '100%', padding: 14, textAlign: 'left', font: 'inherit', color: 'inherit', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 }}
                     >
                       <span style={{ fontWeight: 600 }}>{b.title}</span>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{b.category} · {b.nodeCount} elements</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{b.category} · {b.nodeCount} elements · {b.edgeCount} connections</span>
                     </button>
                   </li>
                 ))}

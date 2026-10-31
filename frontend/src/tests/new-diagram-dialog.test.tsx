@@ -6,7 +6,7 @@ import { DiagramProvider, type DiagramContextValue } from '../state/store';
 import { useDiagram } from '../state/useDiagram';
 import NewDiagramDialog from '../components/NewDiagramDialog';
 import { resetLibraryState } from '../state/library';
-import { blueprints } from '../data/blueprints';
+import { blueprintGraph, blueprints } from '../data/blueprints';
 
 const latest: { v: DiagramContextValue | null } = { v: null };
 function Probe() {
@@ -60,6 +60,34 @@ describe('New diagram dialog (R1-E10-T02)', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(store().docs).toHaveLength(before + 1);
     expect(store().nodes.length).toBeGreaterThan(0);
+  });
+
+  it('template cards show the real counts of the graph they create (BUG-LIVE-009)', async () => {
+    mount();
+    fireEvent.click(screen.getByRole('tab', { name: 'Templates' }));
+    for (const bp of blueprints) {
+      const g = blueprintGraph(bp.id);
+      const card = screen.getByRole('button', { name: new RegExp(`^${bp.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`) });
+      expect(card.textContent).toContain(`${g.nodes.length} elements · ${g.edges.length} connections`);
+    }
+    const bp = blueprints.find((b) => b.id === 'multi-region-vpc')!;
+    const g = blueprintGraph(bp.id);
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${bp.title}`) }));
+    await waitFor(() => expect(store().nodes.length).toBe(g.nodes.length));
+    expect(store().edges.length).toBe(g.edges.length);
+  });
+
+  it('template diagram is named after the template, suffix only on collision (BUG-LIVE-019)', async () => {
+    const bp = blueprints[4];
+    const onClose = mount();
+    fireEvent.click(screen.getByRole('tab', { name: 'Templates' }));
+    for (const [i, expected] of [`${bp.title}.arch`, `${bp.title} (2).arch`].entries()) {
+      fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${bp.title}`) }));
+      await waitFor(() => expect(onClose).toHaveBeenCalledTimes(i + 1));
+      await waitFor(() => expect(store().docTitle).toBe(expected));
+    }
+    const titles = store().docs.map((d) => d.title);
+    expect(new Set(titles).size).toBe(titles.length);
   });
 
   it('AI tab explains R2 and creates nothing', () => {

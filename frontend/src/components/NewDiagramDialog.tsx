@@ -8,6 +8,7 @@ import { isSignedIn } from '../state/session';
 import { moveDoc, useLibrary } from '../state/library';
 import { useDiagram } from '../state/useDiagram';
 import type { DisplayStyle } from '../types';
+import { uniqueTitle } from './library/libraryModel';
 import ImportDialog from './import/ImportDialog';
 
 type Tab = 'blank' | 'template' | 'import' | 'ai';
@@ -184,7 +185,7 @@ export default function NewDiagramDialog({ onClose, initialTab = 'blank' }: { on
                       <li key={b.id}>
                         <button
                           type="button"
-                          onClick={() => start({ title: `${b.title}.arch`, graph: blueprintGraph(b.id), label: `Loaded blueprint: ${b.title}` })}
+                          onClick={() => start({ title: uniqueTitle(b.title, docs.map((d) => d.title)), graph: blueprintGraph(b.id), label: `Loaded blueprint: ${b.title}` })}
                           style={{ width: '100%', textAlign: 'left', padding: 14, border: '1px solid #E3E6EB', borderRadius: 10, background: '#FFFFFF', font: 'inherit', color: 'inherit', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 }}
                         >
                           <span style={{ fontWeight: 600 }}>{b.title}</span>

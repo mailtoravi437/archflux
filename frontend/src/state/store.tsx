@@ -1613,7 +1613,8 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       const count = nodesRef.current.filter((n) => n.type === meta.type).length + 1;
       const id = `${meta.type}-${Date.now().toString(36)}-${count}`;
       const defaultShape = meta.type === 'db' ? 'cylinder' : 'rounded';
-      const node: ArchNode = {
+      // Normalised like every load path, so a fresh node renders exactly as it does after a reload.
+      const node: ArchNode = normalizeNode({
         id,
         type: meta.type,
         label: `${meta.label} ${count}`,
@@ -1627,7 +1628,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
         isOrphan: true,
         shape: defaultShape,
         pageId: activePageIdRef.current,
-      };
+      }, { id: '', title: '', nodes: [], edges: [], createdAt: 0, updatedAt: 0, pages: pagesRef.current });
       setNodesState((prev) => [...prev, node]);
       setSelectedId(id);
       track('element_added', { kind: type });

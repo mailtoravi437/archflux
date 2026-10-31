@@ -19,6 +19,16 @@ export function matchesSource(doc: Pick<DiagramDoc, 'id'>, source: SourceFilter)
   return source === 'server' ? isServerDoc(doc) : !isServerDoc(doc);
 }
 
+/** "<name>.arch", or "<name> (n).arch" when the library already has that title. Capped at 80 characters. */
+export function uniqueTitle(name: string, existing: string[]): string {
+  const taken = new Set(existing);
+  for (let n = 1; ; n++) {
+    const suffix = n === 1 ? '.arch' : ` (${n}).arch`;
+    const t = `${name.slice(0, 80 - suffix.length)}${suffix}`;
+    if (!taken.has(t)) return t;
+  }
+}
+
 function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
@@ -27,11 +37,17 @@ function plural(n: number, one: string, many = `${one}s`): string {
  * Header subtitle. Signed in: "N diagrams · X saved to the server · Y on this device".
  * Signed out (guest or no session): "N diagrams on this device".
  */
-export function librarySubtitle(docs: Pick<DiagramDoc, 'id'>[], signedIn: boolean): string {
+export function librarySubtitle(
+  docs: Pick<DiagramDoc, 'id'>[],
+  signedIn: boolean,
+  view?: { label: string; shown: number },
+): string {
   const total = docs.length;
-  if (!signedIn) return `${plural(total, 'diagram')} on this device`;
+  // A filtered view says both counts: "1 starred of 3 diagrams".
+  const head = view ? `${view.shown} ${view.label} of ${plural(total, 'diagram')}` : plural(total, 'diagram');
+  if (!signedIn) return `${head} on this device`;
   const server = docs.filter(isServerDoc).length;
-  return `${plural(total, 'diagram')} · ${server} saved to the server · ${total - server} on this device`;
+  return `${head} · ${server} saved to the server · ${total - server} on this device`;
 }
 
 export interface SourceChip {
