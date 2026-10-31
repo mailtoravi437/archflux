@@ -216,4 +216,80 @@ describe('app bar = AppBar.dc.html (R1-E14-T01)', () => {
     expect(screen.getByRole('button', { name: 'Search ⌘K' })).toBeTruthy();
     expect(screen.getByRole('button', { name: /Account/ })).toBeTruthy();
   });
+
+  // 2026-10-31 R1-E01-T10: a signed-in user moves a local diagram to the server from the status menu.
+  describe('status menu: Save to server', () => {
+    const signIn = (mode: string) => localStorage.setItem('archflux:session', JSON.stringify({ mode, email: 'a@example.com' }));
+    const openStatusMenu = () => fireEvent.click(screen.getByTestId('status-button'));
+
+    it('offers an enabled "Save to server" for a signed-in user with a local doc, and none for a guest', () => {
+      mockServer();
+      signIn('email');
+      setupShell(true);
+      openStatusMenu();
+      const item = screen.getByRole('menuitem', { name: 'Save to server' }) as HTMLButtonElement;
+      expect(item.disabled).toBe(false);
+      cleanup();
+      localStorage.clear();
+      signIn('guest');
+      setupShell(true);
+      openStatusMenu();
+      expect(screen.queryByRole('menuitem', { name: /Save to server/ })).toBeNull();
+    });
+
+    it('creates the diagram on the server and the doc becomes a server doc', async () => {
+      mockServer();
+      signIn('email');
+      const api = setupShell(true);
+      await act(async () => { api()?.addNode('service', 100, 100); });
+      const localId = api()!.activeDocId;
+      expect(localId).not.toBe(SERVER_ID);
+      openStatusMenu();
+      await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Save to server' })); });
+      await waitFor(() => expect(api()!.activeDocId).toBe(SERVER_ID));
+      expect(api()!.docs.find((d) => d.id === SERVER_ID)?.serverVersion).toBe(1);
+      // The local entry is re-keyed into the server doc, so no stale duplicate is left behind.
+      expect(api()!.docs.some((d) => d.id === localId)).toBe(false);
+    });
+
+    it('toasts "Saved to server" only after the server responds', async () => {
+      signIn('email');
+      mockServer();
+      const base = globalThis.fetch;
+      let release: () => void = () => {};
+      const gate = new Promise<void>((r) => { release = r; });
+      globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
+        if ((init?.method ?? 'GET') === 'POST') await gate;
+        return base(url as RequestInfo, init);
+      }) as typeof fetch;
+      const api = setupShell(true);
+      await act(async () => { api()?.addNode('service', 100, 100); });
+      openStatusMenu();
+      await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Save to server' })); });
+      expect(api()!.toasts.some((t) => /Saved to server/.test(t.text))).toBe(false);
+      expect(api()!.activeDocId).not.toBe(SERVER_ID);
+      await act(async () => { release(); });
+      await waitFor(() => expect(api()!.toasts.some((t) => /Saved to server/.test(t.text))).toBe(true));
+    });
+
+    it('stays local and shows the error when the server fails', async () => {
+      signIn('email');
+      mockServer();
+      const base = globalThis.fetch;
+      globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
+        if ((init?.method ?? 'GET') === 'POST') {
+          return { ok: false, status: 500, headers: { get: () => null }, json: async () => ({ error: { code: 'INTERNAL', message: 'boom' } }) };
+        }
+        return base(url as RequestInfo, init);
+      }) as typeof fetch;
+      const api = setupShell(true);
+      await act(async () => { api()?.addNode('service', 100, 100); });
+      const localId = api()!.activeDocId;
+      openStatusMenu();
+      await act(async () => { fireEvent.click(screen.getByRole('menuitem', { name: 'Save to server' })); });
+      await waitFor(() => expect(api()!.toasts.some((t) => /Save failed/.test(t.text))).toBe(true));
+      expect(api()!.toasts.some((t) => /Saved to server/.test(t.text))).toBe(false);
+      expect(api()!.activeDocId).toBe(localId);
+    });
+  });
 });

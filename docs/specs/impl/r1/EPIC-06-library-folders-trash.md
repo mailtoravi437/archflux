@@ -232,3 +232,4 @@
 - 2026-10-25 R1-E06-T03 done: api.folders/api.diagrams, contracts types, state/library.ts + libraryLocal.ts, store local-trash on `deleteDoc` and `restoreLocalDoc`; 4 tests in library-state.test.tsx. Full vitest 392 pass.
 - 1.0.0 (2026-10-24): epic created.
 - 2026-10-26 Library and Trash routes covered by R1-E13-T05 routes audit (guest and signed in, no console errors); sidebar Templates opens `/blueprints`. No status change.
+- 2026-10-31 R1-E06-T11 review: Library card menu offers "Save to server" on local cards for signed-in users (opens the doc, then `saveActiveDoc`, same semantics as R1-E01-T10; honest toast after the server responds). Files: screens/DashboardScreen.tsx, tests/library-ui.test.tsx (+1).

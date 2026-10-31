@@ -109,6 +109,7 @@ delivered visually by E14-T02 and T03.
 | [R1-E01-T07](r1/EPIC-01-ui-foundation.md) | Click selects; connecting is explicit | S | frontend | R1-E00-T03 | 1 | done | agent-C2 / 2026-10-25 (verified 2026-10-25: select-vs-connect.test 5/5) |
 | [R1-E01-T08](r1/EPIC-01-ui-foundation.md) | `PageHeader` on every page | S | frontend | R1-E01-T02 | 2 | done | agent-F2 / 2026-10-25 |
 | [R1-E01-T09](r1/EPIC-01-ui-foundation.md) | Retire legacy #635BFF accent tokens; move screens to `btn--{size}` | S | frontend | R1-E01-T02 | 2 | done | agent / 2026-10-25 (all btn-xs and light #635BFF retired) |
+| [R1-E01-T10](r1/EPIC-01-ui-foundation.md) | Status menu: Save to server for a local diagram (signed-in) | S | frontend | R1-E01-T03 | 1 | review | agent / 2026-10-31 (PR feature/save-to-server; done after owner merge and live check) |
 | [R1-E02-T01](r1/EPIC-02-element-model.md) | Notation table (`canvas/notation.ts`) | S | frontend | R1-E00-T01 | 1 | done | agent-B2 / 2026-10-25 (reviewed 2026-10-25) |
 | [R1-E02-T02](r1/EPIC-02-element-model.md) | Card style renderer | M | frontend | R1-E02-T01, R1-E00-T07 | 2 | done | agent-C1 / 2026-10-25 |
 | [R1-E02-T03](r1/EPIC-02-element-model.md) | Shape style renderer (notation geometry) | M | frontend | R1-E02-T02 | 3 | done | agent-frontend-implementer / 2026-10-25 |
@@ -144,6 +145,7 @@ delivered visually by E14-T02 and T03.
 | [R1-E06-T03](r1/EPIC-06-library-folders-trash.md) | Frontend API and library state | M | frontend | R1-E06-T02 | 2 | done | agent-F1 / 2026-10-25 |
 | [R1-E06-T04](r1/EPIC-06-library-folders-trash.md) | Library UI: folder tree, breadcrumbs, star, move (SC-06) | M | frontend | R1-E06-T03, R1-E01-T08 | 3 | done | agent-F2 / 2026-10-25 (mounted in DashboardScreen; library-ui 4 tests) |
 | [R1-E06-T05](r1/EPIC-06-library-folders-trash.md) | Trash screen (SC-08) | S | frontend | R1-E06-T03 | 3 | done | agent-F2 / 2026-10-25 (route /trash; trash-screen 3 tests) |
+| [R1-E06-T11](r1/EPIC-06-library.md) | Library card menu: Save to server for local diagrams (signed-in) | S | frontend | R1-E01-T10 | 1 | review | agent / 2026-10-31 (same PR) |
 | [R1-E07-T01](r1/EPIC-07-sharing-access.md) | V11 migration plus `AccessService` (effective role) | M | backend | R1-E06-T02 | 2 | done | agent-E1 / 2026-10-25 |
 | [R1-E07-T02](r1/EPIC-07-sharing-access.md) | Members endpoints | S | backend | R1-E07-T01 | 3 | done | agent-E1 / 2026-10-25 |
 | [R1-E07-T03](r1/EPIC-07-sharing-access.md) | Share links and the `X-Share-Token` header | M | backend | R1-E07-T01 | 3 | done | agent-E1 / 2026-10-25 |

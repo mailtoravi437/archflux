@@ -102,3 +102,20 @@ describe('Library UI (R1-E06-T04)', () => {
     expect(document.activeElement).toBe(items[1]);
   });
 });
+
+// 2026-10-31 R1-E06-T11: the card menu offers Save to server for local docs when signed in.
+describe('Library card menu: Save to server', () => {
+  it('shows "Save to server" on a local card for a signed-in user only', async () => {
+    seed();
+    localStorage.setItem('archflux:session', JSON.stringify({ mode: 'email', email: 'a@example.com' }));
+    globalThis.fetch = (async () => ({ ok: true, status: 200, headers: { get: () => null }, json: async () => ({ data: [], total: 0 }) })) as unknown as typeof fetch;
+    renderLibrary();
+    fireEvent.click(await screen.findByRole('button', { name: "Options for alpha.arch" }));
+    expect(screen.getByRole('menuitem', { name: 'Save to server' })).toBeTruthy();
+    cleanup();
+    localStorage.setItem('archflux:session', JSON.stringify({ mode: 'guest' }));
+    renderLibrary();
+    fireEvent.click(await screen.findByRole('button', { name: "Options for alpha.arch" }));
+    expect(screen.queryByRole('menuitem', { name: 'Save to server' })).toBeNull();
+  });
+});

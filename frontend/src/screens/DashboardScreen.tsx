@@ -21,6 +21,7 @@ import {
   type SourceFilter,
 } from '../components/library/libraryModel';
 import { isSignedIn } from '../state/session';
+import { isServerDocId } from '../lib/honesty';
 import { saveAsTemplate, useTeamTemplates } from '../state/teamTemplates';
 import { isTemplateDoc } from '../lib/teamTemplates';
 import { useDiagram } from '../state/useDiagram';
@@ -150,7 +151,7 @@ function SourceChip({ doc }: { doc: DiagramDoc }) {
 
 export default function DashboardScreen() {
   const navigate = useNavigate();
-  const { docs, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, exportArch, exportPNG, exportSVG, exportCSV, exportPrint, pushToast, activeDocId, nodes: liveNodes, edges: liveEdges, strokes: liveStrokes, texts: liveTexts, pages: livePages, layers: liveLayers, docDefaults } = useDiagram();
+  const { docs, openDoc, newDoc, renameDoc, setDocTags, duplicateDoc, deleteDoc, saveActiveDoc, exportArch, exportPNG, exportSVG, exportCSV, exportPrint, pushToast, activeDocId, nodes: liveNodes, edges: liveEdges, strokes: liveStrokes, texts: liveTexts, pages: livePages, layers: liveLayers, docDefaults } = useDiagram();
   const [signedIn] = useState(() => isSignedIn());
   // Team templates are tagged server diagrams; they live under Blueprints, not in the Library lists (E10-T07).
   const { ids: templateIds } = useTeamTemplates(signedIn);
@@ -402,6 +403,7 @@ export default function DashboardScreen() {
           { label: 'Open', fn: () => open(id) },
           { label: 'Rename', fn: () => startRename(d) },
           { label: 'Duplicate', fn: () => { duplicateDoc(id); track('diagram_created', { source: 'duplicate' }); } },
+          ...(signedIn && !isServerDocId(d.id) ? [{ label: 'Save to server', fn: () => { openDoc(id); window.setTimeout(() => { void saveActiveDoc(); }, 50); } }] : []),
           ...(signedIn ? [{ label: 'Save as template', fn: () => { void makeTemplate(d); } }] : []),
           { label: 'Move to…', fn: () => setMoveDocId(id) },
           { label: 'Export .arch', fn: () => { openDoc(id); window.setTimeout(exportArch, 50); } },
