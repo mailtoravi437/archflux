@@ -43,6 +43,10 @@ export default function LoginScreen() {
   useEffect(() => () => phoneFlow.current?.dispose(), []);
 
   useEffect(() => {
+    document.title = "Sign in · ArchFlux";
+  }, []);
+
+  useEffect(() => {
     emailRef.current?.focus();
     // Returns to the page that asked for sign-in (R1-E07-T06 `?next=`), if it is an in-app path.
     // A guest is not signed in: a shared link (`next`) needs a real sign-in, so a guest stays here instead of
@@ -252,8 +256,10 @@ export default function LoginScreen() {
         flexWrap: "wrap",
         background: "var(--bg-app, #F7F7F5)",
       }}>
-      {/* Brand column — animated drift-resolution motif + quotes */}
-      <div
+      {/* Brand column — animated drift-resolution motif + quotes. Decorative: nothing in it is focusable. */}
+      <aside
+        data-testid="login-brand"
+        aria-label="About ArchFlux"
         style={{
           flex: "1 1 320px",
           minWidth: 0,
@@ -356,7 +362,7 @@ export default function LoginScreen() {
           }}>
           Local-first · .arch in git · deterministic sync
         </div>
-      </div>
+      </aside>
 
       {/* Auth stage */}
       <div
@@ -369,13 +375,12 @@ export default function LoginScreen() {
           // Phones: the card gets the full width minus a 16 px gutter (FE-Q3).
           padding: "clamp(16px, 5vw, 32px)",
         }}>
-        <div
+        <main
           className="content-card"
           style={{ width: 440, maxWidth: "100%", minWidth: 0, boxSizing: "border-box" }}
-          role="main"
           aria-label="Sign in">
           <div className="card-head">
-            <span className="card-title">Sign in to ArchFlux</span>
+            <h1 className="card-title" style={{ margin: 0 }}>Sign in to ArchFlux</h1>
           </div>
           <div
             style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}
@@ -443,6 +448,8 @@ export default function LoginScreen() {
                 <input
                   ref={emailRef}
                   type="email"
+                  required
+                  autoComplete="email"
                   className="doc-title-input"
                   style={{
                     width: "100%",
@@ -644,7 +651,7 @@ export default function LoginScreen() {
               browser) →
             </button>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

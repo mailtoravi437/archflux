@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import type { ThemeName } from '../types';
 import { useDiagram } from '../state/useDiagram';
@@ -110,7 +110,8 @@ function ToastTray() {
   );
 }
 
-export default function AppShell() {
+/** `children` replaces the routed outlet (used by the top-level not-found route). */
+export default function AppShell({ children }: { children?: ReactNode } = {}) {
   const navigate = useNavigate();
   const location = useLocation();
   const { docTitle, pushToast, exportArch, resync, displayName, activeDocId, duplicateDoc, threads, theme, setTheme, saveConflict, saveActiveDoc, forceSaveActiveDoc, reloadActiveDoc, dismissSaveConflict, nodes: docNodes, edges: docEdges, strokes: docStrokes, texts: docTexts, pages: docPages, layers: docLayers, docDefaults, selectedId } = useDiagram();
@@ -542,7 +543,7 @@ export default function AppShell() {
       <main className={`workspace-body${presenting ? ' presenting' : ''}`}>
         <AppStatusBanner onReviewConflict={() => setConflictOpen(true)} />
         <Fragment key={sessionEpoch}>
-          <Outlet />
+          {children ?? <Outlet />}
         </Fragment>
       </main>
 

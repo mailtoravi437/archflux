@@ -68,6 +68,9 @@ export default function OnboardingScreen() {
   const [providers, setProviders] = useState<string[]>([]);
   const [seed, setSeed] = useState<string>('blank');
   // SC-02: signed-in users set up or join a workspace first (R1-E11-T03).
+  useEffect(() => {
+    document.title = 'Set up · ArchFlux';
+  }, []);
   const [needsWorkspace, setNeedsWorkspace] = useState(() => isSignedIn() && !isWorkspaceSetupDone());
 
   const personaRecs = PERSONAS.find((p) => p.id === persona)?.recs ?? ['event-kafka-cqrs', 'k8s-service-mesh', 'zero-trust-gateway'];
@@ -121,17 +124,17 @@ export default function OnboardingScreen() {
   if (needsWorkspace) {
     return (
       <div style={{ minHeight: '100vh', background: '#F6F7F9', color: '#1B1F27', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 13, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 40, boxSizing: 'border-box' }}>
-        <WorkspaceSetup onDone={() => setNeedsWorkspace(false)} />
+        <main><WorkspaceSetup onDone={() => setNeedsWorkspace(false)} /></main>
       </div>
     );
   }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-app, #F7F7F5)', display: 'flex', justifyContent: 'center', padding: 40 }}>
-      <div style={{ width: 720, maxWidth: '100%' }}>
+      <main style={{ width: 720, maxWidth: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
           <img src="/icons/tools/select.svg" alt="" style={{ width: 24, height: 24 }} />
-          <strong>ArchFlux setup</strong>
+          <h1 style={{ margin: 0, fontSize: 'inherit', fontWeight: 700 }}>ArchFlux setup</h1>
           <span style={{ flex: 1 }} />
           <button className="btn btn--sm btn--secondary" onClick={finish} title="Skip onboarding — you can change these anytime in Settings">Skip for now →</button>
         </div>
@@ -246,7 +249,7 @@ export default function OnboardingScreen() {
         <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 8, textAlign: 'center' }}>
           You can change these anytime in Settings → General
         </div>
-      </div>
+      </main>
     </div>
   );
 }
