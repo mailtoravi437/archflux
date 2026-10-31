@@ -7,21 +7,13 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { createAppRouter } from './App';
 import { loadRuntimeConfig } from './lib/config';
 import { migrateLegacyHash } from './lib/legacyHash';
+import { applyStoredTheme } from './state/theme';
 
 // Old `/#/path` links redirect to `/path` before the router reads the URL.
 migrateLegacyHash();
 
 // Apply the persisted theme before first paint to avoid a light→dark flash.
-try {
-  const raw = localStorage.getItem('archflux:v2-light');
-  const theme = raw && (JSON.parse(raw).theme as string);
-  document.documentElement.setAttribute(
-    'data-theme',
-    theme === 'dark' || theme === 'blueprint' || theme === 'light' ? theme : 'light',
-  );
-} catch {
-  document.documentElement.setAttribute('data-theme', 'light');
-}
+applyStoredTheme();
 
 // Resolve apiUrl/wsUrl from /config.json before any request (SERVICES_SPEC §3.1).
 void loadRuntimeConfig().finally(() => {

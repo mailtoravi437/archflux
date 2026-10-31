@@ -1,3 +1,5 @@
+import { clearGitToken } from './settings';
+
 export const SESSION_KEY = 'archflux:session';
 export const AUTH_MODE_KEY = 'archflux:auth_mode';
 /** Legacy pre-cookie bearer key. Never written anymore; removed on clear. */
@@ -41,6 +43,7 @@ export function setSession(s: { mode: string; email?: string }) {
 
 /** Clear to a clean logged-out state: getSession() === null. Expiry path. */
 export function clearSession() {
+  clearGitToken();
   try {
     localStorage.removeItem(SESSION_KEY);
   } catch {

@@ -33,16 +33,14 @@ function persistMerged(next: string[]) {
 export function deriveCheckpointPRs(checkpoints: { id: string; title: string; meta: string; active?: boolean; badge?: string; nodes: { label: string; tag: string }[]; edges: unknown[] }[]): PRItem[] {
   return checkpoints.map((cp) => ({
     id: `cp-${cp.id}`,
-    title: `PR: ${cp.title}`,
-    status: cp.active ? '✓ Checks Passed' : '○ Draft',
+    title: cp.title,
+    status: cp.active ? 'Local checkpoint' : 'Draft',
     file: 'canvas (local checkpoint)',
     summary: `${cp.nodes.length}n • ${cp.edges.length}e — ${cp.meta}`,
     note: cp.badge ?? '',
     branch: 'canvas → main',
-    checks: [
-      { name: 'arch-lint (snapshot)', pass: true },
-      { name: 'schema-validate (.arch JSON)', pass: true },
-    ],
+    // A local checkpoint runs no checks; never fabricate a result (BUG-LIVE-018).
+    checks: [],
     diff: cp.nodes.slice(0, 8).map((n) => ({ kind: 'add' as const, text: `+ service: ${n.label} (${n.tag})` })),
   }));
 }
@@ -204,7 +202,7 @@ export default function GitScreen() {
               {allPRs.map((p) => (
                 <button key={p.id} className={`btn btn--sm btn--${p.id === selectedPR ? 'primary' : 'secondary'}`} onClick={() => setSelectedPR(p.id)} title={p.title}>
                   {p.id.startsWith('cp-') ? '◈' : '#'}
-                  {p.id.startsWith('cp-') ? p.title.replace(/^PR:\s*/, '').slice(0, 18) : p.id}
+                  {p.id.startsWith('cp-') ? p.title.slice(0, 18) : p.id}
                   {merged.includes(p.id) ? ' ✓' : ''}
                 </button>
               ))}
@@ -216,9 +214,16 @@ export default function GitScreen() {
             ) : (
             <div className="pr-visual-diff-card">
               <div className="pr-visual-head">
-                <span>{pr.title}</span>
+                <span>{pr.id.startsWith('cp-') ? `${docTitle} — checkpoint “${pr.title}”` : pr.title}</span>
                 <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                 {(() => {
+                  if (pr.checks.length === 0) {
+                    return (
+                      <span className="badge-count" style={{ fontWeight: 700 }} data-testid="pr-no-checks">
+                        {pr.status} — no checks run
+                      </span>
+                    );
+                  }
                   const failing = pr.checks.some((c) => !c.pass);
                   return (
                     <span className="badge-count" style={{ background: failing ? '#FEE2E2' : '#DCFCE7', color: failing ? '#DC2626' : '#16A34A', fontWeight: 700 }} aria-label={failing ? 'Checks failed' : 'Checks passed'}>
@@ -240,6 +245,9 @@ export default function GitScreen() {
                 </div>
                 <div style={{ marginTop: 10 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 4 }}>PR checks at open time (static snapshot)</div>
+                  {pr.checks.length === 0 && (
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }} data-testid="pr-checks-none">No checks run for a local checkpoint.</div>
+                  )}
                   {pr.checks.map((c) => (
                     <div key={c.name} style={{ fontSize: 11, fontFamily: 'var(--mono-font)', color: c.pass ? '#16A34A' : '#DC2626' }} aria-label={c.pass ? 'Check passed' : 'Check failed'}>
                       <span aria-hidden="true">{c.pass ? '✓' : '✗'}</span> <strong>{c.pass ? 'PASSED' : 'FAILED'}</strong> — {c.name}
