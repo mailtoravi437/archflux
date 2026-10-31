@@ -135,6 +135,11 @@ The SPA uses **clean path URLs** (`createBrowserRouter`): `archflux.in/dashboard
 - Backend-built links (`spaUrl()`, magic link, invites, share links, access-request emails) are
   `{frontend-url}/path` with no `#`.
 - Vite dev serves the SPA fallback by default.
+- **Asset base (decision 2026-10-31, BUG-LIVE-001):** `vite.config.ts` sets `base: '/'`, so built
+  `index.html` references `/assets/...` and `/favicon.svg` from the site root. A relative base
+  (`./`) resolves against the current path, so `/settings/team` requested `/settings/assets/...`,
+  got the SPA fallback HTML and rendered blank. The runtime config is fetched from `/config.json`
+  (absolute) for the same reason. Hosting under a sub-path is not supported.
 
 ### 3.3 Dev server
 
