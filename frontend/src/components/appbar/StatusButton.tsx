@@ -1,5 +1,6 @@
 import { useDiagramDocs, useDiagramUI } from '../../state/useDiagram';
 import { isServerDocId } from '../../lib/honesty';
+import { isSignedIn } from '../../state/session';
 import { MenuButton } from './MenuButton';
 import type { MenuEntry } from './MenuButton';
 import { statusLabel } from './status';
@@ -22,6 +23,7 @@ export function StatusButton({ saveState, onSave, onExport, onLinter, onResync, 
   const { freshnessLabel, isOnline, lintCount, syncError } = useDiagramUI();
   const { activeDocId, dirty, serverVersion, saveConflict, activeDocLimited } = useDiagramDocs();
   const isServerDoc = isServerDocId(activeDocId);
+  const signedIn = isSignedIn();
   const { label, tone } = statusLabel({
     isServerDoc,
     isOnline,
@@ -34,13 +36,16 @@ export function StatusButton({ saveState, onSave, onExport, onLinter, onResync, 
   });
 
   const items: MenuEntry[] = [
-    {
-      id: 'save',
-      label: isServerDoc ? 'Save to server' : 'Save to server (local diagram)',
-      onSelect: onSave,
-      disabled: !isServerDoc || !isOnline || saveState === 'saving',
-      hint: !isServerDoc ? 'This diagram is local; it autosaves in this browser' : !isOnline ? 'Offline' : undefined,
-    },
+    // Guests have no server to save to; a signed-in user can move a local diagram there (2026-10-31).
+    ...(isServerDoc || signedIn
+      ? [{
+          id: 'save',
+          label: 'Save to server',
+          onSelect: onSave,
+          disabled: !isOnline || saveState === 'saving',
+          hint: !isOnline ? 'Offline' : !isServerDoc ? 'Creates a copy on the server; this diagram is local until then' : undefined,
+        } satisfies MenuEntry]
+      : []),
     ...(saveConflict ? [{ id: 'conflict', label: 'Resolve save conflict…', onSelect: onResolveConflict } satisfies MenuEntry] : []),
     { id: 'export', label: 'Export .arch', onSelect: onExport },
     { id: 'linter', label: `Linter (${lintCount} issue${lintCount === 1 ? '' : 's'})`, onSelect: onLinter },
