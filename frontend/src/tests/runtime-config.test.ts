@@ -50,7 +50,7 @@ describe('loadRuntimeConfig', () => {
       new Response(JSON.stringify({ apiUrl: 'https://api.example.com/api' }), { status: 200 }),
     );
     await loadRuntimeConfig(fetchImpl as unknown as typeof fetch);
-    expect(fetchImpl).toHaveBeenCalledWith('config.json', expect.objectContaining({ cache: 'no-store' }));
+    expect(fetchImpl).toHaveBeenCalledWith('/config.json', expect.objectContaining({ cache: 'no-store' }));
     expect(getApiUrl()).toBe('https://api.example.com/api');
     expect(getWsUrl()).toBe('wss://api.example.com');
   });

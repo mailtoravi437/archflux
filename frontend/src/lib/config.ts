@@ -92,7 +92,7 @@ export function setConfigForTests(next: RuntimeConfig): void {
 }
 
 /**
- * Fetch `config.json` (relative to the document, so sub-path hosting works) and
+ * Fetch `config.json` (absolute, so deep links resolve it) and
  * apply it. Missing/invalid/slow files fall back silently to build-time values.
  */
 export async function loadRuntimeConfig(
@@ -103,7 +103,7 @@ export async function loadRuntimeConfig(
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
   try {
-    const res = await fetchImpl('config.json', {
+    const res = await fetchImpl('/config.json', {
       cache: 'no-store',
       headers: { Accept: 'application/json' },
       signal: controller?.signal,

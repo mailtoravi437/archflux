@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const proxied = { target, changeOrigin: false }
   return {
     plugins: [react()],
-    base: './',
+    base: '/',
     server: {
       proxy: {
         '/api': proxied,
