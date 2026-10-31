@@ -40,21 +40,24 @@ function watch(page: Page): Watch {
 }
 
 async function go(page: Page, path: string) {
-  await page.goto(`/#${path}`);
+  await page.goto(path);
   await page.waitForLoadState('domcontentloaded');
 }
-/** In-app navigation: changes the hash without reloading, so store state survives. */
+/** In-app navigation: pushes the path without reloading, so store state survives. */
 async function navigateInApp(page: Page, path: string) {
-  await page.evaluate((p) => { window.location.hash = p; }, path);
+  await page.evaluate((p) => {
+    window.history.pushState(null, '', p);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }, path);
 }
-const hashOf = (page: Page) => new URL(page.url()).hash.slice(1);
+const hashOf = (page: Page) => { const u = new URL(page.url()); return u.pathname + u.search; };
 
 type Mode = 'signed-out' | 'guest' | 'signed-in';
 
 interface RouteCase {
   name: string;
   path: string;
-  /** Expected final hash path (with query) per mode. */
+  /** Expected final path (with query) per mode. */
   lands: Record<Mode, string | RegExp>;
   /** Locator that proves the right screen rendered, per mode. */
   ready: Record<Mode, (p: Page) => Locator>;
@@ -164,7 +167,7 @@ async function newBlankDiagram(page: Page, name: string) {
   await page.getByRole('button', { name: 'New diagram' }).first().click();
   await page.getByLabel('Name').fill(name);
   await page.getByRole('button', { name: 'Create' }).click();
-  await expect(page).toHaveURL(/#\/canvas/);
+  await expect(page).toHaveURL(/\/canvas/);
   await expect(page.locator('#architectureCanvas')).toBeVisible();
 }
 
@@ -206,7 +209,7 @@ test.describe('templates: built-in (guest)', () => {
     // Unsaved changes ask first; the confirm keeps them.
     const confirm = page.getByRole('alertdialog', { name: 'Replace canvas' });
     if (await confirm.isVisible().catch(() => false)) await confirm.getByRole('button', { name: 'Insert', exact: true }).click();
-    await expect(page).toHaveURL(/#\/canvas/);
+    await expect(page).toHaveURL(/\/canvas/);
     await expect.poll(async () => (await activeDoc(page)).nodes.length).toBe(1 + BUILT_IN_GRAPH.nodes.length);
     const doc = await activeDoc(page);
     expect(doc.title).toBe('Insert target');
@@ -223,7 +226,7 @@ test.describe('templates: built-in (guest)', () => {
     const card = page.locator('.blueprint-card', { hasText: BUILT_IN.title }).first();
     await card.getByRole('button', { name: 'Load to Canvas' }).click();
     await page.getByRole('alertdialog', { name: 'Replace canvas' }).getByRole('button', { name: 'Replace', exact: true }).click();
-    await expect(page).toHaveURL(/#\/canvas/);
+    await expect(page).toHaveURL(/\/canvas/);
     await expect.poll(async () => (await activeDoc(page)).nodes.length).toBe(BUILT_IN_GRAPH.nodes.length);
     expect((await activeDoc(page)).nodes.map((n) => n.label).sort()).toEqual(BUILT_IN_GRAPH.nodes.map((n) => n.label).sort());
   });
@@ -236,7 +239,7 @@ test.describe('templates: built-in (guest)', () => {
     await page.getByRole('tab', { name: 'Templates' }).click();
     // Scope to the dialog: the Home page behind it has template cards with the same names.
     await page.getByRole('dialog', { name: 'New diagram' }).getByRole('button', { name: new RegExp(`^${BUILT_IN.title}`) }).click();
-    await expect(page).toHaveURL(/#\/canvas/);
+    await expect(page).toHaveURL(/\/canvas/);
     await expect(page.locator('#architectureCanvas')).toBeVisible();
     await expect.poll(async () => (await activeDoc(page)).nodes.length).toBe(BUILT_IN_GRAPH.nodes.length);
     const doc = await activeDoc(page);
@@ -249,7 +252,7 @@ test.describe('templates: built-in (guest)', () => {
   test('Library sidebar Templates opens Blueprints', async ({ page }) => {
     await go(page, '/dashboard');
     await page.getByRole('navigation').getByRole('link', { name: 'Templates' }).click();
-    await expect(page).toHaveURL(/#\/blueprints/);
+    await expect(page).toHaveURL(/\/blueprints/);
     await expect(page.getByRole('heading', { level: 1, name: 'Blueprints' })).toBeVisible();
   });
 
@@ -281,7 +284,7 @@ test.describe('templates: team (signed in)', () => {
     const use = page.getByRole('button', { name: `Use team template ${title} (template)` });
     await expect(use).toBeVisible();
     await use.click();
-    await expect(page).toHaveURL(/#\/canvas/);
+    await expect(page).toHaveURL(/\/canvas/);
 
     await expect.poll(async () => (await activeDoc(page)).id).not.toBe(original.id);
     const copy = await activeDoc(page);
@@ -293,5 +296,17 @@ test.describe('templates: team (signed in)', () => {
     expect(ws.docs.filter((d) => d.title === title)).toHaveLength(2);
     expect(ws.docs.some((d) => d.title === `${title} (template)`)).toBe(false);
     expect(w.problems).toEqual([]);
+  });
+});
+
+test.describe('legacy hash URLs', () => {
+  test('/#/dashboard redirects to /dashboard', async ({ page }) => {
+    await page.addInitScript(() => {
+      if (!localStorage.getItem('archflux:session')) localStorage.setItem('archflux:session', JSON.stringify({ mode: 'guest' }));
+    });
+    await page.goto('/#/dashboard');
+    await expect(page).toHaveURL(/\/dashboard$/);
+    expect(new URL(page.url()).hash).toBe('');
+    await expect(page.getByRole('heading', { level: 1, name: 'Library' })).toBeVisible({ timeout: 20000 });
   });
 });

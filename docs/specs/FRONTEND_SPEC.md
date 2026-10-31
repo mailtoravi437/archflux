@@ -8,7 +8,7 @@
 ## Repository Overview
 **Package:** `archflux-web` (service directory `frontend/` — see [SERVICES_SPEC](SERVICES_SPEC.md))
 **Type:** React 19 + TypeScript + Vite SPA, packaged as an nginx image (`frontend/Dockerfile`)
-**Architecture:** Single Page Application with hash routing
+**Architecture:** Single Page Application with clean path routing (BrowserRouter; legacy `#/path` links redirect)
 **Styling:** CSS custom properties (theming), no CSS framework
 
 > **Cross-ref:** See [Backend Spec](BACKEND_SPEC.md) for REST/WebSocket contracts this frontend consumes.
@@ -123,8 +123,8 @@ src/
 | Login initiation | `{apiUrl}/v1/auth/login/{github,google,saml,oidc}` (full-page navigation) |
 | Transport auth | `ARCHFLUX_TOKEN` cookie (`credentials: 'include'`); no `Authorization` header, no localStorage token |
 | Login | OAuth/magic-link redirects set the cookie; callback screen probes `GET /api/v1/auth/me`, then `setSession({mode, email})` |
-| Logout | `POST /api/v1/auth/logout` → guest session + legacy-token wipe → `#/login` |
-| Expiry | Single-flight 401: non-probe requests clear a non-guest session once, toast once, route `#/login`; probes (`/me`, logout) never redirect |
+| Logout | `POST /api/v1/auth/logout` → guest session + legacy-token wipe → `/login` |
+| Expiry | Single-flight 401: non-probe requests clear a non-guest session once, toast once, route `/login`; probes (`/me`, logout) never redirect |
 | Guest | Zero network: no socket, no fetches, no probes |
 | Correlation | `X-Correlation-ID` propagated request→request; server messages surface `err.error?.message` |
 
@@ -354,7 +354,7 @@ E2E suites that need a populated canvas seed `tests/fixtures/sampleDiagram.ts` t
 
 ## Known Constraints
 
-1. **No SSR** — pure SPA, hash routing only
+1. **No SSR** — pure SPA, path routing (server returns `index.html` for non-`/api` paths)
 2. **Single-threaded canvas** — all rendering on main thread
 3. **Local-first contracts** — no backend contract registry yet
 4. **Yjs awareness only** — full node/edge CRDT sync WIP

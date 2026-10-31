@@ -36,15 +36,15 @@ for (const size of SIZES) {
     test('route /login and /onboarding (no session)', async ({ browser, baseURL }) => {
       const ctx = await browser.newContext({ baseURL, viewport: size });
       const page = await ctx.newPage();
-      await page.goto('/#/login'); await page.waitForTimeout(500);
+      await page.goto('/login'); await page.waitForTimeout(500);
       const a = await scan(page, `${size.name} /login`);
-      await page.goto('/#/onboarding'); await page.waitForTimeout(500);
+      await page.goto('/onboarding'); await page.waitForTimeout(500);
       const b = await scan(page, `${size.name} /onboarding`);
       expect([...a, ...b]).toEqual([]);
     });
 
     test('canvas with a selection and the inspector open', async ({ page }) => {
-      await page.goto('/#/canvas');
+      await page.goto('/canvas');
       await expect(page.getByTestId('canvas-status')).toBeAttached();
       await page.getByRole('button', { name: /^Microservice|^Client Gateway|Client Gateway/ }).first().click().catch(() => undefined);
       await page.waitForTimeout(400);
@@ -52,7 +52,7 @@ for (const size of SIZES) {
     });
 
     test('canvas dialogs: shapes panel, export, import, share, icon picker', async ({ page }) => {
-      await page.goto('/#/canvas');
+      await page.goto('/canvas');
       await expect(page.getByTestId('canvas-status')).toBeAttached();
       const found: unknown[] = [];
       // Shapes panel (non-modal).
@@ -75,7 +75,7 @@ for (const size of SIZES) {
         console.log(`AXE ${size.name} share dialog: not scanned, the Share button is not visible at this width`);
       }
       // Import dialog from Home.
-      await page.goto('/#/home');
+      await page.goto('/home');
       await page.getByRole('button', { name: 'Import', exact: true }).first().click();
       await expect(page.getByRole('dialog')).toBeVisible();
       found.push(...await scan(page, `${size.name} import dialog`));
@@ -87,7 +87,7 @@ for (const size of SIZES) {
 test.describe('axe on server-backed states (signed in)', () => {
   test('access states, share dialog with people, library with folder', async ({ page }) => {
     await signInAs(page, `a11y-${Date.now().toString(36)}@example.com`);
-    await page.goto('/#/home');
+    await page.goto('/home');
     await page.getByRole('button', { name: 'New diagram' }).first().click();
     await page.getByLabel('Name').fill('A11y plan');
     await page.getByRole('button', { name: 'Create' }).click();
@@ -97,11 +97,11 @@ test.describe('axe on server-backed states (signed in)', () => {
     const found = [...await scan(page, 'signed-in share dialog')];
     await page.getByRole('button', { name: 'Close', exact: true }).click();
     const id = (await activeDoc(page)).id;
-    await page.goto(`/#/d/${id}`); await page.waitForTimeout(1500);
-    found.push(...await scan(page, '#/d/:id state ok'));
-    await page.goto('/#/d/00000000-0000-0000-0000-000000000000'); await page.waitForTimeout(1500);
-    found.push(...await scan(page, '#/d/:id state not_found'));
-    await page.goto('/#/dashboard');
+    await page.goto(`/d/${id}`); await page.waitForTimeout(1500);
+    found.push(...await scan(page, '/d/:id state ok'));
+    await page.goto('/d/00000000-0000-0000-0000-000000000000'); await page.waitForTimeout(1500);
+    found.push(...await scan(page, '/d/:id state not_found'));
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: 'New folder' }).click();
     found.push(...await scan(page, 'new folder dialog'));
     expect(found).toEqual([]);
@@ -110,7 +110,7 @@ test.describe('axe on server-backed states (signed in)', () => {
 
 test('keyboard only: create, move, rename, context menu style', async ({ page }) => {
   await guestSession(page);
-  await page.goto('/#/home');
+  await page.goto('/home');
   await page.getByRole('button', { name: 'New diagram' }).first().click();
   await page.keyboard.type('Keys only');
   await page.keyboard.press('Enter');                 // form submit: Create
@@ -165,7 +165,7 @@ test('keyboard only: create, move, rename, context menu style', async ({ page })
 test('keyboard only: connect two elements', async ({ page }) => {
   await guestSession(page);
   await seedSampleWorkspace(page);
-  await page.goto('/#/canvas');
+  await page.goto('/canvas');
   const nodeBtns = page.getByRole('navigation', { name: 'Diagram nodes and routes' }).getByRole('button');
   const edges = Number(await page.getByTestId('canvas-status').getAttribute('data-edges'));
   await nodeBtns.last().focus();

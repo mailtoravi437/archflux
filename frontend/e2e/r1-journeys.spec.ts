@@ -6,13 +6,13 @@ import { activeDoc, dragNodeTo, guestSession, nodeCentre, seedSampleWorkspace, s
 // archflux-qa backend on 23001. Dev server: E2E_PORT=5191 VITE_DEV_API_PROXY=http://localhost:23001.
 
 async function newDiagram(page: Page, name: string, style: 'Icon' | 'Card' | 'Shape') {
-  await page.goto('/#/home');
+  await page.goto('/home');
   await page.getByRole('button', { name: 'New diagram' }).first().click();
   await page.getByRole('radio', { name: style }).click();
   await page.getByLabel('Name').fill(name);
   await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByTestId('canvas-status')).toBeAttached();
-  await expect(page).toHaveURL(/#\/canvas/);
+  await expect(page).toHaveURL(/\/canvas/);
 }
 
 async function nodeByLabel(page: Page, label: string) {
@@ -44,7 +44,7 @@ async function ownerWithSharedDiagram(browser: Browser, baseURL: string | undefi
   const diagramId = (await activeDoc(a)).id;
   // Workspace membership first (Share needs it): invite through Settings, then accept as the invitee.
   await a.getByRole('button', { name: 'Close', exact: true }).click();
-  await a.goto('/#/settings/team');
+  await a.goto('/settings/team');
   await a.getByRole('button', { name: 'Invite people' }).click();
   await a.getByLabel('Invite emails').fill(invitee);
   // The real invite response carries the one-time token (the email is mocked in QA).
@@ -136,7 +136,7 @@ test.describe('R1 journeys', () => {
 
   test('J2 pages and layers', async ({ page }) => {
     await seedSampleWorkspace(page);
-    await page.goto('/#/canvas');
+    await page.goto('/canvas');
     await expect(page.getByTestId('canvas-status')).toHaveAttribute('data-nodes', '9');
     const deselect = () => page.mouse.click(930, 600);
 
@@ -229,7 +229,7 @@ test.describe('R1 journeys', () => {
     await signInAs(page, `j3-${Date.now()}@example.com`);
     // A first diagram, so trashing the second never empties the library.
     await newDiagram(page, 'Quarterly plan', 'Card');
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: 'New folder' }).click();
     await page.getByLabel('Folder name').fill('Clients');
     await page.getByRole('button', { name: 'Create' }).click();
@@ -259,7 +259,7 @@ test.describe('R1 journeys', () => {
     // Restore: it returns to its folder (and stays starred).
     await page.getByRole('button', { name: 'Restore Quarterly plan' }).click();
     await expect(row).toHaveCount(0);
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await page.reload(); // the placement must survive a reload, not only live in memory
     await page.getByRole('treeitem', { name: 'Clients' }).click();
     await expect(doc).toBeVisible();
@@ -273,17 +273,17 @@ test.describe('R1 journeys', () => {
     const emailA = `j4-a-${id}@example.com`;
     const emailB = `j4-b-${id}@example.com`;
     const b = await userPage(browser, baseURL, emailB);
-    await b.goto('/#/home');
+    await b.goto('/home');
     const { a, diagramId, token } = await ownerWithSharedDiagram(browser, baseURL, emailA, emailB);
 
     // Opening the invite accepts it; wait for the server to confirm before A shares with B.
     const accepted = b.waitForResponse((r) => r.url().includes('/invites/') && r.url().endsWith('/accept') && r.request().method() === 'POST' && r.ok());
-    await b.goto(`/#/invite/${token}`);
+    await b.goto(`/invite/${token}`);
     await accepted; // resolves only on a 2xx accept (the first try can 401 before the session refresh)
-    await expect(b).toHaveURL(/#\/dashboard/); // accepted: the invite screen hands over to the workspace dashboard
+    await expect(b).toHaveURL(/\/dashboard/); // accepted: the invite screen hands over to the workspace dashboard
 
     // A shares the diagram with B as a commenter.
-    await a.goto('/#/canvas');
+    await a.goto('/canvas');
     await a.getByRole('button', { name: 'Share', exact: true }).click();
     await a.getByLabel('Add people, teams or emails').fill(emailB);
     await a.keyboard.press('Enter');
@@ -292,7 +292,7 @@ test.describe('R1 journeys', () => {
     await expect(a.getByRole('combobox', { name: new RegExp(`^Role for ${emailB.split('@')[0]}`) })).toHaveValue('commenter');
 
     // B opens the deep link.
-    await b.goto(`/#/d/${diagramId}`);
+    await b.goto(`/d/${diagramId}`);
     await expect(b.getByTestId('canvas-status')).toBeAttached({ timeout: 20000 });
     await expect(b.getByRole('status', { name: 'Access level' })).toContainText('Can comment');
     // No edit tools: the creation tools are gone or disabled, and Delete does nothing.
@@ -326,9 +326,9 @@ test.describe('R1 journeys', () => {
     const emailA = `j5-a-${id}@example.com`;
     const emailC = `j5-c-${id}@example.com`;
     const c = await userPage(browser, baseURL, emailC);
-    await c.goto('/#/home');
+    await c.goto('/home');
     const { diagramId } = await ownerWithSharedDiagram(browser, baseURL, emailA, `j5-x-${id}@example.com`);
-    await c.goto(`/#/d/${diagramId}`);
+    await c.goto(`/d/${diagramId}`);
     await expect(c.getByText("We can't open this diagram")).toBeVisible();
     await expect(c.getByText('Shared plan')).toHaveCount(0);
     await expect(c.getByTestId('canvas-status')).toHaveCount(0);
@@ -339,7 +339,7 @@ test.describe('R1 journeys', () => {
     const emailA = `j5-a-${id}@example.com`;
     const emailC = `j5-c-${id}@example.com`;
     const c = await userPage(browser, baseURL, emailC);
-    await c.goto('/#/home');
+    await c.goto('/home');
     const { a, diagramId } = await ownerWithSharedDiagram(browser, baseURL, emailA, `j5-x-${id}@example.com`);
 
     // A creates a share link (the one-time token is only returned at creation).
@@ -348,7 +348,7 @@ test.describe('R1 journeys', () => {
     const shareToken = ((await link.json()) as { data: { token: string } }).data.token;
 
     // State `request`: C is signed in, holds the link, has no access to this diagram.
-    await c.goto(`/#/d/${diagramId}?token=${encodeURIComponent(shareToken)}`);
+    await c.goto(`/d/${diagramId}?token=${encodeURIComponent(shareToken)}`);
     const card = c.getByRole('region', { name: 'Request access' });
     await expect(card).toBeVisible();
     await expect(c.getByTestId('canvas-status')).toHaveCount(0);
@@ -363,14 +363,14 @@ test.describe('R1 journeys', () => {
     expect((await a.request.post(`/api/v1/access-requests/${rows[0].id}/approve`, { data: {} })).ok()).toBeTruthy();
 
     // State `ok`: the diagram opens, view only.
-    await c.goto(`/#/d/${diagramId}`);
+    await c.goto(`/d/${diagramId}`);
     await c.reload();
     await expect(c.getByTestId('canvas-status')).toBeAttached({ timeout: 20000 });
     await expect(c.getByRole('status', { name: 'Access level' })).toContainText('View only');
   });
 
   test('J6 import: draw.io preview, warnings, import as new', async ({ page }) => {
-    await page.goto('/#/home');
+    await page.goto('/home');
     await page.getByRole('button', { name: 'Import', exact: true }).first().click();
     const dialog = page.getByRole('dialog');
     // The draw.io fixture: 2 pages, 6 elements, 5 connections, 1 boundary, and 2 skipped (the image and the edge that pointed at it).
@@ -440,7 +440,7 @@ test.describe('R1 journeys', () => {
     await page.getByRole('tab', { name: 'History' }).click();
     await page.getByRole('button', { name: /^Compare Baseline with current/ }).click();
     // The panel opens the full History screen; pick the version there again (E08-T04 note).
-    await expect(page).toHaveURL(/#\/history/);
+    await expect(page).toHaveURL(/\/history/);
     await page.getByRole('button', { name: /^Compare Baseline with current/ }).click();
     const compare = page.getByRole('region', { name: 'Compare versions' });
     await expect(compare).toBeVisible();

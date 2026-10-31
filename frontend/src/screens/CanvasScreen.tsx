@@ -1757,7 +1757,7 @@ const n = cur.nodes.find((node) => node.id === hit);
     ctxOpenerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     setCtxMenu({ x: point.x, y: point.y, ids, label });
   }, [setSelectedId]);
-  // "Copy link to element" lands here: `#/canvas?doc=<id>&element=<id>` opens that doc, selects and
+  // "Copy link to element" lands here: `/canvas?doc=<id>&element=<id>` opens that doc, selects and
   // centres the element, and says so when it no longer exists. Each link is handled once.
   const navigate = useNavigate();
   const [linkParams] = useSearchParams();

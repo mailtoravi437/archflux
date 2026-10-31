@@ -165,7 +165,7 @@ describe('Library page fidelity (R1-E14-T04)', () => {
     const footer = screen.getByLabelText('Storage on this device');
     expect(footer.tagName).toBe('P');
     expect(footer.textContent).toMatch(/^This device: 3 of 25 diagrams · [\d.]+ KB used · Manage storage$/);
-    expect(within(footer).getByRole('link', { name: 'Manage storage' }).getAttribute('href')).toBe('#/settings/storage');
+    expect(within(footer).getByRole('link', { name: 'Manage storage' }).getAttribute('href')).toBe('/settings/storage');
   });
 });
 

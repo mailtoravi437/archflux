@@ -20,8 +20,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   private reloadCanvas = () => {
-    window.location.hash = '#/canvas';
-    window.location.reload();
+    window.location.assign('/canvas');
   };
 
   private loadSafeDefault = () => {
@@ -33,8 +32,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     } catch {
       /* storage unavailable */
     }
-    window.location.hash = '#/canvas';
-    window.location.reload();
+    window.location.assign('/canvas');
   };
 
   render(): ReactNode {

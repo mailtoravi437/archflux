@@ -23,15 +23,15 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
       localStorage.setItem('archflux:onboarded', 'true');
     });
 
-    // Use hash routing; canvas-status proves React rendered with live counts
-    await page.goto('/#/canvas');
+    // Clean path URLs; canvas-status proves React rendered with live counts
+    await page.goto('/canvas');
     const status = page.getByTestId('canvas-status');
     await expect(status).toBeAttached({ timeout: 30000 });
     await expect(page.locator('#architectureCanvas')).toBeVisible();
   });
 
   test('complete onboarding flow', async ({ page }) => {
-    await page.goto('/#/onboarding');
+    await page.goto('/onboarding');
 
     await page.getByRole('button', { name: 'Platform / Backend Engineer' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -81,7 +81,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
     expect(download.suggestedFilename()).toMatch(/\.arch$/);
 
     // Import lives on the Living (file transfer) screen, then returns to canvas
-    await page.goto('/#/living');
+    await page.goto('/living');
     await page.locator('input[type="file"]').setInputFiles({
       name: 'test.arch',
       mimeType: 'application/json',
@@ -117,7 +117,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   });
 
   test('open blueprints and load one', async ({ page }) => {
-    await page.goto('/#/blueprints');
+    await page.goto('/blueprints');
     await expect(page.getByRole('heading', { name: /Blueprints/ })).toBeVisible();
 
     await page.getByRole('button', { name: 'Load to Canvas' }).first().click();
@@ -127,7 +127,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   });
 
   test('blueprint preview lists routes and saves canvas as blueprint', async ({ page }) => {
-    await page.goto('/#/blueprints');
+    await page.goto('/blueprints');
     await expect(page.getByRole('heading', { name: /Blueprints/ })).toBeVisible();
 
     // Preview shows node + route lists.
@@ -153,7 +153,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
     await page.mouse.click(...emptySpots[0]);
     await expect(status).toHaveAttribute('data-nodes', String(before.nodes + 1), { timeout: 10000 });
 
-    await page.goto('/#/reviews');
+    await page.goto('/reviews');
     await expect(page.getByText('Architecture Review Comments')).toBeVisible();
 
     await page.fill('[aria-label="New thread text"]', 'This service needs better error handling');
@@ -163,7 +163,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   });
 
   test('settings persistence across reload', async ({ page }) => {
-    await page.goto('/#/settings/general');
+    await page.goto('/settings/general');
     await expect(page.locator('select[aria-label="Default rendering style"]')).toBeVisible();
 
     await page.selectOption('select[aria-label="Default rendering style"]', 'sketchy');
@@ -178,7 +178,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   test('theme switching works', async ({ page }) => {
     // §4: theme moved out of the app bar into Settings → General (and the
     // account menu); it applies app-wide.
-    await page.goto('/#/settings/general');
+    await page.goto('/settings/general');
     await page.selectOption('select[aria-label="Theme"]', 'dark');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
@@ -190,7 +190,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   });
 
   test('living resync is honest without a connected source', async ({ page }) => {
-    await page.goto('/#/living');
+    await page.goto('/living');
     await expect(page.getByRole('heading', { level: 2, name: 'Drift' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Re-sync' }).click();
@@ -239,7 +239,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   });
 
   test('connector modal configures and adds a connector', async ({ page }) => {
-    await page.goto('/#/living');
+    await page.goto('/living');
     await expect(page.getByRole('heading', { level: 2, name: 'Sources' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Add source' }).click();
@@ -276,7 +276,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
   });
 
   test('multi-document management', async ({ page }) => {
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: /Table/ }).click();
     await expect(page.getByRole('table', { name: 'Diagrams table' })).toBeVisible();
 
@@ -293,7 +293,7 @@ test.describe('ArchFlux E2E Critical User Journeys', () => {
       });
     }, { timeout: 10000 }).toBe(true);
 
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     // The Table toggle (R1-E14-T04) is persisted, so the revisit opens in table view.
     await expect(page.getByRole('button', { name: 'Table view' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('table', { name: 'Diagrams table' })).toBeVisible();
@@ -313,7 +313,7 @@ test.describe('Error handling and recovery', () => {
       localStorage.setItem('archflux:session', JSON.stringify({ mode: 'guest' }));
       localStorage.setItem('archflux:onboarded', 'true');
     });
-    await page.goto('/#/canvas');
+    await page.goto('/canvas');
     await expect(page.locator('#architectureCanvas')).toBeVisible({ timeout: 30000 });
 
     // Neither the React error boundary nor the no-2d-context fallback shows

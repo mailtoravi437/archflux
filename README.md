@@ -62,7 +62,7 @@ topology healing engine.
 
 Core architectural principles:
 
-1. **Local-First Determinism / Zero-Barrier Sketching** — land on `#/login`, start diagramming with
+1. **Local-First Determinism / Zero-Barrier Sketching** — land on `/login`, start diagramming with
    zero authentication overhead via browser storage (`archflux:*`). Cloud pairing and Git hooks attach
    lazily without disrupting flow.
 2. **Contextual Rendering / Dual Visual Style Engine** — switch between `Hand-Drawn Sketchy` mode
@@ -78,26 +78,26 @@ Core architectural principles:
 
 | Category | Route | Screen Name | Core Capabilities | Shortcut |
 |---|---|---|---|---|
-| Auth | `#/login` | Authentication & Entry | Magic link, GitHub OAuth, SAML SSO, 1-click Local Guest mode | Esc / Tab |
-| Auth | `#/onboarding` | Setup & Persona Wizard | Persona customization, cloud provider pills, initial seed | Enter / 1–3 |
-| Workspace | `#/dashboard` | Document Library | Global search, multi-doc management, duplicate, tag filters | `/` or `⌘O` |
-| Authoring | `#/canvas` | Precision Canvas Editor | 38 cloud shapes, orthogonal auto-router, linter & inspector | V, H, S, C |
-| Living Sync | `#/living` | Infrastructure Reconciler | Upstream drift detection (K8s/OpenAPI/TF), 1-click re-sync | `⌘S` / R |
-| Review | `#/reviews` | Reviews, Merge & Automation | Version snapshots, visual A/B diff (green/amber/red), pinned RFCs, PR merge gating, REST sandbox | D / Space / `⌘G` |
-| Templates | `#/blueprints` | Topology Catalog | 9 curated architectures, collision-safe Insert vs. Replace | B / `⌘B` |
-| Settings | `#/settings/general` | Preferences | Sketchy vs. clean mode, grid snapping, custom keyboard rebinding | `⌘,` |
-| Settings | `#/settings/connectors` | Integrations | GitHub PAT credentials, K8s cluster endpoints, polling rate | — |
-| Settings | `#/settings/team` | Access Control & Roles | RBAC (Admin, Editor, Reviewer, Viewer), SAML SSO enforcement | — |
-| Settings | `#/settings/storage` | Storage & Cache Health | LocalStorage quota inspection, schema verification, reset | — |
+| Auth | `/login` | Authentication & Entry | Magic link, GitHub OAuth, SAML SSO, 1-click Local Guest mode | Esc / Tab |
+| Auth | `/onboarding` | Setup & Persona Wizard | Persona customization, cloud provider pills, initial seed | Enter / 1–3 |
+| Workspace | `/dashboard` | Document Library | Global search, multi-doc management, duplicate, tag filters | `/` or `⌘O` |
+| Authoring | `/canvas` | Precision Canvas Editor | 38 cloud shapes, orthogonal auto-router, linter & inspector | V, H, S, C |
+| Living Sync | `/living` | Infrastructure Reconciler | Upstream drift detection (K8s/OpenAPI/TF), 1-click re-sync | `⌘S` / R |
+| Review | `/reviews` | Reviews, Merge & Automation | Version snapshots, visual A/B diff (green/amber/red), pinned RFCs, PR merge gating, REST sandbox | D / Space / `⌘G` |
+| Templates | `/blueprints` | Topology Catalog | 9 curated architectures, collision-safe Insert vs. Replace | B / `⌘B` |
+| Settings | `/settings/general` | Preferences | Sketchy vs. clean mode, grid snapping, custom keyboard rebinding | `⌘,` |
+| Settings | `/settings/connectors` | Integrations | GitHub PAT credentials, K8s cluster endpoints, polling rate | — |
+| Settings | `/settings/team` | Access Control & Roles | RBAC (Admin, Editor, Reviewer, Viewer), SAML SSO enforcement | — |
+| Settings | `/settings/storage` | Storage & Cache Health | LocalStorage quota inspection, schema verification, reset | — |
 
-Hash routing (`createHashRouter`) keeps deep links working on plain static hosts. Authenticated and guest
+Clean path URLs (`createBrowserRouter`, no `#`) rely on the web server returning `index.html` for any non-`/api` path; old `#/path` links redirect to `/path`. Authenticated and guest
 sessions share one `AppShell`; `/login` and `/onboarding` render chrome-less. A `⌘K` command palette with
 focus-trap is reachable from every authenticated screen (navigation, quick-insert of all 38 shapes, canvas
 actions, diagram switcher; Up/Down + Enter + Esc).
 
 ## 2. Authentication & Onboarding Lifecycle
 
-### 2.1 `#/login` — Authentication & Frictionless Guest Entry
+### 2.1 `/login` — Authentication & Frictionless Guest Entry
 
 Solves the enterprise drop-off hurdle of mandatory registration before an architect can evaluate the canvas.
 
@@ -107,12 +107,12 @@ Solves the enterprise drop-off hurdle of mandatory registration before an archit
   with RFC 5322 regex validation, and SAML 2.0 SSO toggle for enterprise directories.
 - **Zero-Barrier Escape Hatch** — full-width secondary button: "Continue as Local Guest (No account
   needed — data saved in browser)". Instantly initializes an in-memory graph, sets
-  `archflux:auth_mode = 'guest'`, and transitions directly to `#/canvas` (no network requests).
+  `archflux:auth_mode = 'guest'`, and transitions directly to `/canvas` (no network requests).
 - **Interactive states** — loading button spinner (`aria-busy="true"`); OTP 6-digit input transition
   with auto-advance and clipboard paste support; inline error banners (e.g. "OAuth scope denied",
   "Invalid email format"). Enter submits; email field autofocuses on mount.
 
-### 2.2 `#/onboarding` — Persona & Workspace Wizard
+### 2.2 `/onboarding` — Persona & Workspace Wizard
 
 Activates on first authentication or via "Upgrade Workspace". Configures shortcuts, shape palettes, and
 telemetry defaults by engineering domain.
@@ -127,7 +127,7 @@ telemetry defaults by engineering domain.
 - **Seed selection** — "Start Blank" or a persona-recommended pre-configured architecture. Completing
   writes `archflux:onboarded = true` and navigates to the chosen topology.
 
-## 3. Workspace & Library Hub (`#/dashboard`)
+## 3. Workspace & Library Hub (`/dashboard`)
 
 Central management hub for local and Git-synced topologies (browser storage, Git bindings, metadata index).
 
@@ -144,13 +144,13 @@ Central management hub for local and Git-synced topologies (browser storage, Git
 - **UUID remapping** — duplicating re-keys every element ID with fresh UUIDs, re-maps connector
   references, preserves coordinates, and appends `(Copy)` to the document title.
 
-## 4. Core Authoring — Precision Canvas Editor (`#/canvas`)
+## 4. Core Authoring — Precision Canvas Editor (`/canvas`)
 
 Primary authoring environment: infinite 2D panning grid, orthogonal connector pathfinding, real-time
 topology linter with auto-healing.
 
 - **Top app chrome (global bar)** — brand logo, inline click-to-edit document title, Git branch chip
-  (`[git:main]`), upstream sync pill (● Synced / ⚠️ Drift Detected, jumps to `#/living`), utility cluster
+  (`[git:main]`), upstream sync pill (● Synced / ⚠️ Drift Detected, jumps to `/living`), utility cluster
   (⌘K palette, Undo/Redo with stack-depth tooltips, theme switcher, Focus mode, Export). The linter
   count chip pulses amber whenever a new lint error appears.
 - **Viewport sub-nav** — Canvas | Living Sync | Reviews & Merge | Blueprints.
@@ -192,7 +192,7 @@ topology linter with auto-healing.
     connection). Per-card Inspect / Auto-bind (or Highlight / protocol quick-tag) plus global
     "Heal All Safe Issues" in a single undo step.
 
-## 5. Living Sync & Infrastructure Reconciler (`#/living`)
+## 5. Living Sync & Infrastructure Reconciler (`/living`)
 
 Monitors external infrastructure descriptors and highlights drift; deterministic idempotent re-sync keeps
 canvas models aligned with reality.
@@ -211,10 +211,10 @@ canvas models aligned with reality.
 - **Idempotent re-sync** — staged diffs apply in an atomic single-undo transaction with progress bar;
   the append-only sync log records timestamp, identity, commit SHA, and net shape delta.
 
-## 6. Architecture Reviews, Merge & Automation (`#/reviews`)
+## 6. Architecture Reviews, Merge & Automation (`/reviews`)
 
 Async PR reviews with visual A/B diffing, pinned discussions, merge gating, and the REST sandbox —
-two sub-tabs: **Discussion & Diff** and **Merge & Automation** (the former `#/git`, which now
+two sub-tabs: **Discussion & Diff** and **Merge & Automation** (the former `/git`, which now
 redirects here; `⌘G` jumps straight to Merge & Automation).
 
 - **Version checkpoints (left rail)** — timeline of immutable named snapshots (e.g. `v2.4-head`,
@@ -228,7 +228,7 @@ redirects here; `⌘G` jumps straight to Merge & Automation).
   markdown (`**bold**`, ``code``), @mention autocomplete, reply threads, resolve/reopen lifecycle,
   "Jump to Node on Canvas", detached-node detection.
 
-## 7. Merge Gating & REST Sandbox (`#/reviews` → Merge & Automation tab)
+## 7. Merge Gating & REST Sandbox (`/reviews` → Merge & Automation tab)
 
 Enforces architectural discipline in enterprise CI/CD pipelines by treating .arch diagrams as build artifacts.
 
@@ -240,7 +240,7 @@ Enforces architectural discipline in enterprise CI/CD pipelines by treating .arc
   `POST /api/v1/lint`), JSON body editor with syntax validation, "Send Simulated Request" with status
   + latency pill, one-click cURL copy, recent-call history.
 
-## 8. Topology Catalog & Blueprints (`#/blueprints`)
+## 8. Topology Catalog & Blueprints (`/blueprints`)
 
 9 curated reference architectures, vetted for scalability, security, and resilience:
 
@@ -261,18 +261,18 @@ after explicit confirmation when unsaved changes exist (Load itself remains a si
 
 ## 9. Settings & Workspace Governance
 
-- **9.1 `#/settings/general`** — default rendering style (`Hand-Drawn Sketchy` vs `Clean
+- **9.1 `/settings/general`** — default rendering style (`Hand-Drawn Sketchy` vs `Clean
   Architectural`), grid display (Dots / Lines / None), snap thresholds (5px / 10px / 20px / Disabled),
   connector algorithm (Orthogonal / Straight / Bezier), export resolution (1x / 2x Retina / 4x Print),
   SVG metadata embedding, keyboard shortcut rebinding table.
-- **9.2 `#/settings/connectors`** — GitHub / GitLab PAT with scope validation, target repository +
+- **9.2 `/settings/connectors`** — GitHub / GitLab PAT with scope validation, target repository +
   file path bindings, webhook listener URL with signing-key generation/verification, polling cadences
   (Real-time / 5m / 1h / Manual).
-- **9.3 `#/settings/team`** — member table with roles (Admin: config+billing+invites; Editor:
+- **9.3 `/settings/team`** — member table with roles (Admin: config+billing+invites; Editor:
   canvas+sync+blueprints; Reviewer: read-only + comments/approvals; Viewer: read-only + export),
   SAML/OIDC provider setup (Okta, Azure AD, Google Workspace), required-approval policy, audit-trail
   export.
-- **9.4 `#/settings/storage`** — `archflux:*` key inspector with sizes, complete workspace backup
+- **9.4 `/settings/storage`** — `archflux:*` key inspector with sizes, complete workspace backup
   download (`.tar.gz`), schema integrity scanner, cache clear (retains diagrams), `RESET`-gated
   factory reset.
 

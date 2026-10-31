@@ -152,7 +152,7 @@ Base: `/api/v1`
 JWTs carry validated signature/issuer/audience/expiry with previous-secret rotation; `sub` is the real user UUID
 (auto-provisioned with a personal workspace via the SECURITY DEFINER `provision_user()` function — the only
 login-time user writer, since auth paths run with no RequestUser yet). Redirects never carry tokens and always target the
-SPA hash router (success → `{frontend-url}/#/auth/callback?provider=`, failure → `{frontend-url}/#/login?error=`);
+SPA path router (success → `{frontend-url}/auth/callback?provider=`, failure → `{frontend-url}/login?error=`; clean URLs since 2026-10-31);
 magic links point at the API (`{public-api-url}/v1/auth/verify?token=`) — SVC-G6/G7. The static API token is a service credential
 accepted **only** on `POST /api/v1/sync/webhook/git` and authenticates nobody. State-changing `/api/v1/**`
 requests with a foreign Origin/Referer are rejected 403 (CSRF posture for cookie auth); `POST /auth/magic-link`
@@ -335,7 +335,7 @@ spring:
 ```yaml
 app:
   api-token: ${APP_API_TOKEN}           # Service credential (webhook path only)
-  frontend-url: ${FRONTEND_URL}         # SPA origin: post-login redirects (hash routes)
+  frontend-url: ${FRONTEND_URL}         # SPA origin: post-login redirects (path routes, no `#`)
   public-api-url: ${PUBLIC_API_URL:${app.frontend-url}/api}   # absolute API root for emailed links
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:<frontend-url + localhost dev origins>}  # CORS + Origin check + WS

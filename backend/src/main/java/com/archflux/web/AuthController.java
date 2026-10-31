@@ -438,9 +438,9 @@ public class AuthController {
         }
     }
 
-    /** SPA hash route on archflux-web: {frontend-url}/#{route} (the SPA uses a hash router). */
+    /** SPA path route on archflux-web: {frontend-url}{route} (clean URLs, no hash; decision 2026-10-31). */
     String spaUrl(String route) {
-        return stripTrailingSlash(frontendUrl) + "/#" + route;
+        return stripTrailingSlash(frontendUrl) + route;
     }
 
     String apiRoot() {

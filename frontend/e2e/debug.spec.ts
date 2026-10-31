@@ -18,8 +18,8 @@ test.describe('Debug Canvas Load', () => {
       errors.push(error.message);
     });
 
-    // Use hash routing
-    await page.goto('/#/canvas');
+    // Clean path URLs
+    await page.goto('/canvas');
     await page.waitForTimeout(5000); // Wait for React to hydrate
 
     console.log('Console errors:', errors);

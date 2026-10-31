@@ -88,12 +88,15 @@ describe('banner wiring (R1-E12-T02)', () => {
     const seen: string[] = [];
     setUnauthorizedHandler(() => { seen.push(document.body.textContent ?? ''); });
     vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: false, status: 401, headers: new Headers(), json: async () => ({}) } as unknown as Response);
+    const assign = vi.fn();
+    vi.stubGlobal('location', { ...window.location, assign });
     render(<AppStatusBanner onReviewConflict={() => {}} />);
     await act(async () => { await api.listDiagrams().catch(() => undefined); });
     expect(screen.getByRole('status').textContent).toContain('Session expired');
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
     expect(screen.queryByText('Session expired')).toBeNull();
-    expect(window.location.hash).toBe('#/login');
+    expect(assign).toHaveBeenCalledWith('/login');
+    vi.unstubAllGlobals();
   });
 
   it('401 for a guest or a probe raises no banner', async () => {

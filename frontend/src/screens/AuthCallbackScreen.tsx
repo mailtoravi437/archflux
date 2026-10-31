@@ -11,7 +11,7 @@ export interface CallbackParams {
   error: string | null;
 }
 
-/** Pure: parse the `#/auth/callback?provider=&error=` hash query. */
+/** Pure: parse the `/auth/callback?provider=&error=` query string. */
 export function parseAuthCallbackParams(
   params: URLSearchParams | Record<string, string | null>,
 ): CallbackParams {

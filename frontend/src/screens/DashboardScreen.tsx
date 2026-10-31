@@ -91,7 +91,7 @@ export function StorageFooter({ docCount, usedKB, onFreeUp, onManage }: {
       )}
       <a
         className="libpage-link"
-        href="#/settings/storage"
+        href="/settings/storage"
         onClick={(e) => {
           e.preventDefault();
           onManage();
@@ -678,7 +678,7 @@ export default function DashboardScreen() {
             ) : (
               <a
                 className="libpage-card__link"
-                href="#/canvas"
+                href="/canvas"
                 onClick={(e) => {
                   e.preventDefault();
                   open(d.id);

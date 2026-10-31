@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .redirectionEndpoint(endpoint ->
                     endpoint.baseUri("/login/oauth2/code/*"))
                 .defaultSuccessUrl("/api/v1/auth/success", true)
-                // Hands off to AuthController, which redirects to the SPA hash route.
+                // Hands off to AuthController, which redirects to the SPA path route.
                 .failureUrl("/api/v1/auth/failure")
             )
             // NOTE: no oauth2ResourceServer JWT configurer — user JWTs are

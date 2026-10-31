@@ -24,7 +24,7 @@ function mockServer(members: unknown[], calls: Call[], opts: { linkStatus?: numb
     if (url.endsWith('/links') && method === 'GET') return respond(200, { data: [] });
     if (url.endsWith('/links') && method === 'POST') {
       if (opts.linkStatus) return respond(opts.linkStatus, { error: { code: 'PUBLIC_LINKS_DISABLED', message: 'no' } });
-      return respond(201, { data: { id: 'l1', diagramId: ID, role: 'viewer', audience: 'workspace', expiresAt: null, revokedAt: null, state: 'active', createdBy: null, createdAt: null, url: `http://app/#/d/${ID}?link=1`, token: 'tok-secret' } });
+      return respond(201, { data: { id: 'l1', diagramId: ID, role: 'viewer', audience: 'workspace', expiresAt: null, revokedAt: null, state: 'active', createdBy: null, createdAt: null, url: `http://app/d/${ID}?link=1`, token: 'tok-secret' } });
     }
     return respond(404, {});
   });
@@ -67,7 +67,7 @@ describe('ShareDialog (R1-E07-T05)', () => {
     fireEvent.change(screen.getByLabelText('General access'), { target: { value: 'workspace' } });
     fireEvent.click(screen.getByRole('button', { name: 'Copy link' }));
     expect(await screen.findByText(/Link created — copy it now\. For security we can’t show it again\./)).toBeTruthy();
-    expect(writeText).toHaveBeenCalledWith(`http://app/#/d/${ID}?token=tok-secret`);
+    expect(writeText).toHaveBeenCalledWith(`http://app/d/${ID}?token=tok-secret`);
     expect((screen.getByLabelText('Share link') as HTMLInputElement).value).toContain('?token=tok-secret');
     expect(document.body.textContent).not.toContain('tok-secret');
   });

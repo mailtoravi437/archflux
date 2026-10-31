@@ -50,7 +50,7 @@ interface RequestOpts {
 
 function redirectToLogin() {
   try {
-    window.location.hash = '#/login';
+    window.location.assign('/login');
   } catch {
     /* ignore */
   }

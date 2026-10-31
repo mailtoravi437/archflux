@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Navigate, createHashRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter, type RouteObject } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import LoginScreen from './screens/LoginScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
@@ -11,8 +11,9 @@ import { IndexRoute } from './app/IndexRoute';
 import { NotFoundRoute } from './app/NotFoundRoute';
 
 // Route-level code splitting: the canvas editor is the heavy chunk and
-// shouldn't block first paint of the shell. Hash routing keeps deep links
-// working on plain static hosts (no server rewrites available).
+// shouldn't block first paint of the shell. Clean path URLs (BrowserRouter) rely
+// on the web server returning index.html for non-/api paths; legacy hash-style links are rewritten
+// to `/path` in main.tsx before the router starts.
 const CanvasScreen = lazy(() => import('./screens/CanvasScreen'));
 const LivingScreen = lazy(() => import('./screens/LivingScreen'));
 const ReviewsScreen = lazy(() => import('./screens/ReviewsScreen'));
@@ -28,7 +29,7 @@ const SettingsConnectorsScreen = lazy(() => import('./screens/SettingsConnectors
 const SettingsTeamScreen = lazy(() => import('./screens/SettingsTeamScreen'));
 const SettingsStorageScreen = lazy(() => import('./screens/SettingsStorageScreen'));
 
-const router = createHashRouter([
+export const routes: RouteObject[] = [
   { path: '/login', element: <LoginScreen /> },
   { path: '/onboarding', element: <OnboardingScreen /> },
   { path: '/auth/callback', element: <AuthCallbackScreen /> },
@@ -70,6 +71,9 @@ const router = createHashRouter([
       { path: '*', element: <NotFoundRoute /> },
     ],
   },
-]);
+];
 
-export default router;
+/** Built after `migrateLegacyHash()` so the router reads the clean URL. */
+export function createAppRouter() {
+  return createBrowserRouter(routes);
+}

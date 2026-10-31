@@ -3077,7 +3077,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .lint-dialog__heal:focus-visible, .lint-dialog__close:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 2px; }
 
 /* =======================================================
-   SYNC (#/living), Sync.dc.html SC-32 (R1-E14-T11)
+   SYNC (/living), Sync.dc.html SC-32 (R1-E14-T11)
    ======================================================= */
 .syncpage-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .syncpage-stat, .syncpage-card {

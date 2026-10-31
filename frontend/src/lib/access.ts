@@ -22,7 +22,7 @@ export function readOnlyBannerText(role: DiagramRoleWire | null | undefined): st
   return role === 'commenter' ? 'Can comment' : 'View only · Request edit access';
 }
 
-/** `#/d/:id` path for a diagram. */
+/** `/d/:id` path for a diagram. */
 export function deepLinkPath(id: string): string {
   return `/d/${id}`;
 }
@@ -38,14 +38,14 @@ export function safeNext(next: string | null | undefined): string | null {
   return next;
 }
 
-/** `#/d/:id` path carrying a share-link token in the hash query. */
+/** `/d/:id` path carrying a share-link token in the query string. */
 export function deepLinkWithToken(id: string, token: string | null | undefined): string {
   return token ? `${deepLinkPath(id)}?token=${encodeURIComponent(token)}` : deepLinkPath(id);
 }
 
 /**
  * The URL to hand out for a new link: the server's URL with its `?link=1` marker replaced by the
- * one-time token (`#/d/:id?token=<token>`). The token is only known at creation.
+ * one-time token (`/d/:id?token=<token>`). The token is only known at creation.
  */
 export function shareLinkUrl(serverUrl: string, token: string): string {
   const q = serverUrl.indexOf('?');

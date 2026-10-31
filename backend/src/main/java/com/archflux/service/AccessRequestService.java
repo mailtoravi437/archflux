@@ -295,7 +295,7 @@ public class AccessRequestService {
           .setParameter("id", diagramId)
           .getResultList();
       String subject = ShareService.singleLine(who + " requested " + role + " access to " + title);
-      String link = frontendUrl + "/#/d/" + diagramId;
+      String link = frontendUrl + "/d/" + diagramId;
       String html = "<p>" + HtmlUtils.htmlEscape(who) + " asked for <strong>"
           + HtmlUtils.htmlEscape(role) + "</strong> access to <strong>"
           + HtmlUtils.htmlEscape(title) + "</strong>.</p>"
@@ -316,7 +316,7 @@ public class AccessRequestService {
     try {
       String subject = ShareService.singleLine(
           "Your request for " + diagram.getTitle() + " was " + outcome);
-      String link = frontendUrl + "/#/canvas?doc=" + diagram.getId();
+      String link = frontendUrl + "/canvas?doc=" + diagram.getId();
       String html = "<p>Your request for <strong>" + HtmlUtils.htmlEscape(diagram.getTitle())
           + "</strong> was " + outcome
           + (role == null ? "" : " (" + HtmlUtils.htmlEscape(role) + ")") + ".</p>"

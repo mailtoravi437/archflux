@@ -170,7 +170,7 @@ public class ShareService {
     audit.record(callerId, diagram.workspaceId(), "share.link_create", "share_link",
         link.getId().toString(), "ok");
     Map<String, Object> out = linkToJson(link);
-    out.put("url", frontendUrl + "/#/d/" + diagramId + "?link=1");
+    out.put("url", frontendUrl + "/d/" + diagramId + "?link=1");
     out.put("token", token);
     return out;
   }
@@ -264,7 +264,7 @@ public class ShareService {
       String sharer = users.findById(callerId).map(User::getName)
           .filter(n -> n != null && !n.isBlank()).orElse("Someone");
       String subject = singleLine(sharer + " shared " + diagram.getTitle() + " with you");
-      String link = frontendUrl + "/#/canvas?doc=" + diagram.getId();
+      String link = frontendUrl + "/canvas?doc=" + diagram.getId();
       String html = "<p>" + HtmlUtils.htmlEscape(sharer) + " shared <strong>"
           + HtmlUtils.htmlEscape(diagram.getTitle()) + "</strong> with you on ArchFlux.</p>"
           + "<p><a href=\"" + HtmlUtils.htmlEscape(link) + "\">Open the diagram</a></p>";

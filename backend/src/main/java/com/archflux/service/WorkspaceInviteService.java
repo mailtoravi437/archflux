@@ -182,7 +182,7 @@ public class WorkspaceInviteService {
         String n = u.getName();
         return n == null || n.isBlank() ? u.getEmail() : n;
       }).orElse("A teammate");
-      String link = frontendUrl.replaceAll("/+$", "") + "/#/invite/" + token;
+      String link = frontendUrl.replaceAll("/+$", "") + "/invite/" + token;
       String subject = inviter + " invited you to " + ws.getName() + " on ArchFlux";
       String body = "<p>" + HtmlUtils.htmlEscape(inviter) + " invited you to join <strong>"
           + HtmlUtils.htmlEscape(ws.getName()) + "</strong> on ArchFlux.</p>"

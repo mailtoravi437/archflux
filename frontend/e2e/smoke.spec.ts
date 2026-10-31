@@ -22,7 +22,7 @@ test.describe('Responsive smoke', () => {
 
   test('header never overflows the viewport', async ({ page }) => {
     for (const route of ['dashboard', 'canvas', 'living']) {
-      await page.goto(`/#/${route}`);
+      await page.goto(`/${route}`);
       await expect(page.locator('#architectureCanvas, main').first()).toBeVisible({ timeout: 15000 });
       const overflow = await page.evaluate(() => {
         const header = document.querySelector('.top-header') as HTMLElement | null;
@@ -33,7 +33,7 @@ test.describe('Responsive smoke', () => {
   });
 
   test('canvas stays usable with dock collapsed', async ({ page }) => {
-    await page.goto('/#/canvas');
+    await page.goto('/canvas');
     const status = page.getByTestId('canvas-status');
     await expect(status).toBeAttached({ timeout: 30000 });
 
@@ -65,7 +65,7 @@ test.describe('Responsive smoke', () => {
   });
 
   test('tool rail places nodes on a phone viewport', async ({ page }) => {
-    await page.goto('/#/canvas');
+    await page.goto('/canvas');
     const status = page.getByTestId('canvas-status');
     await expect(status).toBeAttached({ timeout: 30000 });
     const before = Number(await status.getAttribute('data-nodes'));
@@ -77,7 +77,7 @@ test.describe('Responsive smoke', () => {
   });
 
   test('dashboard table has no page-level overflow', async ({ page }) => {
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: /Table/ }).click();
     await expect(page.getByRole('table', { name: 'Diagrams table' })).toBeVisible({ timeout: 15000 });
     const pageOverflow = await page.evaluate(
@@ -87,7 +87,7 @@ test.describe('Responsive smoke', () => {
   });
 
   test('living screen has no page-level overflow', async ({ page }) => {
-    await page.goto('/#/living');
+    await page.goto('/living');
     await expect(page.getByRole('heading', { level: 2, name: 'Drift' })).toBeVisible({ timeout: 15000 });
     const pageOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,

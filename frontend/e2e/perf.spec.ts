@@ -54,7 +54,7 @@ async function open(page: Page, nodes: number, edges: number): Promise<number> {
     localStorage.setItem('archflux:v2-light', v);
   }, { v: value });
   const t0 = Date.now();
-  await page.goto('/#/canvas');
+  await page.goto('/canvas');
   await expect(page.getByTestId('canvas-status')).toHaveAttribute('data-nodes', String(nodes), { timeout: 60000 });
   // First full paint: two animation frames after the canvas holds every element.
   await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));

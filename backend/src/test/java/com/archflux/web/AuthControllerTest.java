@@ -221,7 +221,7 @@ class AuthControllerTest extends PostgresIT {
         MvcResult result = mockMvc.perform(get("/api/v1/auth/verify")
                 .param("token", token))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("http://localhost:5173/#/auth/callback?provider=email"))
+            .andExpect(redirectedUrl("http://localhost:5173/auth/callback?provider=email"))
             .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("ARCHFLUX_TOKEN=generated-jwt-token")))
             .andReturn();
 
@@ -242,7 +242,7 @@ class AuthControllerTest extends PostgresIT {
         MvcResult result = mockMvc.perform(get("/api/v1/auth/verify")
                 .param("token", "invalid-token"))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("http://localhost:5173/#/login?error=invalid_token"))
+            .andExpect(redirectedUrl("http://localhost:5173/login?error=invalid_token"))
             .andReturn();
 
         assertTrue(result.getResponse().getHeader("Set-Cookie") == null
