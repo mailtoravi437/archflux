@@ -8,6 +8,7 @@ import { Section } from '../../components/Section';
 import { NodeIconPicker } from '../../components/NodeIconPicker';
 import { MultiAppearance } from './MultiAppearance';
 import { PropertiesSection } from './PropertiesSection';
+import { firstPageId } from '../../lib/pageView';
 import { notationFor } from '../../canvas/notation';
 import { drawKindGlyph, glyphTileTint, isIconPath } from '../../canvas/render/nodes';
 
@@ -229,7 +230,12 @@ export function Inspector({ checkpointInspector }: InspectorProps) {
     setDisplayStyle,
     multiSel,
     checkpoint,
+    pages,
+    activePageId,
   } = useDiagram();
+  // BUG-LIVE-023: the outline lists the active page only (elements without a pageId live on the first page).
+  const firstPage = firstPageId(pages);
+  const outlineNodes = useMemo(() => nodes.filter((n) => (n.pageId ?? firstPage) === activePageId), [nodes, firstPage, activePageId]);
   const [iconPickerAt, setIconPickerAt] = useState<{ x: number; y: number } | null>(null);
   const multiNodes = multiSel.length > 1 ? nodes.filter((n) => multiSel.includes(n.id)) : [];
   const { selected, selectedEdge, selectedText, selToolbarPos, setSelectedEdgeId, setSelectedTextId, beginTextEdit } = useCanvasLocal();
@@ -257,7 +263,7 @@ export function Inspector({ checkpointInspector }: InspectorProps) {
         <div className="callout-block">Nothing selected — click a node or route to edit its properties here.</div>
       )}
       {multiNodes.length <= 1 && !selected && !selectedEdge && (
-      <DiagramOutline nodes={nodes} edges={edges} selectedId={selectedId} onPick={pickOutline} />
+      <DiagramOutline nodes={outlineNodes} edges={edges} selectedId={selectedId} onPick={pickOutline} />
       )}
       {multiNodes.length <= 1 && selected && (() => {
         const connections = edges.filter((e) => e.from === selected.id || e.to === selected.id).length;

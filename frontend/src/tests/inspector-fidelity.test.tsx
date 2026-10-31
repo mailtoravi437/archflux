@@ -32,6 +32,8 @@ vi.mock('../state/useDiagram', () => ({
     duplicateSelected: writes.duplicateSelected,
     setDisplayStyle: writes.setDisplayStyle,
     multiSel: [],
+    pages: [],
+    activePageId: '',
     checkpoint: () => {},
     docDefaults: {},
     setDocDefaults: () => {},
