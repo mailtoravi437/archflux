@@ -502,7 +502,7 @@ export default function DashboardScreen() {
   const header = (
     <PageHeader
       title="Library"
-      subtitle={librarySubtitle(docs, signedIn)}
+      subtitle={librarySubtitle(docs, signedIn, libView === 'all' ? undefined : { label: libView, shown: filtered.length })}
       actions={
         <>
           <button type="button" className="libpage-btn libpage-btn--secondary" onClick={() => setNewFolderOpen(true)}>New folder</button>

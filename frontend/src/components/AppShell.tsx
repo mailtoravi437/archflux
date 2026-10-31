@@ -71,9 +71,9 @@ export function resetMeProbeCache() {
 }
 
 const ROUTE_TITLES: Record<string, string> = {
-  '/': 'Document Library',
+  '/': 'Library',
   '/home': 'Home',
-  '/dashboard': 'Document Library',
+  '/dashboard': 'Library',
   '/trash': 'Trash',
   '/canvas': 'Precision Canvas',
   '/living': 'Living Sync',
@@ -353,8 +353,8 @@ export default function AppShell() {
   }, [navigate, location.pathname]);
 
   useEffect(() => {
-    const screen = ROUTE_TITLES[location.pathname] ?? 'ArchFlux';
-    document.title = `${screen} · ArchFlux — Living System Canvas`;
+    const screen = ROUTE_TITLES[location.pathname];
+    document.title = screen ? `${screen} · ArchFlux` : 'ArchFlux';
   }, [location.pathname]);
 
   // Home's "Continue" lists the diagrams opened on the canvas, newest first.
