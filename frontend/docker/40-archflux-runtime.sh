@@ -56,14 +56,17 @@ ws_origin_override="$(origin_of "$ws_url")"
 # Phone sign-in (Firebase Auth + reCAPTCHA) needs Google endpoints; allowed only when configured.
 script_src="'self'"
 frame_src="'none'"
+# Google Fonts (BUG-LIVE-005) are part of the base policy (SERVICES_SPEC P9a).
+style_src="'self' 'unsafe-inline' https://fonts.googleapis.com"
 if [ -n "$fb_key" ]; then
-  connect="$connect https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google.com"
-  script_src="'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/"
+  connect="$connect https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google.com https://www.google.com/recaptcha/ https://www.recaptcha.net"
+  script_src="'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://www.recaptcha.net/recaptcha/"
+  style_src="$style_src https://www.gstatic.com/recaptcha/"
   frame_src="https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/"
 fi
 
 cat > "$conf_dir/runtime.conf" <<CONF
-set \$archflux_csp "default-src 'self'; script-src $script_src; frame-src $frame_src; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src $connect; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+set \$archflux_csp "default-src 'self'; script-src $script_src; frame-src $frame_src; style-src $style_src; img-src 'self' data: blob:; connect-src $connect; font-src 'self' data: https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
 CONF
 
 if [ -z "$api_upstream" ]; then
