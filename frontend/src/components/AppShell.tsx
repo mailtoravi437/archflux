@@ -9,6 +9,7 @@ import LintDialog from './LintDialog';
 import { AppStatusBanner } from './states';
 import { ErrorBoundary } from '../app/RouteErrorBoundary';
 import { api, ApiError, setUnauthorizedHandler } from '../lib/api';
+import { clearGitToken } from '../state/settings';
 import { getSession, setSession, clearSession, isSignedIn } from '../state/session';
 import { resolveSessionMode } from '../screens/AuthCallbackScreen';
 import { DocSwitcher } from './appbar/DocSwitcher';
@@ -189,6 +190,7 @@ export default function AppShell({ children }: { children?: ReactNode } = {}) {
       }
       try {
         resetMeProbeCache();
+        clearGitToken();
         setSession({ mode: 'guest' });
         // Hygiene: drop any legacy pre-cookie bearer leftover.
         api.clearToken();

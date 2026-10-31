@@ -68,7 +68,7 @@ describe('deriveCheckpointPRs', () => {
       { id: 'b', title: 'v2', meta: 'm2', nodes: [], edges: [] },
     ]);
     expect(prs.map((p) => p.id)).toEqual(['cp-a', 'cp-b']);
-    expect(prs[0].status).toContain('Checks Passed');
+    expect(prs[0].status).toContain('Local checkpoint');
     expect(prs[1].status).toContain('Draft');
     expect(prs[0].diff[0].text).toContain('S');
   });

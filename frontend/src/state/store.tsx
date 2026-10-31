@@ -1,4 +1,5 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { loadTheme, saveTheme } from './theme';
 import type { ReactNode } from 'react';
 import type { ArchEdge, ArchNode, DiagramDoc, DisplayStyle, FreeStroke, FreeText, FreshnessState, Layer, LibraryShape, Page, TextFont, ThemeName } from '../types';
 import type { Checkpoint } from '../types';
@@ -675,7 +676,7 @@ const TYPE_META: Record<string, { label: string; tag: string; stroke: string; ty
 
 export function DiagramProvider({ children }: { children: ReactNode }) {
   const persisted = useRef(loadPersisted());
-  const [theme, setThemeState] = useState<ThemeName>(() => persisted.current?.theme ?? 'light');
+  const [theme, setThemeState] = useState<ThemeName>(() => loadTheme() ?? persisted.current?.theme ?? 'light');
   const [nodes, setNodesState] = useState<ArchNode[]>(() =>
     persisted.current ? cloneNodes(persisted.current.nodes) : [],
   );
@@ -1156,6 +1157,7 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
   const setTheme = useCallback(
     (t: ThemeName) => {
       setThemeState(t);
+      saveTheme(t);
       document.documentElement.setAttribute('data-theme', t);
       pushToast(`Switched theme to ${t.toUpperCase()}`);
       schedulePersist();

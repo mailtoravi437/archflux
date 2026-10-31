@@ -43,9 +43,9 @@ export default function SettingsConnectorsScreen() {
           </div>
         </label>
         <div style={{ fontSize: 11, marginTop: 4, color: patValid ? 'var(--accent-emerald)' : 'var(--text-muted)' }}>
-          {s.pat.trim() === '' ? 'No token configured — Git push/merge simulation only.' : patValid ? '✓ Token length OK (8+ chars) — stored locally, never validated against the provider' : '✗ Token too short — needs 8+ characters'}
+          {s.pat.trim() === '' ? 'No token configured — Git push/merge simulation only.' : patValid ? '✓ Token length OK (8+ chars) — held in memory only, never validated against the provider' : '✗ Token too short — needs 8+ characters'}
         </div>
-        <div style={{ fontSize: 10, marginTop: 4, color: 'var(--text-dim)' }}>Token is stored in plain text in this browser&apos;s localStorage — use a scoped, revocable token.</div>
+        <div style={{ fontSize: 10, marginTop: 4, color: 'var(--text-dim)' }}>Kept for this session only; you will be asked again after you reload.</div>
         <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
           <label style={{ fontSize: 11 }}>Target repository
             <input className="doc-title-input" style={{ display: 'block', width: '100%', maxWidth: 260, background: 'var(--bg-panel-subtle)', border: '1px solid var(--border-panel)', borderRadius: 6, padding: '6px 10px', marginTop: 4, fontFamily: 'var(--mono-font)' }} value={s.targetRepo} onChange={(e) => set({ targetRepo: e.target.value })} aria-label="Target repository" />
