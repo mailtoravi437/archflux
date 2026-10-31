@@ -362,6 +362,10 @@ export const api = {
   logout: () =>
     request<void>('/v1/auth/logout', { method: 'POST' }, { probe: true }),
 
+  /** Public: sign-in providers that have real credentials on the server (H4). */
+  getAuthProviders: () =>
+    request<{ data: { providers: { id: string }[] } }>('/v1/auth/providers', {}, { probe: true }),
+
   sendMagicLink: (email: string) =>
     request<{ data?: unknown }>('/v1/auth/magic-link', {
       method: 'POST',

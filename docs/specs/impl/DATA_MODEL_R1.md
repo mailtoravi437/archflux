@@ -1,6 +1,6 @@
 # R1 shared contract: types, file format, schema, API
 
-> **Version:** 1.2.1 | **Last Updated:** 2026-10-25 | **Status:** 🟡 Proposed (frozen once R1-E00 starts)
+> **Version:** 1.3.0 | **Last Updated:** 2026-10-31 | **Status:** 🟡 Proposed (frozen once R1-E00 starts)
 > **Part of:** [Implementation specs](README.md) | **Sources:** PRODUCT_SPEC v4.2.0 §3/§7,
 > UI_REVAMP_SPEC v1.2.0 §5A, REVIEW_VERSIONING_SPEC v1.0.0 §6
 
@@ -361,6 +361,7 @@ index diagram_revisions(diagram_id) where name is not null
 | V17 | Revision label UPDATE policy tightened to EDITOR+ (V14 runs before `diagram_role_at_least` exists) | R1-E08-T02 |
 | V18 | Invitee can read the invited workspace (`has_pending_workspace_invite`, policy `workspaces_invitee_read`) plus EXECUTE grants (R1-BUG-06) | R1-BUG-06 |
 | V19 | `workspace_editor_seat_count(ws)` SECURITY DEFINER: editor seat count for members and live invitees only (NULL otherwise), so the plan limit holds on invite accept under `archflux_app`; EXECUTE granted to `archflux_app` and `app_tester` when present (R1-BUG-08) | R1-BUG-08 |
+| V20 | Sets `users.access_token` to NULL: the provider access token is no longer stored at login (nothing reads it). Column and `provision_user` signature unchanged (V4/V6 immutable); callers pass NULL | R1-SEC-01 |
 
 If two tasks need a migration at the same time, they take the numbers above in order. Never renumber
 a migration once it is merged.
@@ -446,3 +447,7 @@ committed.
 - **1.1.0 (2026-10-25):** fixed the `.arch` app id (`'ArchFlux'`), the tag→technology rule and the normalisation precedence (§2.5); added icon id and mapping-file rules (§6). Affected: E00-T01, T05, E05-T01, E05-T02.
 - **1.0.0 (2026-10-24):** First version. Element kinds, display styles, containers, pages/layers,
   relationships, `.arch` v2, V10–V13, R1 API, icon manifest.
+
+### 4.7 Sign-in providers API (R1-SEC-01, 2026-10-31)
+
+`GET /api/v1/auth/providers` (public, no auth): `{"data":{"providers":[{"id":"google"}]}}`. `id` is one of `github`, `google`, `oidc`, `saml`; a provider is listed only when its client id and secret are real (not the application.yml placeholders), `oidc` also needs a non-placeholder issuer, and `saml` also needs `app.saml.enabled=true` and a configured IdP SSO URL. Empty list when none. No migration other than V20 (token wipe).

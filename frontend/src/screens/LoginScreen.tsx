@@ -8,7 +8,15 @@ import { safeNext } from "../lib/access";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Tab = "magic-link" | "google" | "saml" | "oidc";
+type Tab = "magic-link" | "saml" | "oidc";
+
+// Honest copy for the server's ?error= codes (H1/H2).
+const ERROR_COPY: Record<string, string> = {
+  email_not_verified:
+    "Sign-in failed: your provider has not verified this email address, so we did not sign you in. Verify the email with your provider, or use the email link below.",
+  no_email:
+    "Sign-in failed: we could not get an email address from your provider. Make sure it has a verified primary email, or use the email link below.",
+};
 
 export default function LoginScreen() {
   const navigate = useNavigate();
@@ -20,6 +28,8 @@ export default function LoginScreen() {
   const [magicSent, setMagicSent] = useState(false);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const [searchParams] = useSearchParams();
+  // Providers the server can really sign in with; none until the server answers (or if it fails).
+  const [providers, setProviders] = useState<string[]>([]);
 
   useEffect(() => {
     emailRef.current?.focus();
@@ -30,8 +40,23 @@ export default function LoginScreen() {
     if (isSignedIn()) navigate(next ?? "/dashboard", { replace: true });
     else if (getSession() && !next) navigate("/dashboard", { replace: true });
     const err = searchParams.get("error");
-    if (err) setError(`Sign-in failed: ${err}`);
+    if (err) setError(ERROR_COPY[err] ?? `Sign-in failed: ${err}`);
   }, [navigate, searchParams]);
+
+  useEffect(() => {
+    let live = true;
+    api
+      .getAuthProviders()
+      .then((r) => {
+        if (live) setProviders((r?.data?.providers ?? []).map((p) => p.id));
+      })
+      .catch(() => {
+        if (live) setProviders([]);
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
 
   const wasOnboarded = () => {
     try {
@@ -293,7 +318,7 @@ export default function LoginScreen() {
             style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}
             role="tablist"
             aria-label="Sign-in method">
-            {(["magic-link", "google", "saml", "oidc"] as Tab[]).map((t) => (
+            {(["magic-link", ...(["saml", "oidc"] as const).filter((p) => providers.includes(p))] as Tab[]).map((t) => (
               <button
                 key={t}
                 role="tab"
@@ -303,35 +328,31 @@ export default function LoginScreen() {
                   setTab(t);
                   setError(null);
                 }}>
-                {t === "magic-link" ? "Magic Link" : t === "google" ? "Google" : t === "saml" ? "SSO (SAML)" : "OIDC"}
+                {t === "magic-link" ? "Magic Link" : t === "saml" ? "SSO (SAML)" : "OIDC"}
               </button>
             ))}
           </div>
 
-          <button
-            className="btn btn-primary"
-            style={{ width: "100%", justifyContent: "center", marginBottom: 6 }}
-            onClick={github}
-            disabled={busyGithub}
-            aria-busy={busyGithub}>
-            {busyGithub ? "Connecting…" : "⬢ Continue with GitHub"}
-</button>
+          {providers.includes("github") && (
             <button
-            className="btn"
-            style={{ width: "100%", justifyContent: "center", marginBottom: 6 }}
-            onClick={google}
-            disabled={busyGoogle}
-            aria-busy={busyGoogle}>
-            {busyGoogle ? "Connecting…" : "🌐 Continue with Google"}
-</button>
-            <div
-              style={{
-                fontSize: 10,
-                color: "var(--text-muted)",
-                marginBottom: 12,
-              }}>
-              Requests repository read/write scope for .arch commits.
-            </div>
+              className="btn btn-primary"
+              style={{ width: "100%", justifyContent: "center", marginBottom: 6 }}
+              onClick={github}
+              disabled={busyGithub}
+              aria-busy={busyGithub}>
+              {busyGithub ? "Connecting…" : "⬢ Continue with GitHub"}
+            </button>
+          )}
+          {providers.includes("google") && (
+            <button
+              className="btn"
+              style={{ width: "100%", justifyContent: "center", marginBottom: 12 }}
+              onClick={google}
+              disabled={busyGoogle}
+              aria-busy={busyGoogle}>
+              {busyGoogle ? "Connecting…" : "🌐 Continue with Google"}
+            </button>
+          )}
 
           {tab === "magic-link" && (
             <form onSubmit={submitMagicLink}>

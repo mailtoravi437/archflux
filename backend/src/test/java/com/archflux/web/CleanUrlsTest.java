@@ -15,7 +15,7 @@ class CleanUrlsTest {
 
   @Test
   void spaUrlHasNoHash() {
-    AuthController controller = new AuthController(null, null, null, null, null, null, null);
+    AuthController controller = new AuthController(null, null, null, null, null, null);
     ReflectionTestUtils.setField(controller, "frontendUrl", "https://archflux.in/");
     assertThat(controller.spaUrl("/auth/callback?provider=email"))
         .isEqualTo("https://archflux.in/auth/callback?provider=email");

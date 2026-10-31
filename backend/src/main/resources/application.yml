@@ -69,7 +69,8 @@ spring:
             client-id: ${GITHUB_CLIENT_ID:Iv23lixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
             client-secret: ${GITHUB_CLIENT_SECRET:d5150374db41aa7b1bf23957bb3294c56d9bb94e7ef3e4358b4021ba96658c56}
             redirect-uri: "{baseUrl}/login/oauth2/code/github"
-            scope: read:user,user:email,repo
+            # Sign-in only needs identity + email. No repo scope: nothing reads a stored provider token.
+            scope: read:user,user:email
             authorization-grant-type: authorization_code
             client-name: GitHub
           google:

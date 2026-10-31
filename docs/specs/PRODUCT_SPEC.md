@@ -1,6 +1,6 @@
 # ArchFlux Product Specification — "Advanced Lucidchart for architecture"
 
-> **Version:** 4.3.0 | **Last Updated:** 2026-10-25 | **Status:** 🟡 Proposed (awaiting sign-off)
+> **Version:** 4.3.1 | **Last Updated:** 2026-10-31 | **Status:** 🟡 Proposed (awaiting sign-off)
 > **Part of:** [Master Spec](../../SPEC.md) | **Platform contracts:** Appendix A (moved from the deleted PRODUCTIZATION_SPEC v3.0.0; still binding). **Visual design:** [UI_REVAMP_SPEC](UI_REVAMP_SPEC.md) + the
 > [Claude Design canvas](https://claude.ai/artifact/JsPYiRas4WwTm2SpEHK9gu).
 
@@ -136,6 +136,8 @@ Legend: ✅ shipped · ◐ partial/unreliable · ❌ missing · **R1–R4** = ta
 | CAP-A2 | **Edit by instruction** ("add a Redis cache in front of Order Service") with preview + accept | ❌ | R3 |
 | CAP-A3 | **Explain / document** (generate ADR, onboarding summary, alt-text) | ❌ | R2 |
 | CAP-A4 | **Review risks** (single points of failure, missing auth, chatty calls) → rule suggestions | ❌ | R3 |
+
+**Owner decision 2026-10-31:** the AI assistant stays in R2; no AI code ships in R1 (BACKLOG D10).
 
 Rule (Appendix A): AI output is always a *proposal* the user accepts; never a silent edit.
 

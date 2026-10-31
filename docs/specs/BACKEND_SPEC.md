@@ -304,7 +304,7 @@ spring:
     oauth2:
       client:
         registration:
-          github: { client-id, secret, scope: read:user,user:email,repo }
+          github: { client-id, secret, scope: read:user,user:email }  # no repo: sign-in only (R1-SEC-01)
           google: { client-id, secret, scope: openid,email,profile }
           oidc:   { client-id, secret, scope: openid,email,profile }
     saml2:
