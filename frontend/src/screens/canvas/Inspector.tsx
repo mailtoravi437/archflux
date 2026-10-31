@@ -9,7 +9,7 @@ import { NodeIconPicker } from '../../components/NodeIconPicker';
 import { MultiAppearance } from './MultiAppearance';
 import { PropertiesSection } from './PropertiesSection';
 import { notationFor } from '../../canvas/notation';
-import { drawKindGlyph, glyphTileTint } from '../../canvas/render/nodes';
+import { drawKindGlyph, glyphTileTint, isIconPath } from '../../canvas/render/nodes';
 
 /** localStorage key for the Inspector sections' open state: `{ [sectionId]: boolean }`. */
 export const INSPECTOR_SECTIONS_KEY = 'archflux:inspector:sections:v1';
@@ -29,6 +29,16 @@ const FIELD_INPUT: CSSProperties = {
   font: 'inherit', fontSize: 13,
 };
 const FOOTER_BTN: CSSProperties = { flexGrow: 1, height: 32, borderRadius: 6, background: 'var(--bg-panel)', font: 'inherit', fontSize: 13, fontWeight: 500, cursor: 'pointer' };
+
+/** Inspector Icon summary: the name of what the canvas shows (iconRef, then iconSrc, then a legacy icon path). */
+function nodeIconName(n: ArchNode): string {
+  if (n.iconRef === null) return 'None';
+  const tail = (s: string) => s.split('/').pop()?.replace(/\.(svg|png)$/i, '') ?? 'icon';
+  if (n.iconRef) return tail(n.iconRef.id);
+  if (n.iconSrc) return tail(n.iconSrc);
+  if (isIconPath(n.icon)) return tail(n.icon);
+  return n.icon ? n.icon : 'None';
+}
 
 /** Kind label for the header subtitle: "service" → "Service". */
 function kindLabel(type: string): string {
@@ -255,7 +265,7 @@ export function Inspector({ checkpointInspector }: InspectorProps) {
         const borderValue: BorderChoice = selected.borderDashed
           ? 'dashed'
           : strokeWidth <= 1 ? 'thin' : strokeWidth <= 1.5 ? 'regular' : 'bold';
-        const iconName = selected.icon ? (selected.icon.split('/').pop()?.replace(/\.svg$/i, '') ?? 'icon') : 'None';
+        const iconName = nodeIconName(selected);
         return (
       <div className="inspector-node">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -353,11 +363,11 @@ export function Inspector({ checkpointInspector }: InspectorProps) {
               <button
                 key={icon}
                 className="btn btn--sm btn--secondary"
-                aria-pressed={selected.icon === icon}
+                aria-pressed={selected.iconRef == null && selected.iconSrc === icon}
                 aria-label={`Provider icon ${name}`}
                 title={`Provider icon ${name}`}
-                onClick={() => { checkpointInspector(`icon:${selected.id}`); updateNode(selected.id, { icon }); }}
-                style={selected.icon === icon ? { borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' } : undefined}
+                onClick={() => { checkpointInspector(`icon:${selected.id}`); updateNode(selected.id, { iconSrc: icon, iconRef: undefined, icon: undefined }); }}
+                style={selected.iconRef == null && selected.iconSrc === icon ? { borderColor: 'var(--accent-cyan)', color: 'var(--accent-cyan)' } : undefined}
               >
                 <img src={icon} alt="" style={{ width: 20, height: 20, display: 'block' }} />
               </button>
