@@ -215,6 +215,9 @@ app:
     api-token: ${GITHUB_API_TOKEN:}
     api-url: ${GITHUB_API_URL:https://api.github.com}
   webhook-secret: ${GITHUB_WEBHOOK_SECRET:}
+  # Phone sign-in via Firebase Auth (R1-SEC-02). Public project id, not a secret; blank = phone sign-in off (production: archflux-89085).
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:}
 
   # Magic link email service
   email:

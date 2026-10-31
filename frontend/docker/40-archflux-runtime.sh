@@ -1,10 +1,13 @@
 #!/bin/sh
 # archflux-web runtime configuration (SERVICES_SPEC §3.1/§3.2). Runs from
 # nginx:alpine's /docker-entrypoint.d before nginx starts and writes:
-#   /usr/share/nginx/html/config.json   {"apiUrl","wsUrl"} for src/config.ts
+#   /usr/share/nginx/html/config.json   {"apiUrl","wsUrl","firebase"?} for src/config.ts
 #   /etc/nginx/archflux/runtime.conf    CSP with the API origin in connect-src
 #   /etc/nginx/archflux/api-proxy.conf  reverse proxy iff API_UPSTREAM is set
-# Env: API_URL (default /api), WS_URL (optional), API_UPSTREAM (optional).
+# Env: API_URL (default /api), WS_URL (optional), API_UPSTREAM (optional),
+#      FIREBASE_API_KEY / FIREBASE_AUTH_DOMAIN / FIREBASE_PROJECT_ID / FIREBASE_APP_ID /
+#      FIREBASE_MESSAGING_SENDER_ID (optional, public web config for phone sign-in, R1-SEC-02;
+#      the firebase block and its CSP additions are written only when FIREBASE_API_KEY is set).
 set -eu
 
 api_url="${API_URL:-/api}"
@@ -17,11 +20,25 @@ json_escape() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
 # scheme://host[:port] of an absolute URL; empty for relative URLs.
 origin_of() { printf '%s' "$1" | sed -n -E 's#^(https?|wss?)://([^/]+).*#\1://\2#p'; }
 # Reject characters that could break out of the nginx string / JSON.
-case "$api_url$ws_url$api_upstream" in
-  *[\"\;\{\}\ \$\'\`]*) echo "archflux-runtime: invalid character in API_URL/WS_URL/API_UPSTREAM" >&2; exit 1 ;;
+fb_key="${FIREBASE_API_KEY:-}"
+fb_domain="${FIREBASE_AUTH_DOMAIN:-}"
+fb_project="${FIREBASE_PROJECT_ID:-}"
+fb_app="${FIREBASE_APP_ID:-}"
+fb_sender="${FIREBASE_MESSAGING_SENDER_ID:-}"
+case "$api_url$ws_url$api_upstream$fb_key$fb_domain$fb_project$fb_app$fb_sender" in
+  *[\"\;\{\}\ \$\'\`]*) echo "archflux-runtime: invalid character in API_URL/WS_URL/API_UPSTREAM/FIREBASE_*" >&2; exit 1 ;;
 esac
 
-printf '{"apiUrl":"%s","wsUrl":"%s"}\n' "$(json_escape "$api_url")" "$(json_escape "$ws_url")" \
+firebase_json=""
+if [ -n "$fb_key" ]; then
+  if [ -z "$fb_domain" ] || [ -z "$fb_project" ] || [ -z "$fb_app" ]; then
+    echo "archflux-runtime: FIREBASE_API_KEY needs FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID and FIREBASE_APP_ID" >&2
+    exit 1
+  fi
+  firebase_json=",\"firebase\":{\"apiKey\":\"$(json_escape "$fb_key")\",\"authDomain\":\"$(json_escape "$fb_domain")\",\"projectId\":\"$(json_escape "$fb_project")\",\"appId\":\"$(json_escape "$fb_app")\",\"messagingSenderId\":\"$(json_escape "$fb_sender")\"}"
+fi
+
+printf '{"apiUrl":"%s","wsUrl":"%s"%s}\n' "$(json_escape "$api_url")" "$(json_escape "$ws_url")" "$firebase_json" \
   > /usr/share/nginx/html/config.json
 
 connect="'self'"
@@ -36,8 +53,17 @@ fi
 ws_origin_override="$(origin_of "$ws_url")"
 [ -n "$ws_origin_override" ] && connect="$connect $ws_origin_override"
 
+# Phone sign-in (Firebase Auth + reCAPTCHA) needs Google endpoints; allowed only when configured.
+script_src="'self'"
+frame_src="'none'"
+if [ -n "$fb_key" ]; then
+  connect="$connect https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google.com"
+  script_src="'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/"
+  frame_src="https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/"
+fi
+
 cat > "$conf_dir/runtime.conf" <<CONF
-set \$archflux_csp "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src $connect; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+set \$archflux_csp "default-src 'self'; script-src $script_src; frame-src $frame_src; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src $connect; font-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
 CONF
 
 if [ -z "$api_upstream" ]; then

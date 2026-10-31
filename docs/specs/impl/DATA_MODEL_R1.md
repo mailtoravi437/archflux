@@ -362,6 +362,7 @@ index diagram_revisions(diagram_id) where name is not null
 | V18 | Invitee can read the invited workspace (`has_pending_workspace_invite`, policy `workspaces_invitee_read`) plus EXECUTE grants (R1-BUG-06) | R1-BUG-06 |
 | V19 | `workspace_editor_seat_count(ws)` SECURITY DEFINER: editor seat count for members and live invitees only (NULL otherwise), so the plan limit holds on invite accept under `archflux_app`; EXECUTE granted to `archflux_app` and `app_tester` when present (R1-BUG-08) | R1-BUG-08 |
 | V20 | Sets `users.access_token` to NULL: the provider access token is no longer stored at login (nothing reads it). Column and `provision_user` signature unchanged (V4/V6 immutable); callers pass NULL | R1-SEC-01 |
+| V21 | Phone sign-in (R1-SEC-02): `users.email` nullable, `users.phone_number` unique (E.164), CHECK `email IS NOT NULL OR phone_number IS NOT NULL`, provider CHECK gains `'phone'`, SECURITY DEFINER `provision_phone_user(text, text)` (EXECUTE to `archflux_app`/`archflux_migrator` when present) | R1-SEC-02 |
 
 If two tasks need a migration at the same time, they take the numbers above in order. Never renumber
 a migration once it is merged.
@@ -450,4 +451,4 @@ committed.
 
 ### 4.7 Sign-in providers API (R1-SEC-01, 2026-10-31)
 
-`GET /api/v1/auth/providers` (public, no auth): `{"data":{"providers":[{"id":"google"}]}}`. `id` is one of `github`, `google`, `oidc`, `saml`; a provider is listed only when its client id and secret are real (not the application.yml placeholders), `oidc` also needs a non-placeholder issuer, and `saml` also needs `app.saml.enabled=true` and a configured IdP SSO URL. Empty list when none. No migration other than V20 (token wipe).
+`GET /api/v1/auth/providers` (public, no auth): `{"data":{"providers":[{"id":"google"}]}}`. `id` is one of `github`, `google`, `oidc`, `saml`, `phone` (`phone` when `FIREBASE_PROJECT_ID` is set, R1-SEC-02, V21); a provider is listed only when its client id and secret are real (not the application.yml placeholders), `oidc` also needs a non-placeholder issuer, and `saml` also needs `app.saml.enabled=true` and a configured IdP SSO URL. Empty list when none. No migration other than V20 (token wipe).

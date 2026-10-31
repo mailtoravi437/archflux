@@ -322,6 +322,9 @@ public class AccessRequestService {
           + (role == null ? "" : " (" + HtmlUtils.htmlEscape(role) + ")") + ".</p>"
           + ("approved".equals(outcome)
               ? "<p><a href=\"" + HtmlUtils.htmlEscape(link) + "\">Open the diagram</a></p>" : "");
+      if (requester.getEmail() == null) {
+        return; // phone-only user: no mailbox to notify
+      }
       email.sendHtml(requester.getEmail(), subject, html);
     } catch (Exception e) {
       log.warn("Access decision notification failed for diagram {}: {}", diagram.getId(),

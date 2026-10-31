@@ -18,8 +18,12 @@ public class User {
 
   // citext -> String (see OtherStringUserType; keeps validate green).
   @org.hibernate.annotations.Type(OtherStringUserType.class)
-  @Column(name = "email", nullable = false, unique = true, columnDefinition = "citext")
+  @Column(name = "email", unique = true, columnDefinition = "citext")
   private String email;
+
+  // E.164, set for phone sign-in users (V21); unique.
+  @Column(name = "phone_number", unique = true)
+  private String phoneNumber;
 
   @Column(name = "name", nullable = false)
   private String name = "";
@@ -80,6 +84,14 @@ public class User {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
   }
 
   public String getName() {

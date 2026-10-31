@@ -179,6 +179,22 @@ public class WorkspaceService {
         "provision_user returned non-UUID: " + (out == null ? "null" : out.getClass()));
   }
 
+  /** Phone sign-in provisioning (V21 {@code provision_phone_user}): find-or-create by E.164 number. */
+  @Transactional
+  public UUID provisionPhoneLogin(String phoneNumber) {
+    readiness.requireReady();
+    Object out = entityManager.createNativeQuery("SELECT public.provision_phone_user(:phone, :name)")
+        .setFlushMode(jakarta.persistence.FlushModeType.COMMIT)
+        .setParameter("phone", phoneNumber)
+        .setParameter("name", "")
+        .getSingleResult();
+    if (out instanceof UUID uuid) {
+      return uuid;
+    }
+    throw new IllegalStateException(
+        "provision_phone_user returned non-UUID: " + (out == null ? "null" : out.getClass()));
+  }
+
   private static String orEmpty(String value) {
     return value == null ? "" : value;
   }

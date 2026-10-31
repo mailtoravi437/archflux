@@ -122,6 +122,7 @@ src/
 | Base URL | `getApiUrl()` from `src/config.ts` (`/config.json` → `VITE_API_URL` → `/api`); paths are `/v1/...` |
 | Login initiation | `{apiUrl}/v1/auth/login/{github,google,saml,oidc}` (full-page navigation) |
 | Provider buttons | Rendered only for providers returned by `GET /v1/auth/providers` (R1-SEC-01). None configured, or the request failing, shows the magic-link form only: no GitHub/Google buttons, no SSO tabs. The old "repository read/write scope" line is removed |
+| Phone sign-in (R1-SEC-02, 2026-10-31) | A "Phone" tab appears only when `GET /v1/auth/providers` lists `phone` and `/config.json` has `firebase.apiKey`. Step 1: phone field (E.164, `+91...`) and "Send code" (invisible reCAPTCHA). Step 2: 6-digit code field and "Verify"; "Use a different number" goes back. The ID token is exchanged at `POST /v1/auth/firebase`; success follows the normal `/auth/callback` path. Any failure (bad number, SMS quota, wrong code, 401 from the API) shows an honest `role=alert` message; nothing is shown as sent unless Firebase accepted the request |
 | Login errors | `?error=email_not_verified` and `?error=no_email` show an honest explanation (provider email not verified / no email from provider) |
 | Transport auth | `ARCHFLUX_TOKEN` cookie (`credentials: 'include'`); no `Authorization` header, no localStorage token |
 | Login | OAuth/magic-link redirects set the cookie; callback screen probes `GET /api/v1/auth/me`, then `setSession({mode, email})` |
