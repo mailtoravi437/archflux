@@ -117,3 +117,53 @@ describe('login phone tab', () => {
     expect((await screen.findByRole('alert')).textContent).toMatch(/could not be verified/i);
   });
 });
+
+describe('login phone tab error messages', () => {
+  const fbErr = (code: string) => Object.assign(new Error('firebase'), { code });
+
+  async function reachCodeStep() {
+    flow.sendCode.mockResolvedValue(undefined);
+    renderLogin();
+    await openPhoneTab();
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '+919876543210' } });
+    fireEvent.click(screen.getByRole('button', { name: /send code/i }));
+    return screen.findByLabelText('Verification code');
+  }
+
+  it('says the number is not valid when Firebase rejects it', async () => {
+    flow.sendCode.mockRejectedValue(fbErr('auth/invalid-phone-number'));
+    renderLogin();
+    await openPhoneTab();
+    fireEvent.change(screen.getByLabelText('Phone number'), { target: { value: '+919876543210' } });
+    fireEvent.click(screen.getByRole('button', { name: /send code/i }));
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'That phone number is not valid. Use the international format, for example +919876543210.',
+    );
+    expect(screen.getByLabelText('Phone number')).toBeTruthy();
+  });
+
+  it('says the code is not correct for a wrong code and stays on the code step', async () => {
+    flow.confirm.mockRejectedValue(fbErr('auth/invalid-verification-code'));
+    fireEvent.change(await reachCodeStep(), { target: { value: '000000' } });
+    fireEvent.click(screen.getByRole('button', { name: /verify/i }));
+    expect((await screen.findByRole('alert')).textContent).toBe('That code is not correct. Check the SMS and try again.');
+    expect(screen.getByLabelText('Verification code')).toBeTruthy();
+  });
+
+  it('says the code has expired and offers a way back to send a new one', async () => {
+    flow.confirm.mockRejectedValue(fbErr('auth/code-expired'));
+    fireEvent.change(await reachCodeStep(), { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: /verify/i }));
+    expect((await screen.findByRole('alert')).textContent).toBe('That code has expired. Go back and send a new one.');
+    fireEvent.click(screen.getByRole('button', { name: /use a different number/i }));
+    expect(screen.getByLabelText('Phone number')).toBeTruthy();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('rejects a code that is not 6 digits without calling Firebase', async () => {
+    fireEvent.change(await reachCodeStep(), { target: { value: '12ab' } });
+    fireEvent.click(screen.getByRole('button', { name: /verify/i }));
+    expect((await screen.findByRole('alert')).textContent).toBe('Enter the 6-digit code from the SMS.');
+    expect(flow.confirm).not.toHaveBeenCalled();
+  });
+});

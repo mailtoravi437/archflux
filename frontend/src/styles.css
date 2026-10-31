@@ -2176,11 +2176,11 @@ input:focus-visible, button:focus-visible, select:focus-visible { outline: 2px s
 }
 
 /* Accessibility: focus indicators for keyboard navigation */
-button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--accent-cyan);
   outline-offset: 2px;
 }
-[data-theme="dark"] button:focus-visible, [data-theme="dark"] input:focus-visible, [data-theme="dark"] [tabindex]:focus-visible {
+[data-theme="dark"] button:focus-visible, [data-theme="dark"] input:focus-visible, [data-theme="dark"] select:focus-visible, [data-theme="dark"] textarea:focus-visible, [data-theme="dark"] a:focus-visible, [data-theme="dark"] [tabindex]:focus-visible {
   outline-color: #A49EFF;
 }
 

@@ -8,7 +8,7 @@ import InviteScreen from './screens/InviteScreen';
 import { withFallback } from './app/withFallback';
 import { RequireSession } from './app/RequireSession';
 import { IndexRoute } from './app/IndexRoute';
-import { NotFoundRoute } from './app/NotFoundRoute';
+import { UnknownRoute } from './app/NotFoundRoute';
 
 // Route-level code splitting: the canvas editor is the heavy chunk and
 // shouldn't block first paint of the shell. Clean path URLs (BrowserRouter) rely
@@ -68,9 +68,10 @@ export const routes: RouteObject[] = [
       },
       // Retired pitch route: old bookmarks land on the canvas.
       { path: 'proposal', element: <Navigate to="/canvas" replace /> },
-      { path: '*', element: <NotFoundRoute /> },
     ],
   },
+  // Anything else: not-found, with no redirect for signed-out visitors (BUG-LIVE-013).
+  { path: '*', element: <UnknownRoute /> },
 ];
 
 /** Built after `migrateLegacyHash()` so the router reads the clean URL. */
