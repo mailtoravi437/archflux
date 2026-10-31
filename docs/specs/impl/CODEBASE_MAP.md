@@ -26,7 +26,7 @@ deploy/aws/               CloudFormation + compose + Caddy for AWS
 | File | What |
 |---|---|
 | `main.tsx` | Bootstraps the theme and `DiagramProvider`, then the router |
-| `App.tsx` | `createHashRouter` routes: `/login`, `/onboarding`, `/auth/callback`, and the `/` shell with `dashboard`, `canvas`, `living`, `reviews`, `blueprints`, `settings/*`. Screens are `lazy()` and wrapped in `withFallback` |
+| `App.tsx` | `routes` (and `createAppRouter()` → `createBrowserRouter`): `/login`, `/onboarding`, `/auth/callback`, and the `/` shell with `dashboard`, `canvas`, `living`, `reviews`, `blueprints`, `settings/*`. Screens are `lazy()` and wrapped in `withFallback` |
 | `app/RequireSession.tsx`, `app/IndexRoute.tsx`, `app/RouteErrorBoundary.tsx`, `app/withFallback.tsx` | Route guards and fallbacks |
 
 ### 2.2 State

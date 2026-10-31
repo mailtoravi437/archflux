@@ -51,7 +51,7 @@ export default function AppStatusBanner({ onReviewConflict }: { onReviewConflict
   const download = () => { exportArch(); };
   const signIn = () => {
     clearSessionExpired();
-    try { window.location.hash = '#/login'; } catch { /* non-DOM env */ }
+    try { window.location.assign('/login'); } catch { /* non-DOM env */ }
   };
   const roleName = role ? role.charAt(0).toUpperCase() + role.slice(1) : '';
   return (

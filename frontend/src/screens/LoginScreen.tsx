@@ -77,7 +77,7 @@ export default function LoginScreen() {
     }
     setBusy(true);
     // Real cookie-session magic link: server emails a single-use link that
-    // sets HttpOnly ARCHFLUX_TOKEN and lands on #/auth/callback?provider=.
+    // sets HttpOnly ARCHFLUX_TOKEN and lands on /auth/callback?provider=.
     void api
       .sendMagicLink(email.trim())
       .then(() => {
@@ -98,7 +98,7 @@ export default function LoginScreen() {
   const [busyOidc, setBusyOidc] = useState(false);
   const github = () => {
     // Real GitHub OAuth redirect
-    // Backend returns to {frontend}/#/auth/callback itself (SERVICES_SPEC §4.1).
+    // Backend returns to {frontend}/auth/callback itself (SERVICES_SPEC §4.1).
     const oauthUrl = loginUrl("github");
     
     setBusyGithub(true);
@@ -110,7 +110,7 @@ export default function LoginScreen() {
 
   const google = () => {
     // Real Google OAuth redirect
-    // Backend returns to {frontend}/#/auth/callback itself (SERVICES_SPEC §4.1).
+    // Backend returns to {frontend}/auth/callback itself (SERVICES_SPEC §4.1).
     const oauthUrl = loginUrl("google");
     
     setBusyGoogle(true);
@@ -122,7 +122,7 @@ export default function LoginScreen() {
 
   const saml = () => {
     // Real SAML OAuth redirect
-    // Backend returns to {frontend}/#/auth/callback itself (SERVICES_SPEC §4.1).
+    // Backend returns to {frontend}/auth/callback itself (SERVICES_SPEC §4.1).
     const samlUrl = loginUrl("saml");
     
     setBusySaml(true);
@@ -134,7 +134,7 @@ export default function LoginScreen() {
 
   const oidc = () => {
     // Real OIDC redirect
-    // Backend returns to {frontend}/#/auth/callback itself (SERVICES_SPEC §4.1).
+    // Backend returns to {frontend}/auth/callback itself (SERVICES_SPEC §4.1).
     const oidcUrl = loginUrl("oidc");
     
     setBusyOidc(true);

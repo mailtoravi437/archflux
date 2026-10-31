@@ -74,7 +74,7 @@ class ShareLinkTest extends SharingIT {
     String token = link.get("token").asText();
     assertThat(ShareTokens.wellFormed(token)).isTrue();
     assertThat(java.util.Base64.getUrlDecoder().decode(token)).hasSize(32);
-    assertThat(link.get("url").asText()).endsWith("/#/d/" + id + "?link=1")
+    assertThat(link.get("url").asText()).endsWith("/d/" + id + "?link=1")
         .doesNotContain(token);
     assertThat(link.get("state").asText()).isEqualTo("active");
 

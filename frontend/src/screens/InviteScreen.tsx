@@ -9,7 +9,7 @@ type View =
   | { kind: 'guest' }
   | { kind: 'error'; message: string };
 
-/** `#/invite/:token`: accepts a workspace invite, or goes to sign-in and comes back (R1-E11-T03). */
+/** `/invite/:token`: accepts a workspace invite, or goes to sign-in and comes back (R1-E11-T03). */
 export default function InviteScreen() {
   const { token = '' } = useParams();
   const navigate = useNavigate();

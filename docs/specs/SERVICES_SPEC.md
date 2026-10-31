@@ -1,6 +1,6 @@
 # ArchFlux Service Architecture Specification
 
-> **Version:** 2.3.0 | **Last Updated:** 2026-10-26 | **Status:** ✅ Current
+> **Version:** 2.4.0 | **Last Updated:** 2026-10-31 | **Status:** ✅ Current
 > **Part of:** [Master Spec](../../SPEC.md) | **Maintenance:** [Protocol](../../SPEC.md#spec-maintenance-protocol)
 > **Supersedes:** `docs/SEPARATE_DEPLOY_SPEC.md` v1.0 (which proposed two repos and embedded real secrets).
 
@@ -122,6 +122,20 @@ The SPA resolves its endpoints in one module, `src/config.ts`, before first rend
 | `WS_URL` | Written to `config.json.wsUrl` (optional) | empty (derived) |
 | `API_UPSTREAM` | If set (e.g. `http://server:3001`), nginx reverse-proxies `/api/`, `/ws`, `/oauth2/`, `/login/oauth2/`, `/saml2/`, `/login/saml2/` to it (integrated topology). Empty → no proxy (separate topology). | empty |
 
+### 3.2a Routing and URLs (decision 2026-10-31)
+
+The SPA uses **clean path URLs** (`createBrowserRouter`): `archflux.in/dashboard`, not
+`archflux.in/#/dashboard`. Consequences:
+
+- The web server (nginx in archflux-web; Caddy forwards every path to it) returns `index.html` for any
+  path that is not a static file (`try_files $uri $uri/ /index.html`). `/api`, `/ws`, `/oauth2`,
+  `/login/oauth2`, `/saml2`, `/login/saml2` stay on the API; a bare `/login` is an SPA route.
+- Legacy `#/path` URLs (old bookmarks, emails, shared links) still work: `main.tsx` rewrites
+  `/#/path?q` to `/path?q` before the router starts (`lib/legacyHash.ts`).
+- Backend-built links (`spaUrl()`, magic link, invites, share links, access-request emails) are
+  `{frontend-url}/path` with no `#`.
+- Vite dev serves the SPA fallback by default.
+
 ### 3.3 Dev server
 
 `npm run dev` serves on `:5173` and proxies `/api`, `/ws`, `/oauth2`, `/login/oauth2` to
@@ -147,12 +161,12 @@ The SPA resolves its endpoints in one module, `src/config.ts`, before first rend
 | `app.public-api-url` | `PUBLIC_API_URL` | `${app.frontend-url}/api` | Absolute API root embedded in emails (magic links) |
 | `app.cors.allowed-origins` | `CORS_ALLOWED_ORIGINS` (comma-separated) | `${app.frontend-url}` + local dev origins (`localhost`/`127.0.0.1` on `5173`, `8080`) in the default profile; **prod: `${FRONTEND_URL}` only** | CORS, Origin check, WebSocket handshake |
 
-Redirect targets (the SPA uses **hash routing**, so every redirect must include `#`):
+Redirect targets (the SPA uses **clean path URLs**; since 2026-10-31 no redirect carries a `#`):
 
 | Event | Redirect |
 |---|---|
-| OAuth/SAML/magic-link success | `{frontend-url}/#/auth/callback?provider=<p>` |
-| Any auth failure | `{frontend-url}/#/login?error=<code>` |
+| OAuth/SAML/magic-link success | `{frontend-url}/auth/callback?provider=<p>` |
+| Any auth failure | `{frontend-url}/login?error=<code>` |
 | Magic link in email | `{public-api-url}/v1/auth/verify?token=<t>` (a backend endpoint, not an SPA route) |
 
 Login initiation (from the SPA): `{apiUrl}/v1/auth/login/{github|google|saml|oidc}`.
@@ -275,7 +289,7 @@ would need `SameSite=None` plus token-based CSRF — out of scope.
 | SVC-G3 | No service boundary: frontend at repo root, root `package.json` carries backend/db scripts, overlapping build contexts | High | §2 layout | ✅ |
 | SVC-G4 | Three API-base mechanisms (`__ARCHFLUX_API_URL__` never set, `VITE_API_URL` in 2 files); `/config.json` generated but never read | High | §3.1 `config.ts` | ✅ |
 | SVC-G5 | Login buttons call `{api}/auth/login/*` (missing `/v1`) → 404 | High (auth) | §4.1 | ✅ |
-| SVC-G6 | Backend redirects to `/auth/callback`, `/login` without `#` → hash router never reaches callback | High (auth) | §4.1 | ✅ |
+| SVC-G6 | (superseded 2026-10-31 by clean URLs) Backend redirects to `/auth/callback`, `/login` without `#` reached no route under the old hash router | High (auth) | §4.1 | ✅ |
 | SVC-G7 | Magic link points to `{frontend}/auth/verify` — not an SPA route, not proxied → broken | High (auth) | `app.public-api-url` | ✅ |
 | SVC-G8 | CORS hard-coded to localhost (BACKEND_SPEC claimed `*`) → separate topology impossible | High | §4.2 | ✅ |
 | SVC-G9 | Origin check accepts one host; WebSocket allows any origin with cookie auth | Med (security) | §4.2 | ✅ |
@@ -316,7 +330,7 @@ would need `SameSite=None` plus token-based CSRF — out of scope.
 3. `docker compose config --quiet` passes for `compose.yml`, `frontend/compose.yml`, `backend/compose.yml`.
 4. `docker build frontend` and `docker build backend` succeed with their own context only.
 5. Unit tests cover: `config.ts` precedence + WS derivation; login URL includes `/v1`; backend
-   redirects include `/#/`; magic link uses `public-api-url`; Origin check honours the allow-list;
+   redirects and emailed/share links contain no `#`; magic link uses `public-api-url`; Origin check honours the allow-list;
    login initiation targets the configured OAuth/SAML endpoints.
 6. `git ls-files` contains no `.env`/`.env.backend`/`.env.frontend`, no `google-cloud-sdk/`, and no
    previously committed secret value.

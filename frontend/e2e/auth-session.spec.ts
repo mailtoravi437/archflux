@@ -3,11 +3,11 @@ import { test, expect } from '@playwright/test';
 // Phase 1 auth/session contract (PRODUCTIZATION_SPEC Phase 1: real identity,
 // safe guest mode). Frontend-only and deterministic: no backend required, no
 // sleeps, web-first assertions. Guest localStorage session pattern mirrors
-// e2e/critical-journeys.spec.ts (hash routing; canvas-status/canvas probes).
+// e2e/critical-journeys.spec.ts (clean URLs; canvas-status/canvas probes).
 test.describe('Auth session contract', () => {
   test('unauthenticated deep link to /dashboard lands on /login', async ({ page }) => {
     // Fresh context: no session at all.
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await expect(page).toHaveURL(/.*login/);
     await expect(page.getByRole('main', { name: 'Sign in' })).toBeVisible();
   });
@@ -23,7 +23,7 @@ test.describe('Auth session contract', () => {
       localStorage.setItem('archflux:session', JSON.stringify({ mode: 'guest' }));
       localStorage.setItem('archflux:onboarded', 'true');
     });
-    await page.goto('/#/canvas');
+    await page.goto('/canvas');
     await expect(page.locator('#architectureCanvas')).toBeVisible({ timeout: 30000 });
     expect(failedAuth).toEqual([]);
   });
@@ -47,13 +47,13 @@ test.describe('Auth session contract', () => {
     await page.route('**/api/v1/diagrams**', async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ data: [], total: 0 }) });
     });
-    // Hash-router navigations commit per step; record them to prove the
+    // Router navigations commit per step; record them to prove the
     // sign-out path travels through /login (it is transient: LoginScreen
     // auto-continues guests to /dashboard).
     const visitedHashes: string[] = [];
     page.on('framenavigated', () => {
       try {
-        visitedHashes.push(new URL(page.url()).hash);
+        visitedHashes.push(new URL(page.url()).pathname);
       } catch {
         /* ignore */
       }
@@ -64,7 +64,7 @@ test.describe('Auth session contract', () => {
       localStorage.setItem('archflux:session', JSON.stringify({ mode: 'email', email: 'e2e@example.com' }));
       localStorage.setItem('archflux:onboarded', 'true');
     });
-    await page.goto('/#/canvas');
+    await page.goto('/canvas');
     await expect(page.locator('#architectureCanvas')).toBeVisible({ timeout: 30000 });
 
     // UI sign-out via the account menu (probe stubbed 200, so it is offered).
@@ -98,7 +98,7 @@ test.describe('Auth session contract', () => {
   });
 
   test('oauth callback with ?error shows login', async ({ page }) => {
-    await page.goto('/#/auth/callback?error=access_denied');
+    await page.goto('/auth/callback?error=access_denied');
     await expect(page).toHaveURL(/.*login/);
     await expect(page.getByRole('main', { name: 'Sign in' })).toBeVisible();
   });

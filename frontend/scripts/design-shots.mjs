@@ -126,7 +126,7 @@ async function settle(page) {
 }
 
 async function gotoCanvas(page) {
-  await page.goto(`${BASE}/#/canvas`);
+  await page.goto(`${BASE}/canvas`);
   const status = page.getByTestId('canvas-status');
   await status.waitFor({ state: 'attached', timeout: 30000 });
   await page.locator('#architectureCanvas').waitFor({ state: 'visible', timeout: 30000 });
@@ -190,13 +190,13 @@ async function run() {
       await settle(page);
       await shot(page, 'shapes-panel-scrolled.png');
 
-      await page.goto(`${BASE}/#/dashboard`);
+      await page.goto(`${BASE}/dashboard`);
       await settle(page);
       await shot(page, 'appbar-library.png', { clip: { x: 0, y: 0, width: VIEWPORT.width, height: 48 } });
       await shot(page, 'library.png');
 
       // Sync (Sync.dc.html SC-32): the fixture doc has an isolated element and a dangling route.
-      await page.goto(`${BASE}/#/living`);
+      await page.goto(`${BASE}/living`);
       await settle(page);
       await shot(page, 'sync.png');
 
@@ -206,11 +206,11 @@ async function run() {
       await settle(page);
       await shot(page, 'live-tab.png');
 
-      await page.goto(`${BASE}/#/home`);
+      await page.goto(`${BASE}/home`);
       await settle(page);
-      const hash = await page.evaluate(() => location.hash);
-      if (hash.startsWith('#/home')) await shot(page, 'home.png');
-      else log(`skip home.png: #/home redirects to ${hash} (route not built yet)`);
+      const hash = await page.evaluate(() => location.pathname);
+      if (hash.startsWith('/home')) await shot(page, 'home.png');
+      else log(`skip home.png: /home redirects to ${hash} (route not built yet)`);
       await context.close();
 
       // App bar with a long document title (AppBar.dc.html title cap).

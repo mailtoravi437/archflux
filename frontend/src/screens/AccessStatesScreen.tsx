@@ -9,7 +9,7 @@ import { NotFoundState, Skeleton } from '../components/states';
 import RequestAccess from '../components/access/RequestAccess';
 
 /**
- * Shareable deep link `#/d/:id` (R1-E07-T06, FL-15). Asks GET /diagrams/:id/access first and
+ * Shareable deep link `/d/:id` (R1-E07-T06, FL-15). Asks GET /diagrams/:id/access first and
  * renders the matching state from AccessStates.dc.html. Never shows a title unless the server sent one.
  */
 const center = { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F6F7F9', padding: 16, boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif', fontSize: 13, color: '#1B1F27' } as const;
@@ -53,7 +53,7 @@ export default function AccessStatesScreen() {
   const location = useLocation();
   const urlToken = new URLSearchParams(location.search).get('token');
 
-  // A share link carries its token in the hash query. Keep it in memory for X-Share-Token and drop
+  // A share link carries its token in the query string. Keep it in memory for X-Share-Token and drop
   // it from the address bar once signed in (a signed-out visitor keeps it in `next` through login).
   useEffect(() => {
     if (!urlToken) return;

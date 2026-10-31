@@ -41,8 +41,8 @@ const STYLES: readonly { style: DisplayStyle; title: string; n: number }[] = [
 
 /** The link "Copy link to element" produces; `CanvasScreen` reads `element` on arrival. */
 export function elementLink(docId: string, elementId: string): string {
-  const base = typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}`;
-  return `${base}#/canvas?doc=${encodeURIComponent(docId)}&element=${encodeURIComponent(elementId)}`;
+  const base = typeof window === 'undefined' ? '' : window.location.origin;
+  return `${base}/canvas?doc=${encodeURIComponent(docId)}&element=${encodeURIComponent(elementId)}`;
 }
 
 /**

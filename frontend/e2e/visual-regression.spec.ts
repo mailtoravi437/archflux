@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { seedSampleWorkspace } from './fixtures';
 
-// Visual baselines. All navigation uses hash routing (static-host compatible).
+// Visual baselines. All navigation uses clean path URLs.
 // Screenshots disable animations for determinism; state is asserted via
 // live testids before capturing — no arbitrary sleeps.
 
@@ -11,7 +11,7 @@ const emptySpots: Array<[number, number]> = [[150, 540], [450, 540], [750, 540]]
 const shot = { animations: 'disabled' as const };
 
 async function gotoCanvas(page: Page) {
-  await page.goto('/#/canvas');
+  await page.goto('/canvas');
   const status = page.getByTestId('canvas-status');
   await expect(status).toBeAttached({ timeout: 30000 });
   await expect(page.locator('#architectureCanvas')).toBeVisible();
@@ -33,7 +33,7 @@ async function gotoCanvas(page: Page) {
 
 // Theme lives in Settings → General (app bar no longer has it) and persists app-wide.
 async function setThemeViaSettings(page: Page, theme: 'light' | 'dark' | 'blueprint') {
-  await page.goto('/#/settings/general');
+  await page.goto('/settings/general');
   await page.selectOption('select[aria-label="Theme"]', theme);
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
   await gotoCanvas(page);
@@ -109,38 +109,38 @@ test.describe('Visual Regression Tests', () => {
   });
 
   test('reviews screen matches snapshot', async ({ page }) => {
-    await page.goto('/#/reviews');
+    await page.goto('/reviews');
     await expect(page.getByText('Architecture Review Comments')).toBeVisible();
     await expect(page.locator('main')).toHaveScreenshot('reviews-screen.png', shot);
   });
 
   test('living screen matches snapshot', async ({ page }) => {
-    await page.goto('/#/living');
+    await page.goto('/living');
     await expect(page.getByRole('heading', { level: 2, name: 'Drift' })).toBeVisible();
     await expect(page.locator('main')).toHaveScreenshot('living-screen.png', shot);
   });
 
   test('blueprints screen matches snapshot', async ({ page }) => {
-    await page.goto('/#/blueprints');
+    await page.goto('/blueprints');
     await expect(page.getByRole('heading', { name: /Blueprints/ })).toBeVisible();
     await expect(page.locator('main')).toHaveScreenshot('blueprints-screen.png', shot);
   });
 
   test('dashboard grid view matches snapshot', async ({ page }) => {
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await expect(page.getByText(/of 25 diagrams · .*KB used/).first()).toBeVisible();
     await expect(page.locator('main')).toHaveScreenshot('dashboard-grid.png', shot);
   });
 
   test('dashboard table view matches snapshot', async ({ page }) => {
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: /Table/ }).click();
     await expect(page.getByRole('table', { name: 'Diagrams table' })).toBeVisible();
     await expect(page.locator('main')).toHaveScreenshot('dashboard-table.png', shot);
   });
 
   test('settings screen matches snapshot', async ({ page }) => {
-    await page.goto('/#/settings/general');
+    await page.goto('/settings/general');
     await expect(page.locator('select[aria-label="Default rendering style"]')).toBeVisible();
     await expect(page.locator('main')).toHaveScreenshot('settings-general.png', shot);
   });
@@ -152,7 +152,7 @@ test.describe('Visual Regression Tests', () => {
   });
 
   test('empty canvas state matches snapshot', async ({ page }) => {
-    await page.goto('/#/dashboard');
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: /New diagram/i }).click();
     await page.getByRole('dialog', { name: 'New diagram' }).getByRole('button', { name: 'Create', exact: true }).click();
     await expect(page).toHaveURL(/.*canvas/);
@@ -246,7 +246,7 @@ test.describe('Responsive Visual Tests', () => {
         localStorage.setItem('archflux:onboarded', 'true');
       });
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
-      await page.goto('/#/dashboard');
+      await page.goto('/dashboard');
       await expect(page.getByText(/of 25 diagrams · .*KB used/).first()).toBeVisible();
       await page.waitForLoadState('networkidle');
 
@@ -267,22 +267,22 @@ test.describe('Theme Visual Tests', () => {
       });
       // Theme moved out of the app bar (§4): it lives in Settings → General
       // and the account menu. It persists app-wide.
-      await page.goto('/#/settings/general');
+      await page.goto('/settings/general');
       await page.selectOption('select[aria-label="Theme"]', theme);
       await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
 
       await gotoCanvas(page);
       await expect(page.locator('#architectureCanvas')).toHaveScreenshot(`canvas-${theme}.png`, shot);
 
-      await page.goto('/#/dashboard');
+      await page.goto('/dashboard');
       await expect(page.getByText(/of 25 diagrams · .*KB used/).first()).toBeVisible();
       await expect(page.locator('main')).toHaveScreenshot(`dashboard-${theme}.png`, shot);
 
-      await page.goto('/#/reviews');
+      await page.goto('/reviews');
       await expect(page.getByText('Architecture Review Comments')).toBeVisible();
       await expect(page.locator('main')).toHaveScreenshot(`reviews-${theme}.png`, shot);
 
-      await page.goto('/#/living');
+      await page.goto('/living');
       await expect(page.getByRole('heading', { level: 2, name: 'Drift' })).toBeVisible();
       await expect(page.locator('main')).toHaveScreenshot(`living-${theme}.png`, shot);
     });
@@ -302,20 +302,20 @@ test.describe('Visual Regression: R1 screens (baselines pending human approval)'
   });
 
   test('home screen matches snapshot', async ({ page }) => {
-    await page.goto('/#/home');
+    await page.goto('/home');
     await expect(page.getByRole('heading', { name: /Good (morning|afternoon|evening)/ })).toBeVisible();
     await page.addStyleTag({ content: '[aria-label="Getting started"], [role="complementary"] { visibility: hidden !important; }' });
     await expect(page).toHaveScreenshot('r1-home.png', shot);
   });
 
   test('trash screen matches snapshot', async ({ page }) => {
-    await page.goto('/#/trash');
+    await page.goto('/trash');
     await expect(page.getByTestId('page-header')).toBeVisible();
     await expect(page).toHaveScreenshot('r1-trash.png', shot);
   });
 
   test('new diagram dialog matches snapshot', async ({ page }) => {
-    await page.goto('/#/home');
+    await page.goto('/home');
     await page.getByRole('button', { name: 'New diagram' }).first().click();
     const dialog = page.getByRole('dialog', { name: 'New diagram' });
     await expect(dialog).toBeVisible();
@@ -323,7 +323,7 @@ test.describe('Visual Regression: R1 screens (baselines pending human approval)'
   });
 
   test('import dialog matches snapshot', async ({ page }) => {
-    await page.goto('/#/home');
+    await page.goto('/home');
     await page.getByRole('button', { name: 'Import', exact: true }).first().click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
@@ -386,7 +386,7 @@ test.describe('Visual Regression: R1 screens (baselines pending human approval)'
   // (no cloud stack needed). A node is added between the two so the diff is not empty.
   test('history pair compare', async ({ page }) => {
     const tag = async (name: string) => {
-      await page.goto('/#/reviews');
+      await page.goto('/reviews');
       await page.getByRole('textbox', { name: 'Checkpoint name' }).fill(name);
       await page.getByRole('button', { name: '+ Tag Checkpoint' }).click();
       await expect(page.getByText(`Named Version Checkpoints (${name === 'baseline-a' ? 1 : 2})`)).toBeVisible();
@@ -400,7 +400,7 @@ test.describe('Visual Regression: R1 screens (baselines pending human approval)'
     await expect(status).toHaveAttribute('data-nodes', String(before + 1), { timeout: 10000 });
     await tag('baseline-b');
 
-    await page.goto('/#/history');
+    await page.goto('/history');
     const panel = page.getByRole('complementary', { name: 'Version history' });
     await expect(panel).toBeVisible();
     await panel.getByRole('checkbox', { name: /^Select baseline-a for compare/ }).check();

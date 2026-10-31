@@ -36,8 +36,8 @@ describe('share link token (R1-BUG-07)', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('link format carries the token in the hash query', () => {
-    expect(shareLinkUrl(`http://app/#/d/${ID}?link=1`, 'a b')).toBe(`http://app/#/d/${ID}?token=a%20b`);
-    expect(shareLinkUrl(`http://app/#/d/${ID}`, TOKEN)).toBe(`http://app/#/d/${ID}?token=${TOKEN}`);
+    expect(shareLinkUrl(`http://app/d/${ID}?link=1`, 'a b')).toBe(`http://app/d/${ID}?token=a%20b`);
+    expect(shareLinkUrl(`http://app/d/${ID}`, TOKEN)).toBe(`http://app/d/${ID}?token=${TOKEN}`);
   });
 
   it('sends X-Share-Token on access and diagram load when a token is present, strips it, never persists it', async () => {

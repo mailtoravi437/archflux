@@ -108,7 +108,7 @@ export default function HomeScreen() {
                 <section aria-label="Continue" style={{ ...card, padding: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, flexGrow: 1 }}>Continue</h2>
-                    <a href="#/dashboard" style={{ fontSize: 12, fontWeight: 500, color: "var(--accent-text)" }}>View all</a>
+                    <a href="/dashboard" style={{ fontSize: 12, fontWeight: 500, color: "var(--accent-text)" }}>View all</a>
                   </div>
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                     {continueDocs.map((d) => (
@@ -136,7 +136,7 @@ export default function HomeScreen() {
             <section aria-label="Start from a template" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, flexGrow: 1 }}>Start from a template</h2>
-                <a href="#/blueprints" style={{ fontSize: 12, fontWeight: 500, color: "var(--accent-text)" }}>All templates →</a>
+                <a href="/blueprints" style={{ fontSize: 12, fontWeight: 500, color: "var(--accent-text)" }}>All templates →</a>
               </div>
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
                 {blueprints.slice(0, 4).map((b) => (

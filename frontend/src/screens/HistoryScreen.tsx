@@ -13,7 +13,7 @@ import type { DocState } from '../state/ops/types';
 import type { ElementChange } from '../lib/semanticDiff';
 
 /**
- * History screen (`#/history`, SC-27 + SC-28): the History panel on the left, and compare mode in
+ * History screen (`/history`, SC-27 + SC-28): the History panel on the left, and compare mode in
  * the main area once a version is picked. Everything shown comes from the revisions API, the
  * server checkpoints and the local checkpoints of the active diagram.
  */

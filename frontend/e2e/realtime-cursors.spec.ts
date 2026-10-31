@@ -6,13 +6,13 @@ import { activeDoc, signInAs } from './fixtures';
 // Needs the archflux-qa stack: E2E_PORT=5191 VITE_DEV_API_PROXY=http://localhost:23001.
 
 async function newDiagram(page: Page, name: string, style: 'Icon' | 'Card' | 'Shape') {
-  await page.goto('/#/home');
+  await page.goto('/home');
   await page.getByRole('button', { name: 'New diagram' }).first().click();
   await page.getByRole('radio', { name: style }).click();
   await page.getByLabel('Name').fill(name);
   await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByTestId('canvas-status')).toBeAttached();
-  await expect(page).toHaveURL(/#\/canvas/);
+  await expect(page).toHaveURL(/\/canvas/);
 }
 
 const stamp = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
@@ -39,7 +39,7 @@ async function ownerWithSharedDiagram(browser: Browser, baseURL: string | undefi
   const diagramId = (await activeDoc(a)).id;
   // Workspace membership first (Share needs it): invite through Settings, then accept as the invitee.
   await a.getByRole('button', { name: 'Close', exact: true }).click();
-  await a.goto('/#/settings/team');
+  await a.goto('/settings/team');
   await a.getByRole('button', { name: 'Invite people' }).click();
   await a.getByLabel('Invite emails').fill(invitee);
   // The real invite response carries the one-time token (the email is mocked in QA).
@@ -56,15 +56,15 @@ test('R1-BUG-17 live cursor: B sees A move over a shared cloud diagram', async (
   const emailA = `rt-a-${id}@example.com`;
   const emailB = `rt-b-${id}@example.com`;
   const b = await userPage(browser, baseURL, emailB);
-  await b.goto('/#/home');
+  await b.goto('/home');
   const { a, diagramId, token } = await ownerWithSharedDiagram(browser, baseURL, emailA, emailB);
 
   const accepted = b.waitForResponse((r) => r.url().includes('/invites/') && r.url().endsWith('/accept') && r.request().method() === 'POST' && r.ok());
-  await b.goto(`/#/invite/${token}`);
+  await b.goto(`/invite/${token}`);
   await accepted;
-  await expect(b).toHaveURL(/#\/dashboard/);
+  await expect(b).toHaveURL(/\/dashboard/);
 
-  await a.goto('/#/canvas');
+  await a.goto('/canvas');
   await a.getByRole('button', { name: 'Share', exact: true }).click();
   await a.getByLabel('Add people, teams or emails').fill(emailB);
   await a.keyboard.press('Enter');
@@ -75,7 +75,7 @@ test('R1-BUG-17 live cursor: B sees A move over a shared cloud diagram', async (
 
   // Both sockets must really be open on the relay (no mocks): wait for the handshake on B.
   const bSocket = b.waitForEvent('websocket', (w) => w.url().includes(`/ws/diagram-${diagramId}`));
-  await b.goto(`/#/d/${diagramId}`);
+  await b.goto(`/d/${diagramId}`);
   await expect(b.getByTestId('canvas-status')).toBeAttached({ timeout: 20000 });
   await bSocket;
 

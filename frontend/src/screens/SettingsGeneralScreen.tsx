@@ -186,7 +186,7 @@ export default function SettingsGeneralScreen() {
               /* ignore */
             }
             pushToast('Setup tour reset — opening onboarding');
-            window.location.hash = '#/onboarding';
+            window.location.assign('/onboarding');
           }}
           aria-label="Replay the setup tour"
           title="Clears the onboarded flag and opens the setup flow again."

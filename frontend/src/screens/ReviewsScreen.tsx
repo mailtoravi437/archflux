@@ -56,7 +56,7 @@ export default function ReviewsScreen() {
   const { threads, addThread, replyThread, toggleResolveThread, deleteThread, displayName, setDisplayName, checkpoints, tagCheckpoint, restoreCheckpoint, deleteCheckpoint, createBranch, branchError, retryBranch, nodes, panToNode, pushToast, pushLog, docs, activeDocId } = useDiagram();
   const navigate = useNavigate();
   const location = useLocation();
-  // Merge & Automation (ex-#/git) lives here as a sub-tab; deep links and
+  // Merge & Automation (ex-/git) lives here as a sub-tab; deep links and
   // the ⌘G shortcut arrive via location.state. Derive directly during render
   // instead of using state + effect (avoids setState-in-effect lint warning).
   const subTab: SubTab = (() => {

@@ -202,7 +202,7 @@ It uses the scroll → wrap → min-width cascade at narrow widths and never cau
 | Blueprints       | `/blueprints`         | `/icons/general/blueprint.svg`    | —                              |
 | Settings         | `/settings/general`   | `/icons/tools/settings.svg`       | `warn` `!` when not signed in  |
 
-- `TOP-R5` Tabs MUST be `NavLink`s (hash router) so deep links and the back button work.
+- `TOP-R5` Tabs MUST be `NavLink`s (path router) so deep links and the back button work.
 - `TOP-R6` The Reviews & Merge entry MUST open the Merge tab when navigated from the `⌘G` shortcut (`AppShell.tsx:319`, `209`).
 - `TOP-R7` The tab rail MUST scroll horizontally (thin scrollbar) rather than wrap mid-row on compact widths.
 

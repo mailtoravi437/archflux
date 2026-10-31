@@ -4,8 +4,12 @@ import { RouterProvider } from 'react-router-dom';
 import './styles.css';
 import { DiagramProvider } from './state/store';
 import ErrorBoundary from './components/ErrorBoundary';
-import router from './App';
+import { createAppRouter } from './App';
 import { loadRuntimeConfig } from './lib/config';
+import { migrateLegacyHash } from './lib/legacyHash';
+
+// Old `/#/path` links redirect to `/path` before the router reads the URL.
+migrateLegacyHash();
 
 // Apply the persisted theme before first paint to avoid a light→dark flash.
 try {
@@ -25,7 +29,7 @@ void loadRuntimeConfig().finally(() => {
     <StrictMode>
       <ErrorBoundary>
         <DiagramProvider>
-          <RouterProvider router={router} />
+          <RouterProvider router={createAppRouter()} />
         </DiagramProvider>
       </ErrorBoundary>
     </StrictMode>,
