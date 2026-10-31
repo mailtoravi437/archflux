@@ -53,6 +53,8 @@ function ARRANGE_SHORTCUTS(e: KeyboardEvent, isMod: boolean): string | string[] 
 /** The live editor state the keyboard handler reads through `stateRef`. */
 export interface CanvasKeyboardState {
   nodes: ArchNode[];
+  strokes?: ReadonlyArray<{ id: string; layerId?: string }>;
+  texts?: ReadonlyArray<{ id: string; layerId?: string }>;
   selectedId: string | null;
   selectedEdgeId: string | null;
   selectedStrokeId: string | null;
@@ -212,10 +214,15 @@ export function useCanvasKeyboard(deps: CanvasKeyboardDeps): void {
       } else if (isMod && k === 'a') {
         e.preventDefault();
         const locked = stateRef.current.lockedLayers;
-        const ids = stateRef.current.nodes.filter((n) => !locked?.has(n.layerId ?? 'ly-default')).map((n) => n.id);
-        setMultiSel(ids);
-        setSelectedId(ids.length > 0 ? ids[ids.length - 1] : null);
+        const open = (x: { layerId?: string }) => !locked?.has(x.layerId ?? 'ly-default');
+        const nodeIds = stateRef.current.nodes.filter(open).map((n) => n.id);
+        // Freehand strokes and free texts are part of "all": their ids ride along in multiSel (only nodes match node lookups).
+        const inkIds = [...(stateRef.current.strokes ?? []).filter(open), ...(stateRef.current.texts ?? []).filter(open)].map((x) => x.id);
+        setMultiSel([...nodeIds, ...inkIds]);
+        setSelectedId(nodeIds.length > 0 ? nodeIds[nodeIds.length - 1] : null);
         setSelectedEdgeId(null);
+        setSelectedStrokeId(null);
+        setSelectedTextId(null);
       } else if (isMod && k === 'z') {
         e.preventDefault();
         if (e.shiftKey) redo();
@@ -241,7 +248,8 @@ export function useCanvasKeyboard(deps: CanvasKeyboardDeps): void {
         }
         const bulk = Array.from(new Set([...stateRef.current.multiSel, stateRef.current.selectedId].filter((v): v is string => Boolean(v))));
         if (!stateRef.current.selectedEdgeId && requestDeleteBoundary(bulk)) return;
-        if (bulk.length > 1) {
+        const hasInk = bulk.some((id) => !stateRef.current.nodes.some((n) => n.id === id));
+        if (bulk.length > 1 || hasInk) {
           deleteNodes(bulk);
           setMultiSel([]);
           setSelectedEdgeId(null);

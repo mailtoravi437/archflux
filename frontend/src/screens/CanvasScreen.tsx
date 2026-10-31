@@ -911,13 +911,13 @@ export default function CanvasScreen() {
         if (maxX < vx0 || minX > vx1 || maxY < vy0 || minY > vy1) return;
         drawInkPass(ctx, pts, color, width, selected);
       };
-      s.strokes.forEach((st) => inkPass(st.pts, st.color, st.width, s.selectedStrokeId === st.id));
+      s.strokes.forEach((st) => inkPass(st.pts, st.color, st.width, s.selectedStrokeId === st.id || s.multiSel.includes(st.id)));
       if (ink && ink.length > 0) {
         inkPass(ink, isDark ? '#E5E7EB' : '#1F2937', 3, false);
       }
       // Free-standing text labels (Excalidraw-style).
       s.texts.forEach((t) => {
-        drawFreeTextPass(ctx, t, s.selectedTextId === t.id, isDark);
+        drawFreeTextPass(ctx, t, s.selectedTextId === t.id || s.multiSel.includes(t.id), isDark);
       });
       // Note pins — visual markers for review threads on the canvas.
       s.threads.forEach((t) => {

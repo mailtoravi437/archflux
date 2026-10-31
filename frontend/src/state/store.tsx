@@ -100,6 +100,7 @@ export interface DiagramActionsContextValue {
   /** Quick-add: inserts `node` and a sync edge `fromId` -> node as ONE undo step, and selects the node. */
   insertConnected: (node: ArchNode, fromId: string) => void;
   deleteSelected: () => void;
+  /** Deletes nodes (with their edges), and any freehand stroke / text ids in the list, as ONE undo step. */
   deleteNodes: (ids: string[]) => void;
   /** Duplicates `id`, or the selected node when omitted (menus pass the id: their closure can predate the selection). */
   duplicateSelected: (id?: string) => void;
@@ -1663,27 +1664,44 @@ export function DiagramProvider({ children }: { children: ReactNode }) {
       }
       const ls = lockState();
       for (const n of nodesRef.current) if (set.has(n.id) && arrangeOps.isNodeLocked(ls, n)) set.delete(n.id);
-      if (set.size === 0) {
+      // Select-all also carries freehand stroke and text ids: they go in the same undo step (locked layers are skipped).
+      const lockedLayerIdSet = new Set(layersRef.current.filter((l) => l.locked).map((l) => l.id));
+      const free = (x: { id: string; layerId?: string }) => set.has(x.id) && !lockedLayerIdSet.has(x.layerId ?? 'ly-default');
+      const strokeIds = new Set(strokesRef.current.filter(free).map((s) => s.id));
+      const textIds = new Set(textsRef.current.filter(free).map((t) => t.id));
+      const nodeIds = new Set(nodesRef.current.filter((n) => set.has(n.id)).map((n) => n.id));
+      if (nodeIds.size === 0 && strokeIds.size === 0 && textIds.size === 0) {
         pushToast('Locked nodes cannot be deleted');
         return;
       }
       snapshot(nodesRef.current, edgesRef.current);
-      setNodesState((prev) => {
-        const byId = new Map(prev.map((n) => [n.id, n]));
-        // Children of a deleted boundary move up to the nearest surviving ancestor.
-        const survivor = (pid: string | null | undefined): string | null => {
-          let cur = pid ?? null;
-          while (cur && set.has(cur)) cur = byId.get(cur)?.parentId ?? null;
-          return cur;
-        };
-        return prev.filter((n) => !set.has(n.id)).map((n) => (n.parentId && set.has(n.parentId) ? { ...n, parentId: survivor(n.parentId) } : n));
-      });
-      setEdgesState((prev) => prev.filter((e) => !set.has(e.from) && !(e.to && set.has(e.to))));
-      if (selectedId && set.has(selectedId)) setSelectedId(null);
-      pushToast(`Deleted ${set.size} node${set.size === 1 ? '' : 's'}`);
-      pushLog(`Canvas: bulk deleted ${set.size} nodes`);
+      if (nodeIds.size > 0) {
+        setNodesState((prev) => {
+          const byId = new Map(prev.map((n) => [n.id, n]));
+          // Children of a deleted boundary move up to the nearest surviving ancestor.
+          const survivor = (pid: string | null | undefined): string | null => {
+            let cur = pid ?? null;
+            while (cur && nodeIds.has(cur)) cur = byId.get(cur)?.parentId ?? null;
+            return cur;
+          };
+          return prev.filter((n) => !nodeIds.has(n.id)).map((n) => (n.parentId && nodeIds.has(n.parentId) ? { ...n, parentId: survivor(n.parentId) } : n));
+        });
+        setEdgesState((prev) => prev.filter((e) => !nodeIds.has(e.from) && !(e.to && nodeIds.has(e.to))));
+      }
+      if (strokeIds.size > 0) setStrokesState((prev) => prev.filter((s) => !strokeIds.has(s.id)));
+      if (textIds.size > 0) setTextsState((prev) => prev.filter((t) => !textIds.has(t.id)));
+      if (selectedId && nodeIds.has(selectedId)) setSelectedId(null);
+      const total = nodeIds.size + strokeIds.size + textIds.size;
+      const parts = [
+        nodeIds.size > 0 ? `${nodeIds.size} node${nodeIds.size === 1 ? '' : 's'}` : '',
+        strokeIds.size > 0 ? `${strokeIds.size} stroke${strokeIds.size === 1 ? '' : 's'}` : '',
+        textIds.size > 0 ? `${textIds.size} text${textIds.size === 1 ? '' : 's'}` : '',
+      ].filter(Boolean);
+      pushToast(`Deleted ${parts.join(', ')}`);
+      pushLog(`Canvas: bulk deleted ${total} elements`);
+      if (strokeIds.size > 0 || textIds.size > 0) schedulePersist();
     },
-    [selectedId, pushToast, pushLog, snapshot],
+    [selectedId, pushToast, pushLog, snapshot, schedulePersist],
   );
 
   const duplicateSelected = useCallback((id?: string) => {
