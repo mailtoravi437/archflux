@@ -23,7 +23,7 @@ export function drawLegacyNode(
   const isSelected = opts.selected;
   const isPending = opts.pending;
   const shape = node.shape ?? 'rectangle';
-  const hasIcon = Boolean(node.icon || node.iconSrc);
+  const hasIcon = Boolean(node.icon || cardIconSrc(node, opts.iconEntries));
 
   ctx.save();
   const nodeBg = node.fill ?? (isDark ? '#191D25' : '#FFFFFF');
@@ -36,8 +36,8 @@ export function drawLegacyNode(
     // Logo-only mode: render just the icon, no box
     ctx.shadowColor = shadowColor;
     ctx.shadowBlur = shadowBlur;
-    if (node.iconSrc) {
-      drawIconImage(ctx, node, icons, (n) => ({ x: n.x, y: n.y, size: Math.min(n.w, n.h) }));
+    if (cardIconSrc(node, opts.iconEntries)) {
+      drawIconImage(ctx, node, icons, opts.iconEntries, (n) => ({ x: n.x, y: n.y, size: Math.min(n.w, n.h) }));
     } else if (node.icon) {
       ctx.font = `${Math.min(node.w, node.h) * 0.7}px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif`;
       ctx.textAlign = 'center';
@@ -65,7 +65,7 @@ export function drawLegacyNode(
     drawCylinderBody(ctx, node, nodeBg, strokeColor, lineWidth, shadowColor, shadowBlur);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
-    drawIconImage(ctx, node, icons, (n) => ({ x: n.x + 8, y: n.y + 8, size: 24 }), (n) => {
+    drawIconImage(ctx, node, icons, opts.iconEntries, (n) => ({ x: n.x + 8, y: n.y + 8, size: 24 }), (n) => {
       ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
@@ -85,7 +85,7 @@ export function drawLegacyNode(
     ctx.stroke();
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
-    drawIconImage(ctx, node, icons, (n) => ({ x: n.x + 10, y: n.y + 10, size: 24 }), (n) => {
+    drawIconImage(ctx, node, icons, opts.iconEntries, (n) => ({ x: n.x + 10, y: n.y + 10, size: 24 }), (n) => {
       ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
@@ -118,7 +118,7 @@ export function drawLegacyNode(
     ctx.lineTo(node.x + node.w, node.y + 32);
     ctx.stroke();
 
-    drawIconImage(ctx, node, icons, (n) => ({ x: n.x + 8, y: n.y + 4, size: 24 }), (n) => {
+    drawIconImage(ctx, node, icons, opts.iconEntries, (n) => ({ x: n.x + 8, y: n.y + 4, size: 24 }), (n) => {
       ctx.font = "18px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
@@ -231,12 +231,14 @@ function drawIconImage(
   ctx: CanvasRenderingContext2D,
   node: ArchNode,
   icons: NodeIconSource,
+  entries: IconEntry[] | undefined,
   placement: (n: ArchNode) => { x: number; y: number; size: number },
   emojiFallback?: (n: ArchNode) => void,
 ): void {
-  if (node.iconSrc) {
-    const img = icons.get(node.iconSrc);
-    icons.ensure(node.iconSrc);
+  const src = cardIconSrc(node, entries);
+  if (src) {
+    const img = icons.get(src);
+    icons.ensure(src);
     if (img && img.complete && img.naturalWidth > 0) {
       const { x, y, size } = placement(node);
       ctx.drawImage(img, x, y, size, size);
@@ -398,9 +400,18 @@ export function cardBox(node: ArchNode): Box {
   return { x: node.x, y: node.y, w: ok(node.w) ? node.w : fallback.w, h: ok(node.h) ? node.h : fallback.h };
 }
 
-/** Image src for a node's icon slot: the resolved `iconRef` first, then the legacy `iconSrc`. */
+/** True when a legacy `icon` string is an image path (an old provider-grid pick) rather than emoji text. */
+export function isIconPath(icon: string | undefined): icon is string {
+  return Boolean(icon) && (icon!.startsWith('/') || /\.(svg|png)$/i.test(icon!));
+}
+
+/**
+ * Image src for a node's icon slot, one resolution order everywhere (card, icon, shape, legacy):
+ * the resolved `iconRef` (canonical), then `iconSrc`, then a legacy `icon` that holds an image path.
+ * A legacy `icon` that is emoji text is not an image (see `iconSlotFor`).
+ */
 export function cardIconSrc(node: ArchNode, entries: IconEntry[] | undefined): string | undefined {
-  return resolveIcon(node.iconRef, entries ?? NO_ENTRIES)?.src ?? node.iconSrc;
+  return resolveIcon(node.iconRef, entries ?? NO_ENTRIES)?.src ?? node.iconSrc ?? (isIconPath(node.icon) ? node.icon : undefined);
 }
 
 /** "dataClass" → "Data class", "owner" → "Owner". */
@@ -465,7 +476,7 @@ export function iconSlotFor(node: ArchNode, entries: IconEntry[] | undefined): I
   if (node.iconRef === null) return { kind: 'none' };
   const src = cardIconSrc(node, entries);
   if (src) return { kind: 'image', src };
-  if (node.icon) return { kind: 'emoji', char: node.icon };
+  if (node.icon && !isIconPath(node.icon)) return { kind: 'emoji', char: node.icon };
   return { kind: 'glyph' };
 }
 
