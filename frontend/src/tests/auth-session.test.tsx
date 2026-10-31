@@ -10,6 +10,7 @@ import {
   clearSession,
   isGuestSession,
   hasUsableSession,
+  isSignedIn,
 } from '../state/session';
 import {
   api,
@@ -196,17 +197,47 @@ describe('guest zero-network branches', () => {
     vi.unstubAllGlobals();
   });
 
-  it('AppShell probe skips fetch entirely for guest/null sessions', async () => {
+  it('AppShell probe skips fetch for a null session only', async () => {
     const { probeAuthSession, resetMeProbeCache } = await import('../components/AppShell');
     const fetchMock = vi.fn(async () => jsonResponse(200, { data: { email: 'a@x.com' } }));
     vi.stubGlobal('fetch', fetchMock);
     resetMeProbeCache();
     localStorage.clear();
     await expect(probeAuthSession()).resolves.toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('a stale guest session adopts the server identity from /me', async () => {
+    const { probeAuthSession, resetMeProbeCache } = await import('../components/AppShell');
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(200, { data: { provider: 'email', email: 'x@y.z' } })));
+    resetMeProbeCache();
+    setSession({ mode: 'guest' });
+    await expect(probeAuthSession()).resolves.toBe(true);
+    expect(getSession()).toMatchObject({ mode: 'email', email: 'x@y.z' });
+    expect(isSignedIn()).toBe(true);
+    resetMeProbeCache();
+  });
+
+  it('/me 401 clears a stored non-guest session', async () => {
+    const { probeAuthSession, resetMeProbeCache } = await import('../components/AppShell');
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(401, { error: { code: 'UNAUTHORIZED' } })));
+    resetMeProbeCache();
+    setSession({ mode: 'github', email: 'a@x.com' });
+    await expect(probeAuthSession()).resolves.toBe(false);
+    expect(getSession()).toBeNull();
+    expect(isSignedIn()).toBe(false);
+    resetMeProbeCache();
+  });
+
+  it('a guest session with no cookie (401) stays guest', async () => {
+    const { probeAuthSession, resetMeProbeCache } = await import('../components/AppShell');
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse(401, { error: { code: 'UNAUTHORIZED' } })));
     resetMeProbeCache();
     setSession({ mode: 'guest' });
     await expect(probeAuthSession()).resolves.toBe(false);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(getSession()).toMatchObject({ mode: 'guest' });
+    expect(isSignedIn()).toBe(false);
+    resetMeProbeCache();
   });
 
   it('AppShell probe caches one /me call for non-guests', async () => {

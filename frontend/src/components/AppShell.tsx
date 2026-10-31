@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import type { ThemeName } from '../types';
 import { useDiagram } from '../state/useDiagram';
@@ -8,8 +8,9 @@ import ConflictDialog from './ConflictDialog';
 import LintDialog from './LintDialog';
 import { AppStatusBanner } from './states';
 import { ErrorBoundary } from '../app/RouteErrorBoundary';
-import { api, setUnauthorizedHandler } from '../lib/api';
-import { getSession, setSession, isSignedIn } from '../state/session';
+import { api, ApiError, setUnauthorizedHandler } from '../lib/api';
+import { getSession, setSession, clearSession, isSignedIn } from '../state/session';
+import { resolveSessionMode } from '../screens/AuthCallbackScreen';
 import { DocSwitcher } from './appbar/DocSwitcher';
 import { StatusButton } from './appbar/StatusButton';
 import type { SaveRunState } from './appbar/status';
@@ -28,7 +29,8 @@ import ExportDialog from './export/ExportDialog';
 import { isServerDocId } from '../lib/honesty';
 
 // Cached cookie-session probe: one GET /api/v1/auth/me per mount at most,
-// shared across AppShell instances. Guest/null sessions never hit network.
+// shared across AppShell instances. A null session never hits network. The
+// server identity wins: a /me user replaces a stale local (guest) session.
 let meProbeInflight: Promise<boolean> | null = null;
 let meProbeCached: boolean | null = null;
 
@@ -36,17 +38,24 @@ export function probeAuthSession(): Promise<boolean> {
   if (meProbeCached !== null) return Promise.resolve(meProbeCached);
   if (meProbeInflight) return meProbeInflight;
   const s = getSession();
-  if (!s || s.mode === 'guest') {
+  if (!s) {
     meProbeCached = false;
     return Promise.resolve(false);
   }
   meProbeInflight = api
     .me()
-    .then(() => {
+    .then((me) => {
+      const body = me as { data?: { provider?: unknown }; provider?: unknown };
+      const raw = body.data?.provider ?? body.provider;
+      const next = resolveSessionMode(typeof raw === 'string' && raw ? raw : null, me);
+      const cur = getSession();
+      if (!cur || cur.mode !== next.mode || cur.email !== next.email) setSession(next);
       meProbeCached = true;
       return true;
     })
-    .catch(() => {
+    .catch((err) => {
+      // Only a definite 401 means "no signed-in user"; network errors keep the local session.
+      if (err instanceof ApiError && err.status === 401 && s.mode !== 'guest') clearSession();
       meProbeCached = false;
       return false;
     })
@@ -141,15 +150,21 @@ export default function AppShell() {
     const s = getSession();
     return !!s && s.mode !== 'guest';
   });
+  const [sessionEpoch, setSessionEpoch] = useState(0);
   useEffect(() => {
     const s = getSession();
-    if (!s || s.mode === 'guest') {
+    if (!s) {
       setSignedIn(false);
       return;
     }
     let cancelled = false;
     void probeAuthSession().then((ok) => {
-      if (!cancelled) setSignedIn(ok);
+      if (cancelled) return;
+      setSignedIn(ok);
+      // The probe may have adopted the server identity (or dropped a dead session);
+      // remount the routed screen so it reads the corrected session.
+      const after = getSession();
+      if (after?.mode !== s.mode || after?.email !== s.email) setSessionEpoch((n) => n + 1);
     });
     return () => {
       cancelled = true;
@@ -526,7 +541,9 @@ export default function AppShell() {
 
       <main className={`workspace-body${presenting ? ' presenting' : ''}`}>
         <AppStatusBanner onReviewConflict={() => setConflictOpen(true)} />
-        <Outlet />
+        <Fragment key={sessionEpoch}>
+          <Outlet />
+        </Fragment>
       </main>
 
       <SearchReveal />
