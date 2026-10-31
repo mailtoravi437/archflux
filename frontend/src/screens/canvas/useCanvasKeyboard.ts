@@ -167,6 +167,9 @@ export function useCanvasKeyboard(deps: CanvasKeyboardDeps): void {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      // BUG-LIVE-012: typing in an editor (or before focus reaches the inline text editor) is text, not shortcuts.
+      if ((e.target as HTMLElement | null)?.isContentEditable) return;
+      if (stateRef.current.textDraft && e.key !== 'Escape') return;
       const isMod = e.ctrlKey || e.metaKey;
       if ((e.key === 'F10' && e.shiftKey) || e.key === 'ContextMenu') {
         e.preventDefault();
@@ -338,7 +341,8 @@ export function useCanvasKeyboard(deps: CanvasKeyboardDeps): void {
         // F frames the selection; with nothing selected it fits all content.
         if (stateRef.current.selectedId) panToNode(stateRef.current.selectedId);
         else fitContent();
-      } else if (k === 'm') {
+      } else if (k === 'n') {
+        // Minimap toggle. Was 'm', which the Note tool already owns (BUG-LIVE-020: one key, one action).
         setMiniOpenPersisted((v) => !v);
       } else if (k === keyFor('Library')) {
         setLibOpen((v) => !v);

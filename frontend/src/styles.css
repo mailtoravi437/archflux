@@ -221,11 +221,15 @@
   gap: 2px;
   flex: 1;
   min-width: 0;
+  /* BUG-LIVE-021: at a 288 px dock the four tabs scroll rather than run under the close button. */
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.utility-tablist::-webkit-scrollbar { display: none; }
 
 .utility-tab {
   height: 36px;
-  padding: 0 8px;
+  padding: 0 6px;
   font-size: 13px;
   font-weight: 500;
   font-family: var(--ui-font);
@@ -239,6 +243,7 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .utility-tab.active {
@@ -266,6 +271,7 @@
   width: 28px;
   height: 28px;
   align-self: center;
+  flex-shrink: 0;
   padding: 0;
   border: none;
   background: transparent;
@@ -1287,6 +1293,8 @@ body {
 
 @media (min-width: 1024px) and (max-width: 1279px) {
   .linter-inspector { width: 288px; }
+  .utility-tablist { gap: 0; }
+  .utility-tab { padding: 0 5px; font-size: 12px; }
 }
 
 .linter-header {
@@ -1482,6 +1490,26 @@ body {
   background: var(--canvas-chrome-sep);
 }
 
+/* Pages bar, bottom-right (BUG-LIVE-008): it sits right of the View toolbar (72 px + ~318 px wide, ~426 px with
+   "Show panel") and left of the Layers panel column, so it never covers Focus mode or Undo. Its tab list scrolls. */
+.pages-bar {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 44;
+  box-sizing: border-box;
+  max-width: calc(100% - 430px);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+  background: var(--canvas-chrome-bg, #FFFFFF);
+  border: 1px solid var(--canvas-chrome-border, #E3E6EB);
+  border-radius: 10px;
+  box-shadow: var(--canvas-chrome-shadow, 0 1px 2px rgba(16,24,40,.06));
+}
+.canvas-layout:has([data-testid="dock-reopen"]) .pages-bar { max-width: calc(100% - 538px); }
 /* Minimap above the View toolbar (R1-E14-T02, Main.dc.html L159–L170). */
 .minimap-wrap {
   position: absolute;
@@ -1496,6 +1524,14 @@ body {
   border: 1px solid var(--canvas-chrome-border);
   border-radius: 10px;
   box-shadow: var(--canvas-chrome-shadow);
+}
+
+/* Phones: the pages bar rides above the View toolbar instead of beside it (BUG-LIVE-007). */
+@media (max-width: 600px) {
+  .pages-bar,
+  .canvas-layout:has([data-testid="dock-reopen"]) .pages-bar { right: 8px; left: 8px; bottom: 64px; max-width: none; }
+  .canvas-view-toolbar { left: 8px; right: 8px; overflow-x: auto; }
+  .minimap-wrap { left: 8px; bottom: 112px; }
 }
 
 .minimap-field {
@@ -2513,7 +2549,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   justify-content: center;
   z-index: 35;
   pointer-events: none;
-  padding: 0 16px 0 96px;
+  padding: 0 96px;
 }
 @media (max-width: 640px) {
   .empty-canvas-overlay { padding-left: 84px; padding-right: 12px; }
@@ -2963,6 +2999,23 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
 .libside__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .libside__note { margin: 4px 10px; font-size: 12px; color: var(--text-muted); }
 .libside__spacer { flex-grow: 1; }
+/* Phones (BUG-LIVE-006): the sidebar collapses to a single scrolling row of views above the content. */
+@media (max-width: 720px) {
+  .libshell { flex-direction: column; }
+  .libside {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none;
+    border-bottom: 1px solid var(--border-panel);
+  }
+  .libside__item { white-space: nowrap; }
+  .libside__head, .libside__tree, .libside__note, .libside__spacer { display: none; }
+}
 .libcrumbs { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
 .libcrumbs button { border: 0; background: transparent; padding: 2px 4px; border-radius: 4px; font: inherit; color: var(--accent-text); cursor: pointer; }
 .libcrumbs button:hover { background: var(--bg-panel-subtle); }

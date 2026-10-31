@@ -555,9 +555,9 @@ export default function AppShell() {
           <div ref={shortcutsTrap} className="content-card" style={{ width: 420 }} onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Shortcuts">
             <div className="card-head"><span className="card-title">⌨ Keyboard shortcuts</span><button autoFocus className="btn btn--sm btn--secondary" onClick={() => setShortcutsOpen(false)}>Close</button></div>
             <div style={{ fontSize: 12, fontFamily: 'var(--mono-font)', lineHeight: 2 }}>
-              <div><strong>V / H</strong> — select / pan • <strong>P / T</strong> — freehand / text • <strong>S G D Q N</strong> — service, gateway, database, queue, note • <strong>C</strong> — connector • <strong>L</strong> — library (1–5 are aliases)</div>
+              <div><strong>V / H</strong> — select / pan • <strong>P / T</strong> — freehand / text • <strong>S G D Q M</strong> — service, gateway, database, queue, note • <strong>C</strong> — connector • <strong>L</strong> — library (1–5 are aliases) • <strong>N</strong> — minimap</div>
               <div><strong>Click</strong> — place / select • <strong>Shift+Click</strong> — multi-select • <strong>Cmd+A</strong> — select all</div>
-              <div><strong>Double-click</strong> — rename node • <strong>Q</strong> — lock tool for repeat use</div>
+              <div><strong>Double-click</strong> — rename node • press the queue key again to lock the tool for repeat use</div>
               <div><strong>Del</strong> — delete selected • <strong>Ctrl+D</strong> — duplicate</div>
               <div><strong>Arrows</strong> — nudge selected (Shift = 20px)</div>
               <div><strong>Scroll</strong> — pan canvas • <strong>Ctrl+Scroll</strong> — zoom to cursor • <strong>Drag</strong> — pan / move</div>

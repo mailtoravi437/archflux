@@ -65,13 +65,16 @@ export function drawLegacyNode(
     drawCylinderBody(ctx, node, nodeBg, strokeColor, lineWidth, shadowColor, shadowBlur);
     ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
-    drawIconImage(ctx, node, icons, opts.iconEntries, (n) => ({ x: n.x + 8, y: n.y + 8, size: 24 }), (n) => {
+    // BUG-LIVE-017: the text starts below the top cap (2 * 0.15h) instead of overlapping the ellipse.
+    const capBottom = node.h * 0.3;
+    const cylLabelY = capBottom + 10;
+    drawIconImage(ctx, node, icons, opts.iconEntries, (n) => ({ x: n.x + 8, y: n.y + cylLabelY - 12, size: 24 }), (n) => {
       ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(n.icon!, n.x + 10, n.y + 22);
+      ctx.fillText(n.icon!, n.x + 10, n.y + cylLabelY);
     });
-    drawNodeMeta(ctx, node, { isDark, textX: hasIcon ? 42 : 12, labelY: 20, tagY: 40, detailsTop: 56 });
+    drawNodeMeta(ctx, node, { isDark, textX: hasIcon ? 42 : 12, labelY: cylLabelY, tagY: cylLabelY + 16, detailsTop: cylLabelY + 30 });
   } else if (shape === 'rounded') {
     // Rounded rectangle (modern card style)
     ctx.shadowColor = shadowColor;
@@ -125,7 +128,7 @@ export function drawLegacyNode(
       ctx.fillText(n.icon!, n.x + 10, n.y + 16);
     });
 
-    drawNodeMeta(ctx, node, { isDark, textX: hasIcon ? 40 : 12, labelY: 16, tagY: 34, detailsTop: 50 });
+    drawNodeMeta(ctx, node, { isDark, textX: hasIcon ? 40 : 12, labelY: 16, tagY: 44, detailsTop: 58 }); // tag below the header divider at y + 32 (BUG-LIVE-017)
   }
 
   // Connector ports (only for non-logo shapes); hover shows the §5A.5 ports.

@@ -16,6 +16,7 @@ vi.mock('../state/useDiagram', () => ({
     updateNode: () => {}, updateEdge: () => {}, updateText: () => {}, deleteText: () => {}, deleteEdge: () => {},
     deleteSelected: () => {}, duplicateSelected: () => {}, setDisplayStyle: () => {}, multiSel: [], checkpoint: () => {},
     docDefaults: {}, setDocDefaults: () => {},
+    pages: [], activePageId: '',
   }),
 }));
 

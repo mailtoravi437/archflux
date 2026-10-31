@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { useDiagram } from '../../state/useDiagram';
 import { canEdit } from '../../lib/access';
+import { firstPageId } from '../../lib/pageView';
 import { DEFAULT_LAYER_ID } from '../../state/ops/layers';
 
 export interface LayersPanelProps {
@@ -18,7 +19,7 @@ const ICON_BTN = { width: 26, height: 26, border: '1px solid var(--border-panel,
  * hit-tested; locked layers are drawn but cannot be selected or moved.
  */
 export function LayersPanel({ selectionIds, onClose }: LayersPanelProps) {
-  const { layers, nodes, strokes, texts, addLayer, updateLayer, deleteLayer, reorderLayers, moveToLayer, role } = useDiagram();
+  const { layers, nodes, strokes, texts, addLayer, updateLayer, deleteLayer, reorderLayers, moveToLayer, role, pages, activePageId } = useDiagram();
   const editable = canEdit(role);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
@@ -26,12 +27,15 @@ export function LayersPanel({ selectionIds, onClose }: LayersPanelProps) {
   const topFirst = useMemo(() => [...layers].sort((a, b) => b.order - a.order), [layers]);
   const counts = useMemo(() => {
     const m = new Map<string, number>();
+    // BUG-LIVE-023: count the active page only (layers are shared by all pages of the diagram).
+    const first = firstPageId(pages);
     for (const e of [...nodes, ...strokes, ...texts]) {
+      if ((e.pageId ?? first) !== activePageId) continue;
       const id = e.layerId ?? DEFAULT_LAYER_ID;
       m.set(id, (m.get(id) ?? 0) + 1);
     }
     return m;
-  }, [nodes, strokes, texts]);
+  }, [nodes, strokes, texts, pages, activePageId]);
 
   const bottomToTop = () => topFirst.map((l) => l.id).reverse();
   const move = (id: string, dir: 'up' | 'down') => {

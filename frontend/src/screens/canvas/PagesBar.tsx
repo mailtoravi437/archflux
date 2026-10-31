@@ -114,14 +114,7 @@ export function PagesBar({ layerCount, layersOpen, onToggleLayers }: PagesBarPro
   };
 
   return (
-    <div
-      style={{
-        position: 'absolute', left: '50%', bottom: 16, transform: 'translateX(-50%)', zIndex: 44, maxWidth: 'calc(100% - 520px)',
-        height: 40, display: 'flex', alignItems: 'center', gap: 2, padding: '0 8px',
-        background: 'var(--canvas-chrome-bg, #FFFFFF)', border: '1px solid var(--canvas-chrome-border, #E3E6EB)', borderRadius: 10,
-        boxShadow: 'var(--canvas-chrome-shadow, 0 1px 2px rgba(16,24,40,.06))',
-      }}
-    >
+    <div className="pages-bar">
       <div role="tablist" aria-label="Pages" style={{ display: 'flex', alignItems: 'center', gap: 2, overflowX: 'auto', minWidth: 0 }}>
         {pages.map((p, i) => {
           const on = p.id === activePageId;
